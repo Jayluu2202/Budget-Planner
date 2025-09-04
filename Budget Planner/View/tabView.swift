@@ -13,6 +13,9 @@ struct tabView: View {
             homeViewTab()
                 .tabItem{
                     Image("HomeFilled")
+                        .resizable()
+                        .scaledToFit()
+                        
                     Text("Home")
                 }.tag(0)
             transactionViewTab()

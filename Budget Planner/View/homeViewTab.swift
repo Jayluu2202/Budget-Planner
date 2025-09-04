@@ -13,18 +13,30 @@ struct homeViewTab: View {
             HStack{
                 Text("Hey! Greetings")
                     .font(.headline)
-//                Image("Hand Wave Emoji")
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fit)
-//                    .frame(width: 30, height: 30)
-                
+                Image("WaveHand")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 30, height: 30)
+                Spacer()
                 Button(action: {
                     print("Money button Tapped")
                 }){
-                    Image("Money")
+                    Image("Wealth")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 25, height: 25)
                 }
             }
+            
+            HStack(spacing: 110){
+                Image(systemName: "chevron.left")
+                Text("Month YYYY")
+                Image(systemName: "chevron.right")
+            }
+            Spacer()
+            
         }.padding()
+        
     }
 }
 
