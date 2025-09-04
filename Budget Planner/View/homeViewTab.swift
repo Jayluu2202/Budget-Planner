@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct homeViewTab: View {
+    @State private var currentDate = Date()
     var body: some View {
         VStack{
             HStack{
@@ -28,15 +29,37 @@ struct homeViewTab: View {
                 }
             }
             
-            HStack(spacing: 110){
-                Image(systemName: "chevron.left")
-                Text("Month YYYY")
-                Image(systemName: "chevron.right")
+            HStack{
+                Button(action: previousMonth){
+                    Image(systemName: "chevron.left")
+                        .foregroundStyle(.black)
+                }
+                Text(monthYearString)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                
+                Button(action: nextMonth){
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.black)
+                }
             }
             Spacer()
             
+            
         }.padding()
         
+    }
+    private var monthYearString: String{
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: currentDate)
+    }
+    
+    private func previousMonth(){
+        currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+    }
+    private func nextMonth(){
+        currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
     }
 }
 
