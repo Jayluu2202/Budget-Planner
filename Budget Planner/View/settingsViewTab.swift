@@ -8,70 +8,122 @@
 import SwiftUI
 
 struct settingsViewTab: View {
+    @StateObject private var currencyManager = CurrencyManager()
+    @State private var showCurrencyPicker = false
+    @State private var showMailErrorAlert = false
+    @Environment(\.openURL) var openURL
+    
     var body: some View {
-        VStack{
-            Text("Setting")
-                .font(.title2)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity,minHeight: 40, alignment: .leading)
-                
-            List{
+        NavigationView {
+            List {
                 Section {
-                    HStack{
-                        hStackFunc(image: "arrow.up.doc", title: "Export Data",subtitle: true)
+                    NavigationLink(destination: ExportDataView()) {
+                        hStackFunc(image: "arrow.up.doc", title: "Export Data", showSubtitle: false, subtitle: "")
                     }
-                }header: {
+                } header: {
                     Text("General")
                 }
                 
                 Section {
-                    hStackFunc(image: "creditcard", title: "Accounts")
-                    hStackFunc(image: "dollarsign.circle", title: "Currency")
-                    hStackFunc(image: "square.grid.2x2", title: "Categories")
-                    hStackFunc(image: "circle.lefthalf.filled", title: "Theme")
-                    hStackFunc(image: "checkmark.shield", title: "App Lock")
+                    NavigationLink(destination: AccountsView()){
+                        hStackFunc(image: "creditcard", title: "Accounts", showSubtitle: true, subtitle: "Number of accounts")
+                        
+                    }
+                    
+                    NavigationLink(destination: currencyChangeView(currencyManager: currencyManager)){
+                        hStackFunc(image: "dollarsign.circle", title: "Currency", showSubtitle: true, subtitle: currencyManager.selectedCurrency.code)
+                    }
+                    
+                    NavigationLink(destination: CategoriesView()){
+                        hStackFunc(image: "square.grid.2x2", title: "Categories", showSubtitle: true, subtitle: "Manage Categories")
+                    }
+                    
+                    NavigationLink(destination: themeSettings()){
+                        hStackFunc(image: "circle.lefthalf.filled", title: "Theme", showSubtitle: true, subtitle: "Selected Theme")
+                    }
+                    
+                    NavigationLink(destination: appLock()){
+                        hStackFunc(image: "checkmark.shield", title: "App Lock", showSubtitle: true, subtitle: "Disabled")
+                    }
+                    
                 } header: {
                     Text("Account")
                 }
                 
                 Section {
-                    hStackFunc(image: "headphones", title: "Help & Support", subtitle: true)
-                    hStackFunc(image: "info.circle", title: "Privacy Policy", subtitle: true)
+                    Button {
+                        openSupportEmail()
+                    } label: {
+                        hStackFunc(image: "headphones", title: "Help & Support", showSubtitle: false, subtitle: "")
+                            .foregroundColor(.black)
+                    }
+                    
+                    Link(destination: URL(string: "https://www.freeprivacypolicy.com/live/dc173f25-99d8-4dfd-88ec-39adf553fb9d")!) {
+                        hStackFunc(image: "info.circle", title: "Privacy Policy", showSubtitle: false, subtitle: "")
+                            .foregroundColor(.black)
+                    }
+                    
                 } header: {
                     Text("Support")
                 }
             }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Setting")
+            .alert("Mail Not Available", isPresented: $showMailErrorAlert) {
+                Button("Copy Email") {
+                    UIPasteboard.general.string = "info@unikwork.com"
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Mail app is not configured. Email address 'info@unikwork.com' has been copied to clipboard.")
+            }
         }
-        .padding()
     }
-    func hStackFunc(image: String, title: String, subtitle: Bool = false) -> some View{
-        HStack(spacing: 15){
-            Image(systemName: "\(image)")
+    
+    private func openSupportEmail() {
+        guard let emailURL = URL(string: "mailto:info@unikwork.com?subject=Budget%20Planner%20Support") else {
+            showMailErrorAlert = true
+            return
+        }
+
+        
+        // Check if the URL can be opened
+        if UIApplication.shared.canOpenURL(emailURL) {
+            openURL(emailURL) { accepted in
+                if !accepted {
+                    // If opening failed, show alert
+                    showMailErrorAlert = true
+                }
+            }
+        } else {
+            // If mail app is not available, show alert
+            showMailErrorAlert = true
+        }
+    }
+    
+    func hStackFunc(image: String, title: String, showSubtitle: Bool, subtitle: String) -> some View {
+        HStack(spacing: 15) {
+            Image(systemName: image)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25, height: 25)
-                
-            VStack(spacing: 2){
-                Text("\(title)")
+            
+            VStack(spacing: 2) {
+                Text(title)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                
-                if subtitle == false{
-                    Text("USD")
+                if showSubtitle{
+                    Text(subtitle)
                         .font(.caption)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            
-            Spacer()
-            Image(systemName: "chevron.right")
-        }.frame(height: 50)
+        }
+        .frame(height: 50)
     }
 }
-
 
 struct settingsViewTab_preview: PreviewProvider {
     static var previews: some View {
         settingsViewTab()
-        
     }
 }

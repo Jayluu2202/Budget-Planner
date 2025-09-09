@@ -10,26 +10,47 @@ import SwiftUI
 // 🏠 Main Home View Component
 struct homeViewTab: View {
     @State private var currentDate = Date()
-    @State private var selectedDate = Date() // 📌 Track selected date
+    @State private var selectedDate = Date()
+    @State private var showAddScreen = false
     
     var body: some View {
         VStack(spacing: 0) {
             // 👋 Greeting Section
             buildGreetingSection()
             
-            ScrollView {
-                VStack(spacing: 16) {
-                    // 📆 Calendar Section
-                    buildCalendarSection()
-                    
-                    // 📊 Transactions Section
-                    buildTransactionsSection()
+            ZStack(alignment: .bottomTrailing) { // 👈 Floating button positioning
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        // 📆 Calendar Section
+                        buildCalendarSection()
+                        
+                        // 📊 Transactions Section
+                        buildTransactionsSection()
+                    }
+                    .padding(.top, 8)
                 }
-                .padding(.top, 8)
+                
+                // ➕ Floating Add Button
+                Button {
+                    showAddScreen = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.black)
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
+                }
+                .sheet(isPresented: $showAddScreen) {
+                    AddTransactionDetails()
+                }
+                .ignoresSafeArea()
             }
         }
         .padding()
     }
+    
     
     // MARK: - 🏗️ View Builders
     
@@ -126,8 +147,7 @@ struct homeViewTab: View {
     
     private func handleAddButtonTap() {
         print("➕ Add button tapped! Ready to add new transaction")
-        // 🔄 Here you can add navigation to add transaction view
-        // or show a sheet/modal for adding new transactions
+        
     }
     
     private func previousMonth() {

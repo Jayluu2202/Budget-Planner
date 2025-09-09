@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		040034B62E6F0A2700770CDB /* AddCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040034B52E6F0A2700770CDB /* AddCategoriesView.swift */; };
+		04443F952E702CE700514154 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F942E702CE700514154 /* AccountController.swift */; };
+		04443F972E702D4100514154 /* AccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F962E702D4100514154 /* AccountModel.swift */; };
+		04443F992E70300F00514154 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F982E70300F00514154 /* AddAccountView.swift */; };
+		04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F9A2E7036DD00514154 /* EditAccountView.swift */; };
+		04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F9D2E705A8F00514154 /* PasswordKeyPadView.swift */; };
 		047FB62C2E6848AC0080D024 /* Budget_PlannerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB62B2E6848AC0080D024 /* Budget_PlannerApp.swift */; };
 		047FB6302E6848AE0080D024 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 047FB62F2E6848AE0080D024 /* Assets.xcassets */; };
 		047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB63C2E684D1D0080D024 /* homeViewTab.swift */; };
@@ -14,12 +20,30 @@
 		047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6412E6855CB0080D024 /* reportViewTab.swift */; };
 		047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6452E6855EB0080D024 /* settingsViewTab.swift */; };
 		047FB6482E6856050080D024 /* tabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6472E6856050080D024 /* tabView.swift */; };
+		04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B022E6FE47A001EB314 /* CategoryModel.swift */; };
+		04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B042E6FE4AB001EB314 /* CategoryController.swift */; };
+		04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */; };
+		04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B082E6FF0F8001EB314 /* EditCategoryView.swift */; };
+		04976B0B2E7009C0001EB314 /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B0A2E7009C0001EB314 /* CurrencyModel.swift */; };
+		04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */; };
+		04D1F7E92E6EB04B007D2BA2 /* ExportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */; };
+		04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */; };
+		04D1F7EE2E6EE1C4007D2BA2 /* currencyChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7ED2E6EE1C4007D2BA2 /* currencyChangeView.swift */; };
+		04D1F7F12E6EE27B007D2BA2 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F02E6EE27B007D2BA2 /* CategoriesView.swift */; };
+		04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F22E6EE2A0007D2BA2 /* themeSettings.swift */; };
+		04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */; };
+		04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */; };
+		04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */; };
 		84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */; };
-		84D9E1D22E68B47900919A0F /* chek1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1D12E68B47200919A0F /* chek1.swift */; };
-		84D9E1D42E68B47F00919A0F /* chek2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1D32E68B47D00919A0F /* chek2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		040034B52E6F0A2700770CDB /* AddCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoriesView.swift; sourceTree = "<group>"; };
+		04443F942E702CE700514154 /* AccountController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
+		04443F962E702D4100514154 /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
+		04443F982E70300F00514154 /* AddAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountView.swift; sourceTree = "<group>"; };
+		04443F9A2E7036DD00514154 /* EditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAccountView.swift; sourceTree = "<group>"; };
+		04443F9D2E705A8F00514154 /* PasswordKeyPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordKeyPadView.swift; sourceTree = "<group>"; };
 		047FB6282E6848AC0080D024 /* Budget Planner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Budget Planner.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		047FB62B2E6848AC0080D024 /* Budget_PlannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Budget_PlannerApp.swift; sourceTree = "<group>"; };
 		047FB62F2E6848AE0080D024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -28,9 +52,21 @@
 		047FB6412E6855CB0080D024 /* reportViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reportViewTab.swift; sourceTree = "<group>"; };
 		047FB6452E6855EB0080D024 /* settingsViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsViewTab.swift; sourceTree = "<group>"; };
 		047FB6472E6856050080D024 /* tabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tabView.swift; sourceTree = "<group>"; };
+		04976B022E6FE47A001EB314 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
+		04976B042E6FE4AB001EB314 /* CategoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryController.swift; sourceTree = "<group>"; };
+		04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
+		04976B082E6FF0F8001EB314 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
+		04976B0A2E7009C0001EB314 /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
+		04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionDetails.swift; sourceTree = "<group>"; };
+		04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDataView.swift; sourceTree = "<group>"; };
+		04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
+		04D1F7ED2E6EE1C4007D2BA2 /* currencyChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currencyChangeView.swift; sourceTree = "<group>"; };
+		04D1F7F02E6EE27B007D2BA2 /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		04D1F7F22E6EE2A0007D2BA2 /* themeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = themeSettings.swift; sourceTree = "<group>"; };
+		04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = appLock.swift; sourceTree = "<group>"; };
+		04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = helpAndSupport.swift; sourceTree = "<group>"; };
+		04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = privacyAndPolicy.swift; sourceTree = "<group>"; };
 		84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = budgetViewTab.swift; sourceTree = "<group>"; };
-		84D9E1D12E68B47200919A0F /* chek1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chek1.swift; sourceTree = "<group>"; };
-		84D9E1D32E68B47D00919A0F /* chek2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chek2.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +80,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04443F9C2E705A7A00514154 /* Lock */ = {
+			isa = PBXGroup;
+			children = (
+				04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */,
+				04443F9D2E705A8F00514154 /* PasswordKeyPadView.swift */,
+			);
+			path = Lock;
+			sourceTree = "<group>";
+		};
 		047FB61F2E6848AC0080D024 = {
 			isa = PBXGroup;
 			children = (
@@ -65,7 +110,7 @@
 			children = (
 				84D9E1CF2E68B45200919A0F /* Model */,
 				047FB63A2E684C050080D024 /* View */,
-				84D9E1D02E68B46100919A0F /* ViewModel */,
+				84D9E1D02E68B46100919A0F /* Controller */,
 				047FB62B2E6848AC0080D024 /* Budget_PlannerApp.swift */,
 				047FB63E2E684E560080D024 /* Resources */,
 			);
@@ -77,10 +122,19 @@
 			children = (
 				047FB6472E6856050080D024 /* tabView.swift */,
 				047FB63C2E684D1D0080D024 /* homeViewTab.swift */,
+				04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */,
 				047FB63F2E6855BE0080D024 /* transactionViewTab.swift */,
 				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
 				047FB6412E6855CB0080D024 /* reportViewTab.swift */,
 				047FB6452E6855EB0080D024 /* settingsViewTab.swift */,
+				04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */,
+				04D1F7EA2E6EDFF1007D2BA2 /* Accounts */,
+				04D1F7ED2E6EE1C4007D2BA2 /* currencyChangeView.swift */,
+				04D1F7EF2E6EE252007D2BA2 /* Categories */,
+				04D1F7F22E6EE2A0007D2BA2 /* themeSettings.swift */,
+				04443F9C2E705A7A00514154 /* Lock */,
+				04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */,
+				04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -93,20 +147,44 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		04D1F7EA2E6EDFF1007D2BA2 /* Accounts */ = {
+			isa = PBXGroup;
+			children = (
+				04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */,
+				04443F982E70300F00514154 /* AddAccountView.swift */,
+				04443F9A2E7036DD00514154 /* EditAccountView.swift */,
+			);
+			path = Accounts;
+			sourceTree = "<group>";
+		};
+		04D1F7EF2E6EE252007D2BA2 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				04D1F7F02E6EE27B007D2BA2 /* CategoriesView.swift */,
+				040034B52E6F0A2700770CDB /* AddCategoriesView.swift */,
+				04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */,
+				04976B082E6FF0F8001EB314 /* EditCategoryView.swift */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		84D9E1CF2E68B45200919A0F /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				84D9E1D12E68B47200919A0F /* chek1.swift */,
+				04976B022E6FE47A001EB314 /* CategoryModel.swift */,
+				04976B0A2E7009C0001EB314 /* CurrencyModel.swift */,
+				04443F962E702D4100514154 /* AccountModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
 		};
-		84D9E1D02E68B46100919A0F /* ViewModel */ = {
+		84D9E1D02E68B46100919A0F /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				84D9E1D32E68B47D00919A0F /* chek2.swift */,
+				04976B042E6FE4AB001EB314 /* CategoryController.swift */,
+				04443F942E702CE700514154 /* AccountController.swift */,
 			);
-			path = ViewModel;
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,15 +256,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84D9E1D42E68B47F00919A0F /* chek2.swift in Sources */,
+				04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */,
+				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
+				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
+				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
+				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
+				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
 				047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */,
-				84D9E1D22E68B47900919A0F /* chek1.swift in Sources */,
 				047FB6402E6855BE0080D024 /* transactionViewTab.swift in Sources */,
+				04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */,
+				04D1F7EE2E6EE1C4007D2BA2 /* currencyChangeView.swift in Sources */,
 				84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */,
+				04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */,
+				04443F952E702CE700514154 /* AccountController.swift in Sources */,
+				04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */,
+				04D1F7F12E6EE27B007D2BA2 /* CategoriesView.swift in Sources */,
 				047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */,
+				04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */,
+				04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */,
+				04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */,
+				04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */,
 				047FB6482E6856050080D024 /* tabView.swift in Sources */,
+				04443F972E702D4100514154 /* AccountModel.swift in Sources */,
+				04976B0B2E7009C0001EB314 /* CurrencyModel.swift in Sources */,
+				04D1F7E92E6EB04B007D2BA2 /* ExportDataView.swift in Sources */,
 				047FB62C2E6848AC0080D024 /* Budget_PlannerApp.swift in Sources */,
+				040034B62E6F0A2700770CDB /* AddCategoriesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
