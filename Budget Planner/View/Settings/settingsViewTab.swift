@@ -9,6 +9,7 @@ import SwiftUI
 
 struct settingsViewTab: View {
     @StateObject private var currencyManager = CurrencyManager()
+    @EnvironmentObject var appLockManager: AppLockManager // Add this line
     @State private var showCurrencyPicker = false
     @State private var showMailErrorAlert = false
     @Environment(\.openURL) var openURL
@@ -42,8 +43,9 @@ struct settingsViewTab: View {
                         hStackFunc(image: "circle.lefthalf.filled", title: "Theme", showSubtitle: true, subtitle: "Selected Theme")
                     }
                     
-                    NavigationLink(destination: appLock()){
-                        hStackFunc(image: "checkmark.shield", title: "App Lock", showSubtitle: true, subtitle: "Disabled")
+                    // Updated App Lock Navigation Link
+                    NavigationLink(destination: AppLockView().environmentObject(appLockManager)){
+                        hStackFunc(image: "checkmark.shield", title: "App Lock", showSubtitle: true, subtitle: getLockStatusText())
                     }
                     
                 } header: {
@@ -77,6 +79,17 @@ struct settingsViewTab: View {
             } message: {
                 Text("Mail app is not configured. Email address 'info@unikwork.com' has been copied to clipboard.")
             }
+        }
+    }
+    
+    // Add this new function
+    private func getLockStatusText() -> String {
+        if appLockManager.isPasswordEnabled && appLockManager.isFaceIDEnabled {
+            return "Password & Face ID"
+        } else if appLockManager.isPasswordEnabled {
+            return "Password Only"
+        } else {
+            return "Disabled"
         }
     }
     
@@ -125,5 +138,6 @@ struct settingsViewTab: View {
 struct settingsViewTab_preview: PreviewProvider {
     static var previews: some View {
         settingsViewTab()
+            .environmentObject(AppLockManager()) // Add this line for preview
     }
 }

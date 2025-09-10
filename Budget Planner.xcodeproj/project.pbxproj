@@ -34,6 +34,8 @@
 		04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */; };
 		04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */; };
 		04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */; };
+		04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C0FE2E712E960024FFF4 /* ApplockController.swift */; };
+		04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */; };
 		84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */; };
 /* End PBXBuildFile section */
 
@@ -66,6 +68,8 @@
 		04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = appLock.swift; sourceTree = "<group>"; };
 		04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = helpAndSupport.swift; sourceTree = "<group>"; };
 		04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = privacyAndPolicy.swift; sourceTree = "<group>"; };
+		04D2C0FE2E712E960024FFF4 /* ApplockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplockController.swift; sourceTree = "<group>"; };
+		04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordUnlockView.swift; sourceTree = "<group>"; };
 		84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = budgetViewTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,6 +89,7 @@
 			children = (
 				04D1F7F42E6EE2C4007D2BA2 /* appLock.swift */,
 				04443F9D2E705A8F00514154 /* PasswordKeyPadView.swift */,
+				04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */,
 			);
 			path = Lock;
 			sourceTree = "<group>";
@@ -121,20 +126,11 @@
 			isa = PBXGroup;
 			children = (
 				047FB6472E6856050080D024 /* tabView.swift */,
-				047FB63C2E684D1D0080D024 /* homeViewTab.swift */,
-				04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */,
-				047FB63F2E6855BE0080D024 /* transactionViewTab.swift */,
-				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
-				047FB6412E6855CB0080D024 /* reportViewTab.swift */,
-				047FB6452E6855EB0080D024 /* settingsViewTab.swift */,
-				04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */,
-				04D1F7EA2E6EDFF1007D2BA2 /* Accounts */,
-				04D1F7ED2E6EE1C4007D2BA2 /* currencyChangeView.swift */,
-				04D1F7EF2E6EE252007D2BA2 /* Categories */,
-				04D1F7F22E6EE2A0007D2BA2 /* themeSettings.swift */,
-				04443F9C2E705A7A00514154 /* Lock */,
-				04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */,
-				04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */,
+				04D2C1062E713E210024FFF4 /* Home */,
+				04D2C1052E713E140024FFF4 /* Transactions */,
+				04D2C1042E713DDD0024FFF4 /* Report */,
+				04D2C1032E713DCD0024FFF4 /* Budget */,
+				04D2C1022E713DB10024FFF4 /* Settings */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -168,6 +164,55 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
+		04D2C1022E713DB10024FFF4 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				047FB6452E6855EB0080D024 /* settingsViewTab.swift */,
+				04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */,
+				04D1F7EA2E6EDFF1007D2BA2 /* Accounts */,
+				04D1F7ED2E6EE1C4007D2BA2 /* currencyChangeView.swift */,
+				04D1F7EF2E6EE252007D2BA2 /* Categories */,
+				04D1F7F22E6EE2A0007D2BA2 /* themeSettings.swift */,
+				04443F9C2E705A7A00514154 /* Lock */,
+				04D1F7F62E6EE2D8007D2BA2 /* helpAndSupport.swift */,
+				04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		04D2C1032E713DCD0024FFF4 /* Budget */ = {
+			isa = PBXGroup;
+			children = (
+				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
+			);
+			path = Budget;
+			sourceTree = "<group>";
+		};
+		04D2C1042E713DDD0024FFF4 /* Report */ = {
+			isa = PBXGroup;
+			children = (
+				047FB6412E6855CB0080D024 /* reportViewTab.swift */,
+			);
+			path = Report;
+			sourceTree = "<group>";
+		};
+		04D2C1052E713E140024FFF4 /* Transactions */ = {
+			isa = PBXGroup;
+			children = (
+				047FB63F2E6855BE0080D024 /* transactionViewTab.swift */,
+			);
+			path = Transactions;
+			sourceTree = "<group>";
+		};
+		04D2C1062E713E210024FFF4 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				047FB63C2E684D1D0080D024 /* homeViewTab.swift */,
+				04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		84D9E1CF2E68B45200919A0F /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -183,6 +228,7 @@
 			children = (
 				04976B042E6FE4AB001EB314 /* CategoryController.swift */,
 				04443F942E702CE700514154 /* AccountController.swift */,
+				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -260,6 +306,7 @@
 				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
+				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
 				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
 				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
@@ -275,6 +322,7 @@
 				047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */,
 				04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */,
 				04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */,
+				04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */,
 				04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */,
 				04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */,
 				047FB6482E6856050080D024 /* tabView.swift in Sources */,

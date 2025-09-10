@@ -17,7 +17,7 @@ struct EditAccountView: View {
     @State private var selectedEmoji: String
     @State private var showingDeleteAlert = false
     
-    private let availableEmojis = ["💰", "💳", "🏛️", "💵", "🏦", "💎"]
+    private let availableEmojis = ["💰", "💳", "🏛️", "💵", "🏦", "💎", "💹", "💸", "📊"]
     
     init(account: Account, accountStore: AccountStore) {
         self.account = account
@@ -84,25 +84,27 @@ struct EditAccountView: View {
                 
                 // Emoji Selection
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        ForEach(availableEmojis, id: \.self) { emoji in
-                            Button(action: {
-                                selectedEmoji = emoji
-                            }) {
-                                Text(emoji)
-                                    .font(.system(size: 24))
-                                    .frame(width: 50, height: 50)
-                                    .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(selectedEmoji == emoji ? Color.black : Color.clear, lineWidth: 2)
-                                    )
+                    ScrollView(.horizontal, showsIndicators: false){
+                        HStack {
+                            ForEach(availableEmojis, id: \.self) { emoji in
+                                Button(action: {
+                                    selectedEmoji = emoji
+                                }) {
+                                    Text(emoji)
+                                        .font(.system(size: 24))
+                                        .frame(width: 50, height: 50)
+                                        .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(selectedEmoji == emoji ? Color.black : Color.clear, lineWidth: 2)
+                                        )
+                                }
                             }
+                            Spacer()
                         }
-                        Spacer()
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
                 
                 // Save Button

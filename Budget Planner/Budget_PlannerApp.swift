@@ -9,9 +9,29 @@ import SwiftUI
 
 @main
 struct Budget_PlannerApp: App {
+    @StateObject private var appLockManager = AppLockManager()
+    @Environment(\.scenePhase) private var scenePhase
+    
     var body: some Scene {
         WindowGroup {
-            tabView()
+            Group {
+                if appLockManager.isLocked {
+                    PasswordUnlockView(appLockManager: appLockManager)
+                } else {
+                    tabView()
+                        .environmentObject(appLockManager)
+                }
+            }
+            .onChange(of: scenePhase) { newPhase in
+                switch newPhase {
+                case .background, .inactive:
+                    appLockManager.lockApp()
+                case .active:
+                    break
+                @unknown default:
+                    break
+                }
+            }
         }
     }
 }
