@@ -2,54 +2,51 @@
 //  transactionViewTab.swift
 //  Budget Planner
 //
-//  Created by mac on 03/09/25.
+//  Updated to pass TransactionManager to TransactionDetailsView for proper deletion
 //
 
 import SwiftUI
 
 struct transactionViewTab: View {
     @StateObject var transactionManager = TransactionManager()
-    @State private var showAddScreen = false
+    @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
-    @State private var searchText = ""
-    //New change check
+    
     enum FilterType: String, CaseIterable {
-        case all = "All"
-        case income = "Income"
-        case expense = "Expense"
-        case transfer = "Transfer"
+        case all = "All Transactions"
+        case recurring = "Recurring"
+        case nonRecurring = "Non-Recurring"
     }
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Header with filter options
-                buildHeaderSection()
-                
-                // Search bar
-                buildSearchSection()
-                
-                // Filter chips
-                buildFilterSection()
-                
                 // Transactions list
                 buildTransactionsList()
             }
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    // Filter button
                     Button(action: {
-                        showAddScreen = true
+                        showFilterSheet = true
                     }) {
-                        Image(systemName: "plus")
+                        Image(systemName: "slider.horizontal.3")
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.primary)
                     }
                 }
             }
-            .sheet(isPresented: $showAddScreen) {
-                AddTransactionDetails(transactionManager: transactionManager)
+            .actionSheet(isPresented: $showFilterSheet) {
+                ActionSheet(
+                    title: Text("Filter Transactions"),
+                    buttons: FilterType.allCases.map { filter in
+                        .default(Text(filter.rawValue)) {
+                            selectedFilter = filter
+                        }
+                    } + [.cancel()]
+                )
             }
         }
         .onAppear {
@@ -58,91 +55,6 @@ struct transactionViewTab: View {
     }
     
     // MARK: - View Builders
-    
-    @ViewBuilder
-    private func buildHeaderSection() -> some View {
-        VStack(spacing: 8) {
-            // Total balance summary
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Total Balance")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("₹\(formatAmount(totalBalance))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(totalBalance >= 0 ? .green : .red)
-                }
-                
-                Spacer()
-                
-                HStack(spacing: 20) {
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Income")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("₹\(formatAmount(totalIncome))")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.green)
-                    }
-                    
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Expense")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("₹\(formatAmount(totalExpense))")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.red)
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 12)
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
-            .padding(.horizontal)
-        }
-        .padding(.top, 8)
-    }
-    
-    @ViewBuilder
-    private func buildSearchSection() -> some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
-            
-            TextField("Search transactions", text: $searchText)
-                .textFieldStyle(PlainTextFieldStyle())
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.top, 8)
-    }
-    
-    @ViewBuilder
-    private func buildFilterSection() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(FilterType.allCases, id: \.self) { filter in
-                    FilterChip(
-                        title: filter.rawValue,
-                        isSelected: selectedFilter == filter
-                    ) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            selectedFilter = filter
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .padding(.top, 12)
-    }
     
     @ViewBuilder
     private func buildTransactionsList() -> some View {
@@ -154,13 +66,20 @@ struct transactionViewTab: View {
                     ForEach(groupedTransactions.keys.sorted(by: >), id: \.self) { date in
                         Section {
                             ForEach(groupedTransactions[date] ?? []) { transaction in
-                                TransactionRow(
+                                // FIXED: Pass transactionManager to TransactionDetailsView
+                                NavigationLink(destination: TransactionDetailsView(
                                     transaction: transaction,
-                                    onDelete: {
-                                        deleteTransaction(transaction)
-                                    }
-                                )
-                                .padding(.horizontal)
+                                    transactionManager: transactionManager
+                                )) {
+                                    TransactionRow(
+                                        transaction: transaction,
+                                        onDelete: {
+                                            deleteTransaction(transaction)
+                                        }
+                                    )
+                                    .padding(.horizontal)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         } header: {
                             buildDateHeader(date)
@@ -203,12 +122,6 @@ struct transactionViewTab: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
-            
-            Button("Add Transaction") {
-                showAddScreen = true
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
         }
         .padding(40)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -219,20 +132,17 @@ struct transactionViewTab: View {
     private var filteredTransactions: [Transaction] {
         var transactions = transactionManager.transactions
         
-        // Apply type filter
-        if selectedFilter != .all {
-            transactions = transactions.filter {
-                $0.type.rawValue.lowercased() == selectedFilter.rawValue.lowercased()
-            }
-        }
-        
-        // Apply search filter
-        if !searchText.isEmpty {
-            transactions = transactions.filter { transaction in
-                transaction.description.localizedCaseInsensitiveContains(searchText) ||
-                transaction.category.name.localizedCaseInsensitiveContains(searchText) ||
-                transaction.account.name.localizedCaseInsensitiveContains(searchText)
-            }
+        // Apply type filter based on recurring status
+        switch selectedFilter {
+        case .all:
+            // Show all transactions
+            break
+        case .recurring:
+            // Filter for recurring transactions (you'll need to add this property to your Transaction model)
+            transactions = transactions.filter { $0.isRecurring ?? false }
+        case .nonRecurring:
+            // Filter for non-recurring transactions
+            transactions = transactions.filter { !($0.isRecurring ?? false) }
         }
         
         // Sort by date (newest first)
@@ -245,49 +155,12 @@ struct transactionViewTab: View {
         }
     }
     
-    private var totalBalance: Double {
-        return transactionManager.transactions.reduce(0) { total, transaction in
-            switch transaction.type {
-            case .income:
-                return total + transaction.amount
-            case .expense:
-                return total - transaction.amount
-            case .transfer:
-                return total // Transfers don't affect overall balance
-            }
-        }
-    }
-    
-    private var totalIncome: Double {
-        return transactionManager.transactions
-            .filter { $0.type == .income }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
-    private var totalExpense: Double {
-        return transactionManager.transactions
-            .filter { $0.type == .expense }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
     // MARK: - Helper Methods
     
     private func deleteTransaction(_ transaction: Transaction) {
         withAnimation(.easeOut(duration: 0.3)) {
             transactionManager.deleteTransaction(transaction)
         }
-    }
-    
-    private func formatAmount(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 0
-        
-        if let formattedNumber = formatter.string(from: NSNumber(value: abs(amount))) {
-            return formattedNumber
-        }
-        return "\(Int(abs(amount)))"
     }
     
     private func formatDateHeader(_ date: Date) -> String {
@@ -382,6 +255,11 @@ struct TransactionRow: View {
                         .lineLimit(1)
                 }
             }
+            
+            // Chevron arrow to indicate navigation
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .padding(.vertical, 12)
         .background(Color(.systemBackground))

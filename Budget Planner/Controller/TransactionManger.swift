@@ -2,7 +2,7 @@
 //  TransactionManager.swift
 //  Budget Planner
 //
-//  Dynamic version without hardcoded accounts or categories
+//  Fixed version with proper account balance synchronization
 //
 
 import Foundation
@@ -13,6 +13,9 @@ class TransactionManager: ObservableObject {
     @Published var transactions: [Transaction] = []
     @Published var accounts: [Account] = []
     @Published var categories: [TransactionCategory] = []
+    
+    // Shared AccountStore reference to maintain data consistency
+    private let accountStore = AccountStore.shared
 
     private let transactionsKey = "transactions_key"
     private let accountsKey = "accounts_key"
@@ -147,10 +150,11 @@ class TransactionManager: ObservableObject {
         }
     }
 
+    // FIXED: Proper account balance update with persistent storage
     private func updateAccountBalance(for transaction: Transaction, isAdding: Bool) {
-        // Load the latest account data from AccountStore to sync balances
-        let accountStore = AccountStore()
-
+        // Load latest accounts from AccountStore
+        accountStore.loadAccounts()
+        
         if let accountIndex = accountStore.accounts.firstIndex(where: { $0.id == transaction.account.id }) {
             let multiplier: Double = isAdding ? 1.0 : -1.0
 
@@ -164,8 +168,13 @@ class TransactionManager: ObservableObject {
                 break
             }
 
-            // Update the account in AccountStore
-            accountStore.updateAccount(account: accountStore.accounts[accountIndex])
+            // Save the updated account
+            accountStore.saveAccounts()
+            
+            // Also update our local accounts array for consistency
+            if let localIndex = accounts.firstIndex(where: { $0.id == transaction.account.id }) {
+                accounts[localIndex] = accountStore.accounts[accountIndex]
+            }
         }
     }
 

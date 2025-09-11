@@ -8,6 +8,7 @@
 import Foundation
 
 class AccountStore: ObservableObject {
+    static let shared = AccountStore()
     @Published var accounts: [Account] = []
     private let userDefaults = UserDefaults.standard
     private let accountsKey = "SavedAccounts"
@@ -37,7 +38,7 @@ class AccountStore: ObservableObject {
         saveAccounts()
     }
     
-    private func saveAccounts() {
+    func saveAccounts() {
         if let encoded = try? JSONEncoder().encode(accounts) {
             userDefaults.set(encoded, forKey: accountsKey)
         }

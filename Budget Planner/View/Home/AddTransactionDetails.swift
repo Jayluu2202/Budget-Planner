@@ -2,7 +2,7 @@
 //  AddTransactionDetails.swift
 //  Budget Planner
 //
-//  Created by mac on 08/09/25.
+//  Fixed to use isRecurring instead of isRepeating
 //
 
 import SwiftUI
@@ -11,14 +11,13 @@ import ContactsUI
 struct AddTransactionDetails: View {
     @Environment(\.dismiss) var dismiss
     
-    // 🔄 Accept TransactionManager as parameter instead of creating new instance
     @ObservedObject var transactionManager: TransactionManager
     
     @State private var selectedType: TransactionType = .income
     @State private var transactionDate = Date()
     @State private var amount = ""
     @State private var description = ""
-    @State private var repeatTransation = false
+    @State private var repeatTransaction = false // Changed variable name for clarity
     
     @StateObject private var accountStore = AccountStore()
     @StateObject private var categoryStore = CategoryStore()
@@ -33,7 +32,7 @@ struct AddTransactionDetails: View {
     // Contact picker states
     @State private var showingContactPicker = false
     @State private var selectedContact: String? = nil
-    @State private var isSelectingSender = true // Track which contact we're selecting for
+    @State private var isSelectingSender = true
     
     // Alert states
     @State private var showingAlert = false
@@ -85,7 +84,6 @@ struct AddTransactionDetails: View {
                         
                         // Contact Selection Buttons
                         HStack(spacing: 16) {
-                            // Sender Button - Opens Contacts
                             Button(action: {
                                 isSelectingSender = true
                                 showingContactPicker = true
@@ -99,7 +97,6 @@ struct AddTransactionDetails: View {
                                     .cornerRadius(8)
                             }
                             
-                            // Receiver Button - Opens Contacts
                             Button(action: {
                                 isSelectingSender = false
                                 showingContactPicker = true
@@ -115,17 +112,15 @@ struct AddTransactionDetails: View {
                         }
                         .padding(.horizontal)
                         
-                        // Simple Account List
+                        // Account List
                         VStack(spacing: 8) {
                             ForEach(accountStore.accounts) { account in
                                 Button(action: {
-                                    // Simple toggle selection
                                     if selectedSenderAccount?.id == account.id {
                                         selectedSenderAccount = nil
                                     } else if selectedReceiverAccount?.id == account.id {
                                         selectedReceiverAccount = nil
                                     } else {
-                                        // Assign to sender or receiver based on which was last selected
                                         if isSelectingSender {
                                             selectedSenderAccount = account
                                         } else {
@@ -141,7 +136,6 @@ struct AddTransactionDetails: View {
                                             .foregroundColor(.primary)
                                         Spacer()
                                         
-                                        // Simple checkmark for selected accounts
                                         if selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .foregroundColor(.black)
@@ -172,7 +166,7 @@ struct AddTransactionDetails: View {
                 } else {
                     // Existing Income/Expense UI
                     VStack(spacing: 16) {
-                        // Amount Input for Income/Expense
+                        // Amount Input
                         HStack {
                             TextField("0", text: $amount)
                                 .font(.largeTitle)
@@ -236,7 +230,7 @@ struct AddTransactionDetails: View {
                         
                         Divider()
                         
-                        Toggle(isOn: $repeatTransation) {
+                        Toggle(isOn: $repeatTransaction) {
                             Text("Repeat Transaction")
                                 .font(.headline)
                         }
@@ -314,29 +308,18 @@ struct AddTransactionDetails: View {
             type: selectedType == .income ? .income : .expense
         )
         
-        // Convert local TransactionType to global TransactionType
-        let globalTransactionType: TransactionType
-        switch selectedType {
-        case .income:
-            globalTransactionType = .income
-        case .expense:
-            globalTransactionType = .expense
-        case .transfer:
-            globalTransactionType = .transfer
-        }
-        
-        // Create transaction
+        // Create transaction with corrected property name
         let transaction = Transaction(
-            type: globalTransactionType,
+            type: selectedType,
             amount: amountValue,
             description: description.isEmpty ? "No description" : description,
             date: transactionDate,
             account: account,
             category: transactionCategory,
-            isRepeating: repeatTransation
+            isRecurring: repeatTransaction // Changed from isRepeating to isRecurring
         )
         
-        // Save transaction using the passed transactionManager instance
+        // Save transaction
         transactionManager.addTransaction(transaction)
         
         // Clear form and dismiss
@@ -348,7 +331,7 @@ struct AddTransactionDetails: View {
     }
 }
 
-// Contact Picker View
+// Contact Picker and Preview remain the same
 struct ContactPicker: UIViewControllerRepresentable {
     @Binding var selectedContact: String?
     @Environment(\.dismiss) private var dismiss

@@ -2,7 +2,7 @@
 //  TransactionModel.swift
 //  Budget Planner
 //
-//  Created by mac on 10/09/25.
+//  Fixed version with consistent property names and initializers
 //
 
 import Foundation
@@ -16,9 +16,9 @@ struct Transaction: Identifiable, Codable {
     var date: Date
     var account: Account
     var category: TransactionCategory
-    var isRepeating: Bool
+    var isRecurring: Bool // Changed from isRepeating to isRecurring for consistency
     
-    init(type: TransactionType, amount: Double, description: String, date: Date, account: Account, category: TransactionCategory, isRepeating: Bool = false) {
+    init(type: TransactionType, amount: Double, description: String, date: Date, account: Account, category: TransactionCategory, isRecurring: Bool = false) {
         self.id = UUID()
         self.type = type
         self.amount = amount
@@ -26,7 +26,19 @@ struct Transaction: Identifiable, Codable {
         self.date = date
         self.account = account
         self.category = category
-        self.isRepeating = isRepeating
+        self.isRecurring = isRecurring
+    }
+    
+    // Additional initializer with id parameter for when loading from storage
+    init(id: UUID, type: TransactionType, amount: Double, description: String, date: Date, account: Account, category: TransactionCategory, isRecurring: Bool = false) {
+        self.id = id
+        self.type = type
+        self.amount = amount
+        self.description = description
+        self.date = date
+        self.account = account
+        self.category = category
+        self.isRecurring = isRecurring
     }
 }
 
