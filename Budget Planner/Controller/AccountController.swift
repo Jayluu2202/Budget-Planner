@@ -20,19 +20,19 @@ class AccountStore: ObservableObject {
         }
     }
     
-    func addAccount(_ account: Account) {
+    func addAccount( account: Account) {
         accounts.append(account)
         saveAccounts()
     }
     
-    func updateAccount(_ account: Account) {
+    func updateAccount( account: Account) {
         if let index = accounts.firstIndex(where: { $0.id == account.id }) {
             accounts[index] = account
             saveAccounts()
         }
     }
     
-    func deleteAccount(_ account: Account) {
+    func deleteAccount( account: Account) {
         accounts.removeAll { $0.id == account.id }
         saveAccounts()
     }
@@ -43,7 +43,7 @@ class AccountStore: ObservableObject {
         }
     }
     
-    private func loadAccounts() {
+    func loadAccounts() {
         if let data = userDefaults.data(forKey: accountsKey),
            let decodedAccounts = try? JSONDecoder().decode([Account].self, from: data) {
             self.accounts = decodedAccounts
@@ -60,7 +60,7 @@ class AccountStore: ObservableObject {
         saveAccounts()
     }
     
-    func formatBalance(_ balance: Double) -> String {
+    func formatBalance( balance: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0

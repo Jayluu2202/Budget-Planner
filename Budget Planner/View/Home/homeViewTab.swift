@@ -12,45 +12,63 @@ struct homeViewTab: View {
     @State private var currentDate = Date()
     @State private var selectedDate = Date()
     @State private var showAddScreen = false
+    @State private var navigateToWealth = false
+    @StateObject private var transactionManager = TransactionManager() // Add TransactionManager
     
     var body: some View {
-        VStack(spacing: 0) {
-            // 👋 Greeting Section
-            buildGreetingSection()
-            
-            ZStack(alignment: .bottomTrailing) { // 👈 Floating button positioning
+        NavigationView {
+            VStack(spacing: 0) {
+                // 👋 Greeting Section
+                buildGreetingSection()
+                
+                // Main scrollable content
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
-                        // 📆 Calendar Section
                         buildCalendarSection()
-                        
-                        // 📊 Transactions Section
                         buildTransactionsSection()
                     }
                     .padding(.top, 8)
                 }
-                
-                // ➕ Floating Add Button
-                Button {
-                    showAddScreen = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black)
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
+
+                // ✅ Hidden NavigationLink (MUST be inside VStack)
+                NavigationLink(
+                    destination: MyWealth(),
+                    isActive: $navigateToWealth
+                ) {
+                    EmptyView()
                 }
-                .sheet(isPresented: $showAddScreen) {
-                    AddTransactionDetails()
-                }
-                .ignoresSafeArea()
+                .hidden()
             }
+            .safeAreaInset(edge: .bottom) {
+                HStack {
+                    Spacer()
+                    Button {
+                        showAddScreen = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 16)
+                }
+            }
+            .padding(.horizontal, 10)
+            .navigationBarHidden(true)
         }
-        .padding()
+        .onAppear {
+            transactionManager.loadData()
+        }
+        .sheet(isPresented: $showAddScreen) {
+            AddTransactionDetails(transactionManager: transactionManager)
+        }
     }
-    
+
+
     
     // MARK: - 🏗️ View Builders
     
@@ -67,7 +85,11 @@ struct homeViewTab: View {
             
             Spacer()
             
-            Button(action: handleWealthButtonTap) {
+            // ✅ SIMPLIFIED BUTTON ACTION
+            Button {
+                handleWealthButtonTap()
+                navigateToWealth = true
+            } label: {
                 Image("Wealth")
                     .resizable()
                     .scaledToFit()
@@ -85,7 +107,8 @@ struct homeViewTab: View {
             // 📅 Calendar Grid
             CalendarView(
                 currentDate: $currentDate,
-                selectedDate: $selectedDate
+                selectedDate: $selectedDate,
+                transactionManager: transactionManager // Pass transaction manager
             )
         }
     }
@@ -123,15 +146,49 @@ struct homeViewTab: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            // 📝 Sample Transactions
-            ForEach(0..<5, id: \.self) { index in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Sample Transaction \(index + 1)")
+            // 📝 Real Transactions for Selected Date
+            let dayTransactions = transactionManager.transactionsForDate(selectedDate)
+            
+            if dayTransactions.isEmpty {
+                HStack {
+                    Text("No transactions for this date")
                         .font(.body)
-                    Text("$\((index + 1) * 25).00")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Divider()
+                        .foregroundColor(.gray)
+                    Spacer()
+                }
+                .padding(.vertical, 20)
+            } else {
+                ForEach(dayTransactions) { transaction in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(transaction.category.emoji)
+                                    .font(.title2)
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(transaction.category.name)
+                                        .font(.body)
+                                        .fontWeight(.medium)
+                                    
+                                    Text(transaction.account.name)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        Text("₹\(Int(transaction.amount))")
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .foregroundColor(transaction.type == .income ? .green : .red)
+                    }
+                    .padding(.vertical, 8)
+                    
+                    if transaction.id != dayTransactions.last?.id {
+                        Divider()
+                    }
                 }
             }
         }
@@ -147,7 +204,6 @@ struct homeViewTab: View {
     
     private func handleAddButtonTap() {
         print("➕ Add button tapped! Ready to add new transaction")
-        
     }
     
     private func previousMonth() {
@@ -181,6 +237,7 @@ struct homeViewTab: View {
 struct CalendarView: View {
     @Binding var currentDate: Date
     @Binding var selectedDate: Date
+    @ObservedObject var transactionManager: TransactionManager // Add this
     
     var body: some View {
         VStack(spacing: 12) {
@@ -214,7 +271,8 @@ struct CalendarView: View {
                     DayView(
                         date: date,
                         currentMonth: currentDate,
-                        selectedDate: $selectedDate
+                        selectedDate: $selectedDate,
+                        transactionManager: transactionManager // Pass transaction manager
                     )
                 } else {
                     // 🚫 Empty space for days not in current month
@@ -256,12 +314,61 @@ struct DayView: View {
     let date: Date
     let currentMonth: Date
     @Binding var selectedDate: Date
+    @ObservedObject var transactionManager: TransactionManager
     
-    // 💰 Sample budget values for each day
+    // Check if there are any transactions for this day
+    private var hasTransactions: Bool {
+        return !transactionManager.transactionsForDate(date).isEmpty
+    }
+    
+    // 💰 Calculate actual budget value for each day
     private var budgetValue: String {
-        let day = Calendar.current.component(.day, from: date)
-        let sampleValues = ["$125", "$89", "$234", "$67", "$145", "$78", "$190"]
-        return sampleValues[day % sampleValues.count]
+        let dayTransactions = transactionManager.transactionsForDate(date)
+        let totalAmount = dayTransactions.reduce(0) { total, transaction -> Int in
+            switch transaction.type {
+            case .income:
+                return total + Int(transaction.amount)
+            case .expense:
+                return total - Int(transaction.amount)
+            case .transfer:
+                return total // Handle transfers separately if needed
+            }
+        }
+        
+        if totalAmount == 0 && hasTransactions {
+            return "₹0" // Show ₹0 when there are transactions but they net to zero
+        } else if totalAmount == 0 {
+            return "" // Show nothing when there are no transactions
+        } else if totalAmount > 0 {
+            return "₹\(Int(totalAmount))"
+        } else {
+            return "₹\(Int(abs(totalAmount)))"
+        }
+    }
+    
+    // Color for the budget value
+    private var budgetValueColor: Color {
+        let dayTransactions = transactionManager.transactionsForDate(date)
+        let totalAmount = dayTransactions.reduce(0) { total, transaction in
+            switch transaction.type {
+            case .income:
+                return total + Int(transaction.amount)
+            case .expense:
+                return total - Int(transaction.amount)
+            case .transfer:
+                return total
+            }
+        }
+        
+        if totalAmount > 0 {
+            return .green
+        } else if totalAmount < 0 {
+            return .red
+        } else if hasTransactions {
+            return .orange // Use orange to indicate there are transactions but they net to zero
+        } else {
+            return .secondary
+        }
     }
     
     var body: some View {
@@ -277,9 +384,21 @@ struct DayView: View {
                 // 💵 Budget value below date
                 Text(budgetValue)
                     .font(.system(size: 10, weight: .regular))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(budgetValueColor)
+                
+                // 🟠 Small dot indicator when there are transactions but net is zero
+                if hasTransactions && budgetValue == "₹0" {
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 4, height: 4)
+                } else {
+                    // Empty space to maintain consistent layout
+                    Circle()
+                        .fill(Color.clear)
+                        .frame(width: 4, height: 4)
+                }
             }
-            .frame(width: 45, height: 50)
+            .frame(width: 45, height: 55) // Slightly increased height to accommodate the dot
             .background(backgroundColor)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
@@ -310,7 +429,7 @@ struct DayView: View {
     }
     
     private var backgroundColor: Color {
-        return Color.clear // 🔄 Always transparent background
+        return Color.clear // Always transparent background
     }
     
     private var borderColor: Color {
@@ -318,6 +437,8 @@ struct DayView: View {
             return .blue
         } else if isToday {
             return .orange
+        } else if hasTransactions {
+            return .gray.opacity(0.6) // Slightly more visible border when there are transactions
         } else {
             return .gray.opacity(0.3)
         }
@@ -328,6 +449,8 @@ struct DayView: View {
             return 2.0
         } else if isToday {
             return 1.5
+        } else if hasTransactions {
+            return 1.0 // Slightly thicker border when there are transactions
         } else {
             return 0.5
         }

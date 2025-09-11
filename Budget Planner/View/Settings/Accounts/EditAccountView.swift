@@ -144,12 +144,12 @@ struct EditAccountView: View {
             emoji: selectedEmoji,
             balance: balance
         )
-        accountStore.updateAccount(updatedAccount)
+        accountStore.updateAccount(account: updatedAccount)
         dismiss()
     }
     
     private func deleteAccount() {
-        accountStore.deleteAccount(account)
+        accountStore.deleteAccount(account: account)
         dismiss()
     }
 }

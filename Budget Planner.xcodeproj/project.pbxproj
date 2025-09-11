@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		040034B62E6F0A2700770CDB /* AddCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040034B52E6F0A2700770CDB /* AddCategoriesView.swift */; };
+		042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74F82E72CB9E0050348A /* MyWealth.swift */; };
+		042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FC2E72CC910050348A /* TransactionManger.swift */; };
+		042F75002E72CCFB0050348A /* TransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FF2E72CCFB0050348A /* TransactionModel.swift */; };
+		042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F75012E72CD2A0050348A /* TrabsactionCategoryModel.swift */; };
 		04443F952E702CE700514154 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F942E702CE700514154 /* AccountController.swift */; };
 		04443F972E702D4100514154 /* AccountModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F962E702D4100514154 /* AccountModel.swift */; };
 		04443F992E70300F00514154 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04443F982E70300F00514154 /* AddAccountView.swift */; };
@@ -41,6 +45,11 @@
 
 /* Begin PBXFileReference section */
 		040034B52E6F0A2700770CDB /* AddCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoriesView.swift; sourceTree = "<group>"; };
+		042F74F82E72CB9E0050348A /* MyWealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWealth.swift; sourceTree = "<group>"; };
+		042F74FC2E72CC910050348A /* TransactionManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManger.swift; sourceTree = "<group>"; };
+		042F74FF2E72CCFB0050348A /* TransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModel.swift; sourceTree = "<group>"; };
+		042F75012E72CD2A0050348A /* TrabsactionCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrabsactionCategoryModel.swift; sourceTree = "<group>"; };
+		042F75032E72D09C0050348A /* Budget-Planner-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Budget-Planner-Info.plist"; sourceTree = SOURCE_ROOT; };
 		04443F942E702CE700514154 /* AccountController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
 		04443F962E702D4100514154 /* AccountModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountModel.swift; sourceTree = "<group>"; };
 		04443F982E70300F00514154 /* AddAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountView.swift; sourceTree = "<group>"; };
@@ -84,6 +93,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		042F74FE2E72CCE30050348A /* Tranasctions Model */ = {
+			isa = PBXGroup;
+			children = (
+				042F74FF2E72CCFB0050348A /* TransactionModel.swift */,
+				042F75012E72CD2A0050348A /* TrabsactionCategoryModel.swift */,
+			);
+			path = "Tranasctions Model";
+			sourceTree = "<group>";
+		};
 		04443F9C2E705A7A00514154 /* Lock */ = {
 			isa = PBXGroup;
 			children = (
@@ -113,6 +131,7 @@
 		047FB62A2E6848AC0080D024 /* Budget Planner */ = {
 			isa = PBXGroup;
 			children = (
+				042F75032E72D09C0050348A /* Budget-Planner-Info.plist */,
 				84D9E1CF2E68B45200919A0F /* Model */,
 				047FB63A2E684C050080D024 /* View */,
 				84D9E1D02E68B46100919A0F /* Controller */,
@@ -209,6 +228,7 @@
 			children = (
 				047FB63C2E684D1D0080D024 /* homeViewTab.swift */,
 				04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */,
+				042F74F82E72CB9E0050348A /* MyWealth.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -219,6 +239,7 @@
 				04976B022E6FE47A001EB314 /* CategoryModel.swift */,
 				04976B0A2E7009C0001EB314 /* CurrencyModel.swift */,
 				04443F962E702D4100514154 /* AccountModel.swift */,
+				042F74FE2E72CCE30050348A /* Tranasctions Model */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -229,6 +250,7 @@
 				04976B042E6FE4AB001EB314 /* CategoryController.swift */,
 				04443F942E702CE700514154 /* AccountController.swift */,
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
+				042F74FC2E72CC910050348A /* TransactionManger.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -305,19 +327,23 @@
 				04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */,
 				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
+				042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
+				042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */,
 				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
 				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
 				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
 				047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */,
 				047FB6402E6855BE0080D024 /* transactionViewTab.swift in Sources */,
+				042F75002E72CCFB0050348A /* TransactionModel.swift in Sources */,
 				04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */,
 				04D1F7EE2E6EE1C4007D2BA2 /* currencyChangeView.swift in Sources */,
 				84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */,
 				04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */,
 				04443F952E702CE700514154 /* AccountController.swift in Sources */,
 				04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */,
+				042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */,
 				04D1F7F12E6EE27B007D2BA2 /* CategoriesView.swift in Sources */,
 				047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */,
 				04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */,
@@ -462,6 +488,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Budget-Planner-Info.plist";
+				INFOPLIST_KEY_NSContactsUsageDescription = "This app needs access to contacts to select transfer recipients.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -489,6 +517,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Budget-Planner-Info.plist";
+				INFOPLIST_KEY_NSContactsUsageDescription = "This app needs access to contacts to select transfer recipients.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -99,7 +99,7 @@ struct AccountRow: View {
                     .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.black)
                 
-                Text(AccountStore().formatBalance(account.balance))
+                Text(AccountStore().formatBalance(balance: account.balance))
                     .font(.system(size: 15))
                     .foregroundColor(.green)
             }

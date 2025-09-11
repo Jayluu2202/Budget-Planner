@@ -50,8 +50,10 @@ struct AddAccountView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         TextField("Account Name", text: $accountName)
                             .padding()
-                            .background(Color(.systemGray6))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
                     }
                     .padding(.horizontal)
                     
@@ -60,8 +62,10 @@ struct AddAccountView: View {
                         TextField("Initial Balance", text: $initialBalance)
                             .keyboardType(.decimalPad)
                             .padding()
-                            .background(Color(.systemGray6))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
                     }
                     .padding(.horizontal)
                     
@@ -77,16 +81,16 @@ struct AddAccountView: View {
                                             .font(.system(size: 24))
                                             .frame(width: 50, height: 50)
                                             .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .clipShape(RoundedRectangle(cornerRadius: 10))
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(selectedEmoji == emoji ? Color.black : Color.clear, lineWidth: 2)
+                                                    .stroke(selectedEmoji == emoji ? Color.black : Color.gray, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
                                             )
                                     }
                                 }
                                 Spacer()
                             }
-                            .padding(.horizontal)
+                            .padding()
                         }
                     }
                     
@@ -116,7 +120,6 @@ struct AddAccountView: View {
                                 Text(account.emoji)
                                     .font(.system(size: 20))
                                     .frame(width: 30, height: 30)
-                                    .background(Color(.systemGray6))
                                     .clipShape(RoundedRectangle(cornerRadius: 6))
                                 
                                 Text(account.name)
@@ -124,7 +127,7 @@ struct AddAccountView: View {
                                 
                                 Spacer()
                                 
-                                Text(accountStore.formatBalance(account.balance))
+                                Text(accountStore.formatBalance(balance: account.balance))
                                     .font(.system(size: 15))
                                     .foregroundColor(.green)
                             }
@@ -147,7 +150,7 @@ struct AddAccountView: View {
     private func addAccount() {
         let balance = Double(initialBalance) ?? 0.0
         let newAccount = Account(name: accountName, emoji: selectedEmoji, balance: balance)
-        accountStore.addAccount(newAccount)
+        accountStore.addAccount(account: newAccount)
         dismiss()
     }
 }
