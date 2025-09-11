@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct transactionViewTab: View {
-    @StateObject private var transactionManager = TransactionManager()
+    @StateObject var transactionManager = TransactionManager()
     @State private var showAddScreen = false
     @State private var selectedFilter: FilterType = .all
     @State private var searchText = ""

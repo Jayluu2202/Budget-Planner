@@ -68,8 +68,6 @@ struct homeViewTab: View {
         }
     }
 
-
-    
     // MARK: - 🏗️ View Builders
     
     @ViewBuilder
