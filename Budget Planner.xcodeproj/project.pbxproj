@@ -40,6 +40,10 @@
 		04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */; };
 		04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C0FE2E712E960024FFF4 /* ApplockController.swift */; };
 		04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */; };
+		84A4803B2E73163D00F91140 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803A2E73163D00F91140 /* AddBudgetView.swift */; };
+		84A4803D2E73166200F91140 /* BudgetDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803C2E73166200F91140 /* BudgetDetails.swift */; };
+		84A4803F2E7317D400F91140 /* BudgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803E2E7317CF00F91140 /* BudgetModel.swift */; };
+		84A480412E7317F500F91140 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A480402E7317F000F91140 /* BudgetManager.swift */; };
 		84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +83,10 @@
 		04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = privacyAndPolicy.swift; sourceTree = "<group>"; };
 		04D2C0FE2E712E960024FFF4 /* ApplockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplockController.swift; sourceTree = "<group>"; };
 		04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordUnlockView.swift; sourceTree = "<group>"; };
+		84A4803A2E73163D00F91140 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
+		84A4803C2E73166200F91140 /* BudgetDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetails.swift; sourceTree = "<group>"; };
+		84A4803E2E7317CF00F91140 /* BudgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetModel.swift; sourceTree = "<group>"; };
+		84A480402E7317F000F91140 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
 		84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = budgetViewTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -203,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
+				84A480392E7315D300F91140 /* Budget Details */,
 			);
 			path = Budget;
 			sourceTree = "<group>";
@@ -233,12 +242,22 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		84A480392E7315D300F91140 /* Budget Details */ = {
+			isa = PBXGroup;
+			children = (
+				84A4803A2E73163D00F91140 /* AddBudgetView.swift */,
+				84A4803C2E73166200F91140 /* BudgetDetails.swift */,
+			);
+			path = "Budget Details";
+			sourceTree = "<group>";
+		};
 		84D9E1CF2E68B45200919A0F /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				04976B022E6FE47A001EB314 /* CategoryModel.swift */,
 				04976B0A2E7009C0001EB314 /* CurrencyModel.swift */,
 				04443F962E702D4100514154 /* AccountModel.swift */,
+				84A4803E2E7317CF00F91140 /* BudgetModel.swift */,
 				042F74FE2E72CCE30050348A /* Tranasctions Model */,
 			);
 			path = Model;
@@ -251,6 +270,7 @@
 				04443F942E702CE700514154 /* AccountController.swift */,
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
+				84A480402E7317F000F91140 /* BudgetManager.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -329,12 +349,15 @@
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
 				042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
+				84A4803B2E73163D00F91140 /* AddBudgetView.swift in Sources */,
+				84A480412E7317F500F91140 /* BudgetManager.swift in Sources */,
 				042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */,
 				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
 				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
 				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
 				047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */,
+				84A4803F2E7317D400F91140 /* BudgetModel.swift in Sources */,
 				047FB6402E6855BE0080D024 /* transactionViewTab.swift in Sources */,
 				042F75002E72CCFB0050348A /* TransactionModel.swift in Sources */,
 				04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */,
@@ -350,6 +373,7 @@
 				04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */,
 				04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */,
 				04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */,
+				84A4803D2E73166200F91140 /* BudgetDetails.swift in Sources */,
 				04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */,
 				047FB6482E6856050080D024 /* tabView.swift in Sources */,
 				04443F972E702D4100514154 /* AccountModel.swift in Sources */,
