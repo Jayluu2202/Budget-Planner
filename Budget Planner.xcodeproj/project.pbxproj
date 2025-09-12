@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		040034B62E6F0A2700770CDB /* AddCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040034B52E6F0A2700770CDB /* AddCategoriesView.swift */; };
+		042023EA2E73D87D00598928 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023E92E73D87D00598928 /* AddBudgetView.swift */; };
+		042023EC2E73D89A00598928 /* BudgetDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023EB2E73D89A00598928 /* BudgetDetailsView.swift */; };
+		042023F02E73D8E700598928 /* BudgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023EF2E73D8E700598928 /* BudgetModel.swift */; };
+		042023F22E73D91000598928 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023F12E73D91000598928 /* BudgetManager.swift */; };
 		042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74F82E72CB9E0050348A /* MyWealth.swift */; };
 		042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FC2E72CC910050348A /* TransactionManger.swift */; };
 		042F75002E72CCFB0050348A /* TransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FF2E72CCFB0050348A /* TransactionModel.swift */; };
@@ -46,6 +50,10 @@
 
 /* Begin PBXFileReference section */
 		040034B52E6F0A2700770CDB /* AddCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoriesView.swift; sourceTree = "<group>"; };
+		042023E92E73D87D00598928 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
+		042023EB2E73D89A00598928 /* BudgetDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailsView.swift; sourceTree = "<group>"; };
+		042023EF2E73D8E700598928 /* BudgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetModel.swift; sourceTree = "<group>"; };
+		042023F12E73D91000598928 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
 		042F74F82E72CB9E0050348A /* MyWealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWealth.swift; sourceTree = "<group>"; };
 		042F74FC2E72CC910050348A /* TransactionManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManger.swift; sourceTree = "<group>"; };
 		042F74FF2E72CCFB0050348A /* TransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModel.swift; sourceTree = "<group>"; };
@@ -95,6 +103,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		042023E82E73D86700598928 /* Budget Details */ = {
+			isa = PBXGroup;
+			children = (
+				042023E92E73D87D00598928 /* AddBudgetView.swift */,
+				042023EB2E73D89A00598928 /* BudgetDetailsView.swift */,
+			);
+			path = "Budget Details";
+			sourceTree = "<group>";
+		};
 		042F74FE2E72CCE30050348A /* Tranasctions Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -205,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
+				042023E82E73D86700598928 /* Budget Details */,
 			);
 			path = Budget;
 			sourceTree = "<group>";
@@ -243,6 +261,7 @@
 				04976B0A2E7009C0001EB314 /* CurrencyModel.swift */,
 				04443F962E702D4100514154 /* AccountModel.swift */,
 				042F74FE2E72CCE30050348A /* Tranasctions Model */,
+				042023EF2E73D8E700598928 /* BudgetModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -254,6 +273,7 @@
 				04443F942E702CE700514154 /* AccountController.swift */,
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
+				042023F12E73D91000598928 /* BudgetManager.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -327,6 +347,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				042023F02E73D8E700598928 /* BudgetModel.swift in Sources */,
 				04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */,
 				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
@@ -334,9 +355,11 @@
 				04D4C9B32E72E5F50041B09A /* TransactionDetailsView.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
 				042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */,
+				042023F22E73D91000598928 /* BudgetManager.swift in Sources */,
 				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
 				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
+				042023EA2E73D87D00598928 /* AddBudgetView.swift in Sources */,
 				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
 				047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */,
 				047FB6402E6855BE0080D024 /* transactionViewTab.swift in Sources */,
@@ -348,6 +371,7 @@
 				04443F952E702CE700514154 /* AccountController.swift in Sources */,
 				04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */,
 				042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */,
+				042023EC2E73D89A00598928 /* BudgetDetailsView.swift in Sources */,
 				04D1F7F12E6EE27B007D2BA2 /* CategoriesView.swift in Sources */,
 				047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */,
 				04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */,
