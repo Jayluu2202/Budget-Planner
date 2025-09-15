@@ -23,9 +23,10 @@ struct transactionViewTab: View {
             VStack(spacing: 0) {
                 // Transactions list
                 buildTransactionsList()
-            }
+            }            
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.large)
+            
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     // Filter button

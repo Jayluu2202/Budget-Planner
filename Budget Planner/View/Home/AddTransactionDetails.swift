@@ -2,7 +2,7 @@
 //  AddTransactionDetails.swift
 //  Budget Planner
 //
-//  Fixed to use isRecurring instead of isRepeating
+//  Fixed to include BudgetManager integration
 //
 
 import SwiftUI
@@ -12,12 +12,13 @@ struct AddTransactionDetails: View {
     @Environment(\.dismiss) var dismiss
     
     @ObservedObject var transactionManager: TransactionManager
+    @ObservedObject var budgetManager: BudgetManager
     
     @State private var selectedType: TransactionType = .income
     @State private var transactionDate = Date()
     @State private var amount = ""
     @State private var description = ""
-    @State private var repeatTransaction = false // Changed variable name for clarity
+    @State private var repeatTransaction = false
     
     @StateObject private var accountStore = AccountStore()
     @StateObject private var categoryStore = CategoryStore()
@@ -279,7 +280,7 @@ struct AddTransactionDetails: View {
         }
     }
     
-    // MARK: - Save Transaction Function
+    // MARK: - Save Transaction Function (UPDATED)
     private func saveTransaction() {
         // Validate input
         guard let amountValue = Double(amount), amountValue > 0 else {
@@ -308,7 +309,7 @@ struct AddTransactionDetails: View {
             type: selectedType == .income ? .income : .expense
         )
         
-        // Create transaction with corrected property name
+        // Create transaction
         let transaction = Transaction(
             type: selectedType,
             amount: amountValue,
@@ -316,11 +317,16 @@ struct AddTransactionDetails: View {
             date: transactionDate,
             account: account,
             category: transactionCategory,
-            isRecurring: repeatTransaction // Changed from isRepeating to isRecurring
+            isRecurring: repeatTransaction
         )
         
         // Save transaction
         transactionManager.addTransaction(transaction)
+        
+        // UPDATE BUDGET SPENDING - THIS IS THE KEY ADDITION
+        if selectedType == .expense {
+            budgetManager.updateBudgetSpending(for: transactionCategory, amount: amountValue, isAdding: true)
+        }
         
         // Clear form and dismiss
         amount = ""
@@ -331,7 +337,7 @@ struct AddTransactionDetails: View {
     }
 }
 
-// Contact Picker and Preview remain the same
+// Contact Picker remains the same
 struct ContactPicker: UIViewControllerRepresentable {
     @Binding var selectedContact: String?
     @Environment(\.dismiss) private var dismiss
@@ -370,6 +376,9 @@ struct ContactPicker: UIViewControllerRepresentable {
 
 struct AddTransactionDetails_Previews: PreviewProvider {
     static var previews: some View {
-        AddTransactionDetails(transactionManager: TransactionManager())
+        AddTransactionDetails(
+            transactionManager: TransactionManager(),
+            budgetManager: BudgetManager()
+        )
     }
 }

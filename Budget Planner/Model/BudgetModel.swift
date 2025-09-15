@@ -2,7 +2,7 @@
 //  BudgetModel.swift
 //  Budget Planner
 //
-//  Created by Assistant on 11/09/25.
+//  Updated to remove 'safe' status and add monthly reset functionality
 //
 
 import Foundation
@@ -17,6 +17,7 @@ struct Budget: Identifiable, Codable {
     var startDate: Date
     var endDate: Date
     var isActive: Bool
+    var monthYear: String // Track which month/year this budget belongs to
     
     init(category: TransactionCategory, budgetAmount: Double, description: String = "", startDate: Date = Date(), endDate: Date = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()) {
         self.id = UUID()
@@ -27,9 +28,14 @@ struct Budget: Identifiable, Codable {
         self.startDate = startDate
         self.endDate = endDate
         self.isActive = true
+        
+        // Set month/year identifier for automatic reset
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-yyyy"
+        self.monthYear = formatter.string(from: startDate)
     }
     
-    init(id: UUID, category: TransactionCategory, budgetAmount: Double, spentAmount: Double, description: String, startDate: Date, endDate: Date, isActive: Bool) {
+    init(id: UUID, category: TransactionCategory, budgetAmount: Double, spentAmount: Double, description: String, startDate: Date, endDate: Date, isActive: Bool, monthYear: String? = nil) {
         self.id = id
         self.category = category
         self.budgetAmount = budgetAmount
@@ -38,6 +44,15 @@ struct Budget: Identifiable, Codable {
         self.startDate = startDate
         self.endDate = endDate
         self.isActive = isActive
+        
+        // Set month/year if not provided
+        if let monthYear = monthYear {
+            self.monthYear = monthYear
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MM-yyyy"
+            self.monthYear = formatter.string(from: startDate)
+        }
     }
     
     // MARK: - Computed Properties
@@ -55,11 +70,33 @@ struct Budget: Identifiable, Codable {
         return spentAmount > budgetAmount
     }
     
-    var daysRemaining: Int {
+    // Changed from daysRemaining to daysPassed in current month
+    var daysPassed: Int {
         let calendar = Calendar.current
         let today = Date()
-        let days = calendar.dateComponents([.day], from: today, to: endDate).day ?? 0
-        return max(days, 0)
+        
+        // Get the start of current month
+        let startOfMonth = calendar.dateInterval(of: .month, for: today)?.start ?? today
+        
+        // Calculate days passed from start of month to today
+        let daysPassed = calendar.dateComponents([.day], from: startOfMonth, to: today).day ?? 0
+        return max(daysPassed, 0)
+    }
+    
+    // Total days in current month
+    var totalDaysInMonth: Int {
+        let calendar = Calendar.current
+        let today = Date()
+        let range = calendar.range(of: .day, in: .month, for: today)
+        return range?.count ?? 30
+    }
+    
+    // Check if budget needs to be reset (new month)
+    var needsMonthlyReset: Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-yyyy"
+        let currentMonthYear = formatter.string(from: Date())
+        return monthYear != currentMonthYear
     }
     
     var budgetStatus: BudgetStatus {
@@ -69,25 +106,20 @@ struct Budget: Identifiable, Codable {
             return .overBudget
         } else if percentage >= 80 {
             return .warning
-        } else if percentage >= 50 {
-            return .onTrack
         } else {
-            return .safe
+            return .onTrack // Removed .safe, now defaults to .onTrack
         }
     }
 }
 
-// MARK: - Budget Status Enum
+// MARK: - Budget Status Enum (Updated without 'safe')
 enum BudgetStatus {
-    case safe       // < 50%
-    case onTrack    // 50-80%
+    case onTrack    // < 80%
     case warning    // 80-100%
     case overBudget // > 100%
     
     var color: String {
         switch self {
-        case .safe:
-            return "green"
         case .onTrack:
             return "blue"
         case .warning:
@@ -99,8 +131,6 @@ enum BudgetStatus {
     
     var description: String {
         switch self {
-        case .safe:
-            return "Safe"
         case .onTrack:
             return "On Track"
         case .warning:

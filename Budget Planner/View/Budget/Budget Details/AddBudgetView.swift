@@ -14,62 +14,92 @@ struct AddBudgetView: View {
     
     @State private var selectedCategory: TransactionCategory?
     @State private var budgetAmount: String = ""
-    @State private var description: String = ""
-    @State private var startDate = Date()
-    @State private var endDate = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
-    @State private var showCategoryPicker = false
-    
-    // Slider state for amount
     @State private var sliderValue: Double = 1000
-    @State private var isUsingSlider: Bool = true
+    @State private var description: String = ""
+    @State private var showCategoryPicker = false
     
     private var expenseCategories: [TransactionCategory] {
         return transactionManager.categories.filter { $0.type == .expense }
     }
     
     private var isFormValid: Bool {
-        return selectedCategory != nil &&
-               (budgetAmount.isEmpty ? sliderValue > 0 : Double(budgetAmount) ?? 0 > 0)
+        return selectedCategory != nil && !budgetAmount.isEmpty && (Double(budgetAmount) ?? 0) > 0
     }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
+        VStack(spacing: 0) {
+            // Custom Navigation Bar
+            HStack {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .foregroundColor(.black)
+                }
+                
+                Spacer()
+                
+                Text("Create Budget")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
+                
+                Spacer()
+                
+                // Invisible button for balance
+                Button(action: {}) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .opacity(0)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 10)
+            .padding(.bottom, 20)
+            
+            // Main Content Card
+            VStack(spacing: 0) {
                 VStack(spacing: 24) {
                     // Category Selection
                     buildCategorySection()
                     
-                    // Budget Amount Section
+                    // Budget Amount Section with Slider
                     buildBudgetAmountSection()
-                    
-                    // Date Range Section
-                    buildDateRangeSection()
                     
                     // Description Section
                     buildDescriptionSection()
                     
-                    // Summary Section
-                    if isFormValid {
-                        buildSummarySection()
-                    }
-                    
                     Spacer(minLength: 100)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 16)
+                .padding(.top, 24)
             }
-            .navigationTitle("Create Budget")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
+            .background(Color.white)
+            .cornerRadius(24, corners: [.topLeft, .topRight])
+            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: -5)
+            
+            Spacer()
+            
+            // Create Budget Button
+            createBudgetButton
+                .padding(.horizontal, 20)
+                .padding(.bottom, 34)
+                .background(Color.white)
+        }
+        .background(Color(.systemGray6))
+        .navigationBarHidden(true)
+        .onChange(of: sliderValue) { newValue in
+            budgetAmount = String(Int(newValue))
+        }
+        .onChange(of: budgetAmount) { newValue in
+            if let doubleValue = Double(newValue), doubleValue >= 0 && doubleValue <= 10000 {
+                sliderValue = doubleValue
             }
-            .safeAreaInset(edge: .bottom) {
-                createBudgetButton
-            }
+        }
+        .onAppear {
+            // Initialize the text field with slider value
+            budgetAmount = String(Int(sliderValue))
         }
     }
     
@@ -80,7 +110,7 @@ struct AddBudgetView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Select Category")
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.secondary)
             
             Button(action: {
                 showCategoryPicker = true
@@ -95,21 +125,25 @@ struct AddBudgetView: View {
                     } else {
                         Text("🛍️")
                             .font(.title2)
-                        Text("Select Category")
+                        Text("Shopping")
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.primary)
                     }
                     
                     Spacer()
                     
                     Image(systemName: "chevron.down")
-                        .font(.caption)
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
                 .background(Color(.systemGray6))
                 .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(.systemGray4), lineWidth: 1)
+                )
             }
             .sheet(isPresented: $showCategoryPicker) {
                 CategoryPickerView(
@@ -123,111 +157,61 @@ struct AddBudgetView: View {
     
     @ViewBuilder
     private func buildBudgetAmountSection() -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Budget Amount")
                 .font(.headline)
-                .foregroundColor(.primary)
-            
-            // Amount input methods toggle
-            HStack {
-                Button(action: {
-                    withAnimation(.easeInOut) {
-                        isUsingSlider = true
-                        budgetAmount = ""
-                    }
-                }) {
-                    Text("Slider")
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(isUsingSlider ? Color.black : Color(.systemGray5))
-                        .foregroundColor(isUsingSlider ? .white : .secondary)
-                        .cornerRadius(8)
-                }
-                
-                Button(action: {
-                    withAnimation(.easeInOut) {
-                        isUsingSlider = false
-                        sliderValue = 1000
-                    }
-                }) {
-                    Text("Manual")
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(!isUsingSlider ? Color.black : Color(.systemGray5))
-                        .foregroundColor(!isUsingSlider ? .white : .secondary)
-                        .cornerRadius(8)
-                }
-                
-                Spacer()
-            }
-            
-            if isUsingSlider {
-                // Slider input
-                VStack(spacing: 16) {
-                    Slider(value: $sliderValue, in: 100...50000, step: 100)
-                        .accentColor(.black)
-                    
-                    Text("₹\(Int(sliderValue))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                }
-                .padding(.top, 8)
-            } else {
-                // Manual input
-                HStack {
-                    Text("₹")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                    
-                    TextField("1000", text: $budgetAmount)
-                        .font(.title2)
-                        .keyboardType(.decimalPad)
-                        .textFieldStyle(PlainTextFieldStyle())
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func buildDateRangeSection() -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Budget Period")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Start Date")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    DatePicker("", selection: $startDate, displayedComponents: [.date])
-                        .datePickerStyle(.compact)
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text("End Date")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    DatePicker("", selection: $endDate, in: startDate..., displayedComponents: [.date])
-                        .datePickerStyle(.compact)
-                }
-            }
-            .padding(.top, 4)
-            
-            // Period summary
-            let days = Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0
-            Text("Duration: \(days) days")
-                .font(.caption)
                 .foregroundColor(.secondary)
+            
+            // Single Slider - Removed the duplicate rectangles
+            VStack(spacing: 12) {
+                // Range labels
+                HStack {
+                    Text("₹0")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("₹10,000")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                // Actual Slider
+                Slider(value: $sliderValue, in: 0...10000, step: 100)
+                    .accentColor(.black)
+            }
+            .padding(.horizontal, 4)
+            
+            // Amount Input Field
+            HStack {
+                Text("₹")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+                
+                TextField("1000", text: $budgetAmount)
+                    .font(.title2)
+                    .keyboardType(.numberPad)
+                    .textFieldStyle(PlainTextFieldStyle())
+                    .onChange(of: budgetAmount) { newValue in
+                        // Validate input range
+                        if let doubleValue = Double(newValue) {
+                            if doubleValue > 10000 {
+                                budgetAmount = "10000"
+                                sliderValue = 10000
+                            } else if doubleValue < 0 {
+                                budgetAmount = "0"
+                                sliderValue = 0
+                            }
+                        }
+                    }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(.systemGray4), lineWidth: 1)
+            )
         }
     }
     
@@ -236,78 +220,26 @@ struct AddBudgetView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Description")
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.secondary)
             
-            TextEditor(text: $description)
-                .frame(minHeight: 80)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4), lineWidth: description.isEmpty ? 0 : 1)
-                )
-                .overlay(
-                    VStack {
-                        HStack {
-                            if description.isEmpty {
-                                Text("Add description...")
-                                    .foregroundColor(.secondary)
-                                    .padding(.leading, 16)
-                                    .padding(.top, 16)
-                            }
-                            Spacer()
-                        }
-                        Spacer()
-                    },
-                    alignment: .topLeading
-                )
-        }
-    }
-    
-    @ViewBuilder
-    private func buildSummarySection() -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Budget Summary")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Category:")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    HStack(spacing: 8) {
-                        Text(selectedCategory?.emoji ?? "")
-                        Text(selectedCategory?.name ?? "")
-                            .fontWeight(.medium)
-                    }
-                }
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+                    .frame(height: 100)
                 
-                HStack {
-                    Text("Budget Amount:")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    let amount = isUsingSlider ? sliderValue : (Double(budgetAmount) ?? 0)
-                    Text("₹\(Int(amount))")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.green)
-                }
+                TextEditor(text: $description)
+                    .background(Color.clear)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
                 
-                let days = Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0
-                HStack {
-                    Text("Duration:")
+                if description.isEmpty {
+                    Text("Add description...")
                         .foregroundColor(.secondary)
-                    Spacer()
-                    Text("\(days) days")
-                        .fontWeight(.medium)
+                        .padding(.leading, 16)
+                        .padding(.top, 16)
+                        .allowsHitTesting(false)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
         }
     }
     
@@ -323,28 +255,23 @@ struct AddBudgetView: View {
                 .cornerRadius(12)
         }
         .disabled(!isFormValid)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 8)
-        .background(Color(.systemBackground))
     }
     
     // MARK: - Actions
     
     private func createBudget() {
         guard let category = selectedCategory else { return }
-        
-        let amount = isUsingSlider ? sliderValue : (Double(budgetAmount) ?? 0)
-        guard amount > 0 else { return }
+        guard let amount = Double(budgetAmount), amount > 0 else { return }
         
         let newBudget = Budget(
             category: category,
             budgetAmount: amount,
             description: description.isEmpty ? "Budget for \(category.name)" : description,
-            startDate: startDate,
-            endDate: endDate
+            startDate: Date(),
+            endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
         )
         
-        budgetManager.addBudget(newBudget)
+        budgetManager.addBudget(newBudget, syncWithTransactions: transactionManager.transactions)
         dismiss()
     }
 }
@@ -389,6 +316,23 @@ struct CategoryPickerView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Custom Corner Radius Extension
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
     }
 }
 
