@@ -10,6 +10,8 @@ import SwiftUI
 struct tabView: View {
     @State private var selectedTab = 0
     @EnvironmentObject var appLockManager: AppLockManager
+    @StateObject private var transactionManager = TransactionManager()
+    @StateObject private var budgetManager = BudgetManager()
     
     init() {
         let appearance = UITabBarAppearance()
@@ -45,7 +47,7 @@ struct tabView: View {
                     Image(selectedTab == 1 ? "TransactionFilled" : "TransactionOutline")
                     Text("Transactions")
                 }.tag(1)
-            reportViewTab()
+            ReportViewTab(transactionManager: transactionManager, budgetManager: budgetManager)
                 .tabItem{
                     Image(selectedTab == 2 ? "ReportFilled" : "ReportOutline")
                     Text("Report")
