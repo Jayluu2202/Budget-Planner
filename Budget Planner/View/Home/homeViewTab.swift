@@ -13,7 +13,7 @@ struct homeViewTab: View {
     @State private var showAddScreen = false
     @State private var navigateToWealth = false
     @StateObject private var transactionManager = TransactionManager()
-    @StateObject private var budgetManager = BudgetManager() // Add BudgetManager
+    @StateObject private var budgetManager = BudgetManager()
     
     var body: some View {
         NavigationView {

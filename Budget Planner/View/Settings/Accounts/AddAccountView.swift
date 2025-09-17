@@ -106,7 +106,7 @@ struct AddAccountView: View {
                     }
                     .disabled(accountName.isEmpty)
                     .padding(.horizontal)
-                    .padding(.top, 20)
+//                    .padding(.top, 20)
                     
                     Spacer()
                 }

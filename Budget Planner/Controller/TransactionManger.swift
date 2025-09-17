@@ -10,6 +10,7 @@ import SwiftUI
 
 // MARK: - Transaction Manager
 class TransactionManager: ObservableObject {
+    
     @Published var transactions: [Transaction] = []
     @Published var accounts: [Account] = []
     @Published var categories: [TransactionCategory] = []
@@ -32,7 +33,7 @@ class TransactionManager: ObservableObject {
         loadAccounts()
         loadCategories()
     }
-
+    //Loading Transactions
     private func loadTransactions() {
         if let data = UserDefaults.standard.data(forKey: transactionsKey),
            let decodedTransactions = try? JSONDecoder().decode([Transaction].self, from: data) {
@@ -53,7 +54,7 @@ class TransactionManager: ObservableObject {
             self.categories = decodedCategories
         }
     }
-
+    //Saving Transactions
     private func saveTransactions() {
         if let encoded = try? JSONEncoder().encode(transactions) {
             UserDefaults.standard.set(encoded, forKey: transactionsKey)
@@ -70,48 +71,6 @@ class TransactionManager: ObservableObject {
         if let encoded = try? JSONEncoder().encode(categories) {
             UserDefaults.standard.set(encoded, forKey: categoriesKey)
         }
-    }
-
-    // MARK: - Account Management
-
-    func addAccount(_ account: Account) {
-        accounts.append(account)
-        saveAccounts()
-    }
-
-    func updateAccount(_ account: Account) {
-        if let index = accounts.firstIndex(where: { $0.id == account.id }) {
-            accounts[index] = account
-            saveAccounts()
-        }
-    }
-
-    func deleteAccount(_ account: Account) {
-        accounts.removeAll { $0.id == account.id }
-        saveAccounts()
-
-        // Also remove transactions associated with this account
-        transactions.removeAll { $0.account.id == account.id }
-        saveTransactions()
-    }
-
-    // MARK: - Category Management
-
-    func addCategory(_ category: TransactionCategory) {
-        categories.append(category)
-        saveCategories()
-    }
-
-    func updateCategory(_ category: TransactionCategory) {
-        if let index = categories.firstIndex(where: { $0.id == category.id }) {
-            categories[index] = category
-            saveCategories()
-        }
-    }
-
-    func deleteCategory(_ category: TransactionCategory) {
-        categories.removeAll { $0.id == category.id }
-        saveCategories()
     }
 
     // MARK: - Transaction Management
@@ -156,7 +115,7 @@ class TransactionManager: ObservableObject {
         accountStore.loadAccounts()
         
         if let accountIndex = accountStore.accounts.firstIndex(where: { $0.id == transaction.account.id }) {
-            let multiplier: Double = isAdding ? 1.0 : -1.0
+            let multiplier: Double = isAdding ? 1.0 : -1.0 // if we are adding transaction then 1.0 else -1.0
 
             switch transaction.type {
             case .income:

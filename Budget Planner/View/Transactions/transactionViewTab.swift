@@ -11,6 +11,17 @@ struct transactionViewTab: View {
     @StateObject var transactionManager = TransactionManager()
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
+    @Environment(\.dismiss) private var dismiss
+    
+    
+    // Make category an optional property
+    let category: TransactionCategory?
+    
+    // Initializer to handle both cases
+    init(category: TransactionCategory? = nil) {
+        self.category = category
+        _transactionManager = StateObject(wrappedValue: TransactionManager())
+    }
     
     enum FilterType: String, CaseIterable {
         case all = "All Transactions"
@@ -19,40 +30,67 @@ struct transactionViewTab: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Transactions list
-                buildTransactionsList()
-            }            
-            .navigationTitle("Transactions")
-            .navigationBarTitleDisplayMode(.large)
-            
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    // Filter button
-                    Button(action: {
-                        showFilterSheet = true
-                    }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.primary)
+            NavigationView {
+                VStack(spacing: 0) {
+                    if category != nil {
+                        buildCategoryHeader()
+                    }
+
+                    buildTransactionsList()
+                }
+                .navigationTitle(category == nil ? "Transactions" : "")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        if category == nil {
+                            Button {
+                                showFilterSheet = true
+                            } label: {
+                                Image(systemName: "slider.horizontal.3")
+                                    .font(.system(size: 18, weight: .medium))
+                                    .foregroundColor(.primary)
+                            }
+                        }
                     }
                 }
             }
-            .actionSheet(isPresented: $showFilterSheet) {
-                ActionSheet(
-                    title: Text("Filter Transactions"),
-                    buttons: FilterType.allCases.map { filter in
-                        .default(Text(filter.rawValue)) {
-                            selectedFilter = filter
-                        }
-                    } + [.cancel()]
-                )
+            .navigationBarHidden(true)
+            .onAppear {
+                transactionManager.loadData()
+            }
+            .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
+                ForEach(FilterType.allCases, id: \.self) { filter in
+                    Button(filter.rawValue) {
+                        selectedFilter = filter
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
             }
         }
-        .onAppear {
-            transactionManager.loadData()
+    
+    private func buildCategoryHeader() -> some View {
+        HStack {
+            Button(action: {
+                dismiss()
+            }) {
+                Image(systemName: "chevron.left")
+                    .font(.title2)
+                    .foregroundColor(.black)
+            }
+            
+            Text(category?.emoji ?? "")
+                .font(.title2)
+            
+            Text("Transactions")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Spacer()
         }
+        .navigationBarBackButtonHidden(true)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .background(Color(.systemBackground))
     }
     
     // MARK: - View Builders
@@ -136,13 +174,11 @@ struct transactionViewTab: View {
         // Apply type filter based on recurring status
         switch selectedFilter {
         case .all:
-            // Show all transactions
+            
             break
         case .recurring:
-            // Filter for recurring transactions (you'll need to add this property to your Transaction model)
             transactions = transactions.filter { $0.isRecurring ?? false }
         case .nonRecurring:
-            // Filter for non-recurring transactions
             transactions = transactions.filter { !($0.isRecurring ?? false) }
         }
         

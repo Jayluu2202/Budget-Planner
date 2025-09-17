@@ -13,6 +13,7 @@ struct Account: Identifiable, Codable, Equatable {
     var emoji: String
     var balance: Double
     
+    // when we want to create an account
     init(name: String, emoji: String, balance: Double = 0.0) {
         self.id = UUID()
         self.name = name
@@ -20,6 +21,7 @@ struct Account: Identifiable, Codable, Equatable {
         self.balance = balance
     }
     
+    // when we want to update an account
     init(id: UUID, name: String, emoji: String, balance: Double) {
         self.id = id
         self.name = name

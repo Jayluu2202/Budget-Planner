@@ -255,7 +255,7 @@ struct BudgetCard: View {
                             .cornerRadius(4)
                         
                         Rectangle()
-                            .fill(.blue)
+                            .fill(.black)
                             .frame(
                                 width: min(
                                     geometry.size.width * CGFloat(progressPercentage / 100),

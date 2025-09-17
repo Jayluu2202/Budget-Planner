@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct EditCategoryView: View {
-    @Environment(\.dismiss) var dismiss
+    @Binding var isPresented: Bool
     @EnvironmentObject var categoryStore: CategoryStore
+    @Environment(\.dismiss) private var dismiss
     
     @State var category: Category
     @State private var categoryName: String
@@ -18,7 +19,8 @@ struct EditCategoryView: View {
     @State private var showingEmojiPicker = false
     @State private var showingDeleteAlert = false
     
-    init(category: Category) {
+    init(isPresented: Binding<Bool>, category: Category) {
+        self._isPresented = isPresented
         self._category = State(initialValue: category)
         self._categoryName = State(initialValue: category.name)
         self._selectedEmoji = State(initialValue: category.emoji)
@@ -27,40 +29,12 @@ struct EditCategoryView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Header
-            HStack {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
-                        
-                        Text("Edit Categories")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.black)
-                    }
-                }
-                Spacer()
-                
-                // Delete button
-                Button(action: {
-                    showingDeleteAlert = true
-                }) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 20))
-                        .foregroundColor(.red)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 16)
-            
-            // Replace your Picker with this custom segmented control
+            // Custom segmented control
             HStack(spacing: 0) {
                 Button(action: {
-                    selectedType = .income
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .income
+                    }
                 }) {
                     Text("Income")
                         .font(.system(size: 16, weight: .medium))
@@ -71,7 +45,9 @@ struct EditCategoryView: View {
                 }
                 
                 Button(action: {
-                    selectedType = .expense
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .expense
+                    }
                 }) {
                     Text("Expense")
                         .font(.system(size: 16, weight: .medium))
@@ -86,25 +62,6 @@ struct EditCategoryView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal)
             
-            // Type Selector
-//            Picker("Category Type", selection: $selectedType) {
-//                Text("Income").tag(Category.CategoryType.income)
-//                Text("Expense").tag(Category.CategoryType.expense)
-//            }
-//
-//            .pickerStyle(SegmentedPickerStyle())
-//            .padding(.horizontal)
-//            .onAppear {
-//                // Customize the segmented control appearance
-//                UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.black
-//                UISegmentedControl.appearance().backgroundColor = UIColor.clear
-//                UISegmentedControl.appearance().setTitleTextAttributes([
-//                    .foregroundColor: UIColor.white
-//                ], for: .selected)
-//                UISegmentedControl.appearance().setTitleTextAttributes([
-//                    .foregroundColor: UIColor.black
-//                ], for: .normal)
-//            }
             // Emoji Selector
             VStack(spacing: 16) {
                 Button(action: {
@@ -116,6 +73,7 @@ struct EditCategoryView: View {
                         .background(Color.gray.opacity(0.1))
                         .clipShape(Circle())
                 }
+                .buttonStyle(PlainButtonStyle())
                 
                 // Category Name Input
                 TextField("Category Name", text: $categoryName)
@@ -139,11 +97,41 @@ struct EditCategoryView: View {
                 }
                 .disabled(categoryName.isEmpty)
                 .padding(.horizontal)
+                .buttonStyle(PlainButtonStyle())
             }
             
             Spacer()
         }
-        .navigationBarHidden(true)
+//        .navigationTitle("Edit Category")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                HStack{
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                    }
+                    
+                    Text("Edit Category")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.black)
+                }
+            }
+
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showingDeleteAlert = true
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                }
+            }
+        }
         .sheet(isPresented: $showingEmojiPicker) {
             EmojiPickerView(selectedEmoji: $selectedEmoji)
         }
@@ -161,6 +149,7 @@ struct EditCategoryView: View {
         guard !categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
         let updatedCategory = Category(
+            id: category.id, // Preserve the original ID
             name: categoryName.trimmingCharacters(in: .whitespacesAndNewlines),
             emoji: selectedEmoji,
             type: selectedType
@@ -168,18 +157,33 @@ struct EditCategoryView: View {
         
         categoryStore.updateCategory(original: category, updated: updatedCategory)
         category = updatedCategory
-        dismiss()
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+        
+        isPresented = false
     }
     
     private func deleteCategory() {
         categoryStore.deleteCategory(category)
-        dismiss()
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        isPresented = false
     }
 }
 
 struct EditCategoryView_Previews: PreviewProvider {
     static var previews: some View {
-        EditCategoryView(category: Category(name: "Freelance", emoji: "💻", type: .income))
+        NavigationView {
+            EditCategoryView(
+                isPresented: .constant(true),
+                category: Category(name: "Freelance", emoji: "💻", type: .income)
+            )
             .environmentObject(CategoryStore())
+        }
     }
 }

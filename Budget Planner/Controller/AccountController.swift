@@ -9,7 +9,9 @@ import Foundation
 
 class AccountStore: ObservableObject {
     static let shared = AccountStore()
+    
     @Published var accounts: [Account] = []
+    
     private let userDefaults = UserDefaults.standard
     private let accountsKey = "SavedAccounts"
     

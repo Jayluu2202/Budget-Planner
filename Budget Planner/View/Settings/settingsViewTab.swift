@@ -9,7 +9,7 @@ import SwiftUI
 
 struct settingsViewTab: View {
     @StateObject private var currencyManager = CurrencyManager()
-    @EnvironmentObject var appLockManager: AppLockManager // Add this line
+    @EnvironmentObject var appLockManager: AppLockManager
     @State private var showCurrencyPicker = false
     @State private var showMailErrorAlert = false
     @Environment(\.openURL) var openURL
@@ -31,7 +31,7 @@ struct settingsViewTab: View {
                         
                     }
                     
-                    NavigationLink(destination: currencyChangeView(currencyManager: currencyManager)){
+                    NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager)){
                         hStackFunc(image: "dollarsign.circle", title: "Currency", showSubtitle: true, subtitle: currencyManager.selectedCurrency.code)
                     }
                     

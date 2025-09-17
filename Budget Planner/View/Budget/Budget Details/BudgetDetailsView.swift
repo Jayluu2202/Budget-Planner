@@ -16,36 +16,70 @@ struct BudgetDetailsView: View {
     @State private var showEditBudget = false
     @State private var showDeleteAlert = false
     @State private var selectedMonth = Date()
-    
+    @State private var navigate = false
+    @State private var showCategoryTransactions = false
+
     // Computed properties for budget calculations
     private var dailyBudget: Double {
         let calendar = Calendar.current
-        let today = Date()
-        let range = calendar.range(of: .day, in: .month, for: today)
+        let range = calendar.range(of: .day, in: .month, for: selectedMonth)
         let totalDaysInMonth = range?.count ?? 30
-        let daysPassed = calendar.component(.day, from: today)
-        let remainingDays = max(1, totalDaysInMonth - daysPassed + 1)
         
-        return budget.remainingAmount / Double(remainingDays)
+        // Calculate days passed within the selected month.
+        let today = Date()
+        let daysPassedInSelectedMonth = calendar.isDate(today, equalTo: selectedMonth, toGranularity: .month) ? calendar.component(.day, from: today) : totalDaysInMonth
+        
+        // Calculate remaining days for the rest of the selected month
+        let remainingDaysInSelectedMonth = max(0, totalDaysInMonth - daysPassedInSelectedMonth + 1)
+        
+        // Ensure you don't divide by zero
+        let remainingAmount = budget.budgetAmount - spentForThisBudget
+        return remainingDaysInSelectedMonth > 0 ? remainingAmount / Double(remainingDaysInSelectedMonth) : 0
     }
-    
+
     private var remainingDays: Int {
         let calendar = Calendar.current
         let today = Date()
-        let range = calendar.range(of: .day, in: .month, for: today)
-        let totalDaysInMonth = range?.count ?? 30
-        let daysPassed = calendar.component(.day, from: today)
         
-        return max(0, totalDaysInMonth - daysPassed)
+        // If the selected month is the current month, calculate remaining days from today.
+        if calendar.isDate(selectedMonth, equalTo: today, toGranularity: .month) {
+            let range = calendar.range(of: .day, in: .month, for: today)
+            let totalDaysInMonth = range?.count ?? 30
+            let daysPassed = calendar.component(.day, from: today)
+            return max(0, totalDaysInMonth - daysPassed)
+        } else {
+            // If it's a past or future month, there are no "remaining" days in the same sense.
+            return 0
+        }
     }
     
     private var categoryTransactions: [Transaction] {
-        return transactionManager.transactions.filter { transaction in
-            transaction.category.id == budget.category.id &&
-            transaction.type == .expense &&
-            transaction.date >= budget.startDate &&
-            transaction.date <= budget.endDate
-        }.sorted { $0.date > $1.date }
+        let calendar = Calendar.current
+        return transactionManager.transactions
+            .filter { transaction in
+                transaction.category.id == budget.category.id &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .month) &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .year)
+            }
+            .sorted { $0.date > $1.date }
+    }
+    
+    private var spentForThisBudget: Double {
+        let calendar = Calendar.current
+        return transactionManager.transactions
+            .filter { transaction in
+                // Filter by category name, type, and selected month/year
+                return transaction.category.name == budget.category.name &&
+                transaction.type == .expense &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .month) &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .year)
+            }
+            .reduce(0) { $0 + $1.amount }
+    }
+    
+    private var progressPercentage: Double {
+        guard budget.budgetAmount > 0 else { return 0 }
+        return (spentForThisBudget / budget.budgetAmount) * 100
     }
     
     var body: some View {
@@ -78,6 +112,7 @@ struct BudgetDetailsView: View {
         }
         .background(Color(.systemGray6))
         .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $showEditBudget) {
             EditBudgetView(
                 budget: budget,
@@ -128,49 +163,59 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildMonthSelection() -> some View {
+        let calendar = Calendar.current
+        let today = Date()
+        
         ScrollView(.horizontal, showsIndicators: false){
             HStack(spacing: 12) {
                 // Previous months (lighter)
-                ForEach(getPreviousMonths(), id: \.self) { month in
+                ForEach(getPreviousMonths(around: today), id: \.self) { month in
+                    let isSelected = calendar.isDate(month, equalTo: selectedMonth, toGranularity: .month)
                     Button(action: {
                         selectedMonth = month
+                        
                     }) {
                         Text(formatMonthYear(month))
                             .font(.body)
                             .fontWeight(.medium)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(isSelected ? .white : .secondary)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(Color(.systemBackground))
+                            .background(isSelected ? Color.black : Color(.systemBackground))
                             .cornerRadius(20)
                     }
                 }
                 
-                // Current month (selected)
-                Text(formatMonthYear(Date()))
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(Color.black)
-                    .cornerRadius(20)
+                let isSelected = calendar.isDate(today, equalTo: selectedMonth, toGranularity: .month)
+                Button(action: {
+                    selectedMonth = today
+                }) {
+                    // Current month (selected)
+                    Text(formatMonthYear(today))
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundColor(isSelected ? .white : .secondary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(isSelected ? Color.black : Color(.systemBackground))
+                        .cornerRadius(20)
+                }
                 
                 // Future months (lighter)
-                ForEach(getNextMonths(), id: \.self) { month in
-                    Button(action: {
-                        selectedMonth = month
-                    }) {
-                        Text(formatMonthYear(month))
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(20)
-                    }
-                }
+//                ForEach(getNextMonths(), id: \.self) { month in
+//                    Button(action: {
+//                        selectedMonth = month
+//                    }) {
+//                        Text(formatMonthYear(month))
+//                            .font(.body)
+//                            .fontWeight(.medium)
+//                            .foregroundColor(.secondary)
+//                            .padding(.horizontal, 16)
+//                            .padding(.vertical, 8)
+//                            .background(Color(.systemBackground))
+//                            .cornerRadius(20)
+//                    }
+//                }
                 
                 Spacer()
             }
@@ -179,15 +224,15 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildBudgetOverviewCard() -> some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 12) {
             // Top Row - Daily Budget and Spent So Far
             HStack(spacing: 0) {
                 // Daily Budget
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     Text("You can spend")
                         .font(.body)
                         .foregroundColor(.secondary)
-                    
+                        
                     Text("₹\(formatAmount(max(0, dailyBudget)))")
                         .font(.title)
                         .fontWeight(.bold)
@@ -203,14 +248,15 @@ struct BudgetDetailsView: View {
                 Rectangle()
                     .fill(Color(.systemGray4))
                     .frame(width: 1, height: 80)
+                    .padding(.bottom, -25)
                 
                 // Spent So Far
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     Text("Spent so far")
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("₹\(formatAmount(budget.spentAmount))")
+                    Text("₹\(String(format: "%.2f", spentForThisBudget))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -226,6 +272,7 @@ struct BudgetDetailsView: View {
             Rectangle()
                 .fill(Color(.systemGray4))
                 .frame(height: 1)
+                
             
             // Bottom Row - Remaining and Budget
             HStack(spacing: 0) {
@@ -235,7 +282,7 @@ struct BudgetDetailsView: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("₹\(formatAmount(max(0, budget.remainingAmount)))")
+                    Text("₹\(String(format: "%.2f", budget.budgetAmount - spentForThisBudget))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(budget.remainingAmount < 0 ? .red : .primary)
@@ -246,7 +293,7 @@ struct BudgetDetailsView: View {
                 Rectangle()
                     .fill(Color(.systemGray4))
                     .frame(width: 1, height: 80)
-                
+                    .padding(.top, -25)
                 // Total Budget
                 VStack(spacing: 8) {
                     Text("Budget")
@@ -274,47 +321,53 @@ struct BudgetDetailsView: View {
                         
                         // Progress
                         Rectangle()
-                            .fill(getProgressColor())
+                            .fill(.black)
                             .frame(
                                 width: min(
-                                    geometry.size.width * CGFloat(budget.progressPercentage / 100),
+                                    geometry.size.width * CGFloat(progressPercentage / 100),
                                     geometry.size.width
                                 ),
                                 height: 8
                             )
                             .cornerRadius(4)
-                            .animation(.easeInOut(duration: 0.3), value: budget.progressPercentage)
+                            .animation(.easeInOut(duration: 0.3), value: progressPercentage)
                     }
                 }
                 .frame(height: 8)
                 
                 // Timeline
-                ScrollView(.horizontal, showsIndicators: false){
-                    HStack {
-                        Text(formatDate(budget.startDate))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Spacer()
-                        
-                        Text(formatDate(budget.endDate))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
+                HStack {
+                    let calendar = Calendar.current
+                    let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: budget.startDate)) ?? budget.startDate
+                    let lastOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth) ?? budget.endDate
+                    
+                    //1st date of the month
+                    Text(formatDate(startOfMonth))
+                        .font(.caption)
+                        .foregroundColor(Color.black.opacity(0.7))
+                    
+                    Spacer()
+                    // last date of the month
+                    Text(formatDate(lastOfMonth))
+                        .font(.caption)
+                        .foregroundColor(Color.black.opacity(0.7))
                 }
                 
                 // Remaining Days
                 Text("\(remainingDays) Remaining Days")
                     .font(.body)
                     .fontWeight(.medium)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.black)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 24)
-        .background(Color(.systemBackground))
+        .background(Color(.systemGray6))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(.systemGray4), lineWidth: 4)
+        )
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
     
     @ViewBuilder
@@ -326,20 +379,19 @@ struct BudgetDetailsView: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "square.and.pencil")
-                        .font(.system(size: 16))
+                        .font(.system(size: 18, weight: .bold))
                     
                     Text("Edit")
-                        .font(.body)
-                        .fontWeight(.medium)
+                        .font(.system(size: 18, weight: .semibold))
                 }
                 .foregroundColor(.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(Color(.systemBackground))
-                .cornerRadius(12)
+                .cornerRadius(8)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray4), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color(.black), lineWidth: 2)
                 )
             }
             
@@ -349,48 +401,51 @@ struct BudgetDetailsView: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "trash")
-                        .font(.system(size: 16))
+                        .font(.system(size: 18, weight: .semibold))
                     
                     Text("Delete")
-                        .font(.body)
-                        .fontWeight(.medium)
+                        .font(.system(size: 18, weight: .semibold))
                 }
                 .foregroundColor(.red)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(Color(.systemBackground))
-                .cornerRadius(12)
+                .cornerRadius(8)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.red, lineWidth: 2)
                 )
             }
         }
     }
     
+    
     @ViewBuilder
     private func buildViewTransactionsButton() -> some View {
-        NavigationLink(destination: transactionViewTab()) {
+        Button(action: {
+            navigate = true
+        }) {
             Text("View Transactions")
                 .font(.headline)
                 .fontWeight(.medium)
-                .foregroundColor(.primary)
+                .foregroundColor(.black)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(Color(.systemBackground))
-                .cornerRadius(12)
+                .cornerRadius(8)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 8)
                         .stroke(Color(.systemGray4), lineWidth: 1)
                 )
-        }.onAppear(perform: {
-            navigationBarHidden(true)
-            HStack{
-                Image(systemName: "chevron.left")
-                navigationTitle("Transactions")
-            }
-            
-        })
+        }
+        .background(
+            NavigationLink(
+                destination: transactionViewTab(category: budget.category),
+                isActive: $navigate,
+                label: { EmptyView() }
+            )
+            .hidden()
+        )
         .buttonStyle(PlainButtonStyle())
     }
     
@@ -437,7 +492,7 @@ struct BudgetDetailsView: View {
     
     // MARK: - Helper Methods
     
-    private func getPreviousMonths() -> [Date] {
+    private func getPreviousMonths(around date: Date) -> [Date] {
         let calendar = Calendar.current
         let currentDate = Date()
         var months: [Date] = []
@@ -451,19 +506,19 @@ struct BudgetDetailsView: View {
         return months.reversed()
     }
     
-    private func getNextMonths() -> [Date] {
-        let calendar = Calendar.current
-        let currentDate = Date()
-        var months: [Date] = []
-        
-        for i in 1...2 {
-            if let month = calendar.date(byAdding: .month, value: i, to: currentDate) {
-                months.append(month)
-            }
-        }
-        
-        return months
-    }
+//    private func getNextMonths() -> [Date] {
+//        let calendar = Calendar.current
+//        let currentDate = Date()
+//        var months: [Date] = []
+//
+//        for i in 1...2 {
+//            if let month = calendar.date(byAdding: .month, value: i, to: currentDate) {
+//                months.append(month)
+//            }
+//        }
+//
+//        return months
+//    }
     
     private func formatMonthYear(_ date: Date) -> String {
         let formatter = DateFormatter()
@@ -503,16 +558,7 @@ struct BudgetDetailsView: View {
         return "\(Int(abs(amount)))"
     }
     
-    private func getProgressColor() -> Color {
-        switch budget.budgetStatus {
-        case .onTrack:
-            return .blue
-        case .warning:
-            return .orange
-        case .overBudget:
-            return .red
-        }
-    }
+    
     
     private func deleteBudget() {
         budgetManager.deleteBudget(budget)
@@ -814,8 +860,41 @@ struct BudgetDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         let budgetManager = BudgetManager()
         let transactionManager = TransactionManager()
-        let sampleCategory = TransactionCategory(name: "Food", emoji: "🍔", type: .expense)
-        let sampleBudget = Budget(category: sampleCategory, budgetAmount: 1000, description: "Monthly food budget")
+        
+        // Sample Account
+        let sampleAccount = Account(id: UUID(), name: "Cash", emoji: "💰", balance: 5000)
+        
+        // Sample Category
+        let sampleCategory = TransactionCategory(id: UUID(), name: "Food", emoji: "🍔", type: .expense)
+        
+        // Sample Budget
+        let sampleBudget = Budget(
+            category: sampleCategory,
+            budgetAmount: 1000,
+            description: "Monthly food budget",
+            startDate: Date().addingTimeInterval(-5 * 24 * 60 * 60), // 5 days ago
+            endDate: Date().addingTimeInterval(25 * 24 * 60 * 60)
+        )
+        
+        // Sample Transactions
+        let sampleTransactions = [
+            Transaction(
+                type: .expense,
+                amount: 200,
+                description: "Lunch at cafe",
+                date: Date().addingTimeInterval(-3 * 24 * 60 * 60), // 3 days ago
+                account: sampleAccount,
+                category: sampleCategory
+            ),
+            Transaction(
+                type: .expense,
+                amount: 100,
+                description: "Groceries",
+                date: Date().addingTimeInterval(-1 * 24 * 60 * 60), // 1 day ago
+                account: sampleAccount,
+                category: sampleCategory
+            )
+        ]
         
         BudgetDetailsView(
             budget: sampleBudget,
@@ -824,3 +903,4 @@ struct BudgetDetailsView_Previews: PreviewProvider {
         )
     }
 }
+

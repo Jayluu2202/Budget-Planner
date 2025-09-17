@@ -67,25 +67,29 @@ struct EditAccountView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     TextField("Account Name", text: $accountName)
                         .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray, lineWidth: 1)
+                        )
                 }
                 .padding(.horizontal)
                 
                 // Account Balance Input
                 VStack(alignment: .leading, spacing: 8) {
                     TextField("Account Balance", text: $accountBalance)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray, lineWidth: 1)
+                        )
                 }
                 .padding(.horizontal)
                 
                 // Emoji Selection
                 VStack(alignment: .leading, spacing: 12) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        HStack {
+                        HStack(spacing: 20) {
                             ForEach(availableEmojis, id: \.self) { emoji in
                                 Button(action: {
                                     selectedEmoji = emoji
@@ -94,16 +98,16 @@ struct EditAccountView: View {
                                         .font(.system(size: 24))
                                         .frame(width: 50, height: 50)
                                         .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(selectedEmoji == emoji ? Color.black : Color.clear, lineWidth: 2)
+                                                .stroke(selectedEmoji == emoji ? Color.black : Color.gray, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
                                         )
                                 }
                             }
                             Spacer()
                         }
-                        .padding(.horizontal)
+                        .padding()
                     }
                 }
                 
@@ -119,7 +123,7 @@ struct EditAccountView: View {
                 }
                 .disabled(accountName.isEmpty)
                 .padding(.horizontal)
-                .padding(.top, 20)
+//                .padding(.top, 20)
                 
                 Spacer()
             }

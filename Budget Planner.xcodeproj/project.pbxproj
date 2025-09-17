@@ -33,6 +33,8 @@
 		04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */; };
 		04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B082E6FF0F8001EB314 /* EditCategoryView.swift */; };
 		04976B0B2E7009C0001EB314 /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B0A2E7009C0001EB314 /* CurrencyModel.swift */; };
+		04ADE8482E7A6C1500F6EC9A /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = 04ADE8472E7A6C1500F6EC9A /* Charts */; };
+		04D0AF032E77F75B00A6B1E9 /* CurrencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */; };
 		04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */; };
 		04D1F7E92E6EB04B007D2BA2 /* ExportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */; };
 		04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */; };
@@ -77,6 +79,7 @@
 		04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
 		04976B082E6FF0F8001EB314 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
 		04976B0A2E7009C0001EB314 /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
+		04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyManager.swift; sourceTree = "<group>"; };
 		04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionDetails.swift; sourceTree = "<group>"; };
 		04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDataView.swift; sourceTree = "<group>"; };
 		04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
@@ -97,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04ADE8482E7A6C1500F6EC9A /* Charts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,8 +199,8 @@
 			isa = PBXGroup;
 			children = (
 				04D1F7F02E6EE27B007D2BA2 /* CategoriesView.swift */,
-				040034B52E6F0A2700770CDB /* AddCategoriesView.swift */,
 				04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */,
+				040034B52E6F0A2700770CDB /* AddCategoriesView.swift */,
 				04976B082E6FF0F8001EB314 /* EditCategoryView.swift */,
 			);
 			path = Categories;
@@ -272,6 +276,7 @@
 				04976B042E6FE4AB001EB314 /* CategoryController.swift */,
 				04443F942E702CE700514154 /* AccountController.swift */,
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
+				04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
 				042023F12E73D91000598928 /* BudgetManager.swift */,
 			);
@@ -294,6 +299,9 @@
 			dependencies = (
 			);
 			name = "Budget Planner";
+			packageProductDependencies = (
+				04ADE8472E7A6C1500F6EC9A /* Charts */,
+			);
 			productName = "Budget Planner";
 			productReference = 047FB6282E6848AC0080D024 /* Budget Planner.app */;
 			productType = "com.apple.product-type.application";
@@ -322,6 +330,9 @@
 				Base,
 			);
 			mainGroup = 047FB61F2E6848AC0080D024;
+			packageReferences = (
+				04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */,
+			);
 			productRefGroup = 047FB6292E6848AC0080D024 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -369,6 +380,7 @@
 				84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */,
 				04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */,
 				04443F952E702CE700514154 /* AccountController.swift in Sources */,
+				04D0AF032E77F75B00A6B1E9 /* CurrencyManager.swift in Sources */,
 				04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */,
 				042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */,
 				042023EC2E73D89A00598928 /* BudgetDetailsView.swift in Sources */,
@@ -523,6 +535,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -552,6 +565,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -587,6 +601,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChartsOrg/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		04ADE8472E7A6C1500F6EC9A /* Charts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = Charts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 047FB6202E6848AC0080D024 /* Project object */;
 }

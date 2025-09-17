@@ -1,16 +1,12 @@
-//
-//  CategoriesView.swift
-//  Budget Planner
-//
-//  Created by mac on 08/09/25.
-//
-
 import SwiftUI
 
 struct CategoriesView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var categoryStore = CategoryStore()
     @State private var selectedSegment = 0
+    @State private var selectedCategory: Category?
+    @State private var showEditView = false
+    @State private var showAddView = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -31,7 +27,11 @@ struct CategoriesView: View {
                     }
                 }
                 Spacer()
-                NavigationLink(destination: AddCategoriesView().environmentObject(categoryStore)) {
+                
+                Button(action: {
+                    // Remove the withAnimation wrapper here
+                    showAddView = true
+                }) {
                     Text("Add")
                         .font(.system(size: 17, weight: .medium))
                         .frame(width: 50, height: 30)
@@ -51,7 +51,7 @@ struct CategoriesView: View {
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal)
             
-            // Categories List
+            // Categories ScrollView
             let currentType: Category.CategoryType = selectedSegment == 0 ? .income : .expense
             let filteredCategories = categoryStore.getCategories(for: currentType)
             
@@ -67,41 +67,80 @@ struct CategoriesView: View {
                     Spacer()
                 }
             } else {
-                List {
-                    ForEach(filteredCategories) { category in
-                        NavigationLink(destination: EditCategoryView(category: category).environmentObject(categoryStore)) {
-                            HStack(spacing: 12) {
-                                Text(category.emoji)
-                                    .font(.system(size: 24))
-                                Text(category.name)
-                                    .font(.system(size: 17))
-                                Spacer()
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(filteredCategories) { category in
+                            Button(action: {
+                                selectedCategory = category
+                                showEditView = true
+                            }) {
+                                HStack(spacing: 12) {
+                                    Text(category.emoji)
+                                        .font(.system(size: 24))
+                                    Text(category.name)
+                                        .font(.system(size: 17))
+                                        .foregroundColor(.black)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
+                                .frame(maxWidth: .infinity)
+                                .background(.clear)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray.opacity(0.4))
+                                )
                             }
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray.opacity(0.4))
-                            )
-                        }
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    }
-                    .onDelete { indexSet in
-                        // Note: This deletes from the filtered array, so we need to map back to the original
-                        let categoriesToDelete = indexSet.map { filteredCategories[$0] }
-                        categoryStore.categories.removeAll { category in
-                            categoriesToDelete.contains { $0.id == category.id }
+                            .buttonStyle(PlainButtonStyle())
+                            .contextMenu {
+                                Button("Delete", role: .destructive) {
+                                    categoryStore.categories.removeAll { $0.id == category.id }
+                                }
+                            }
                         }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .listStyle(PlainListStyle())
             }
             
             Spacer()
         }
         .navigationBarHidden(true)
+        // Use ZStack overlay for custom left-to-right animation
+        .overlay(
+            Group {
+                if showAddView {
+                    NavigationView {
+                        AddCategoriesView(isPresented: $showAddView)
+                            .environmentObject(categoryStore)
+                    }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .trailing)
+                    ))
+                    .zIndex(1)
+                }
+            }
+        )
+        .animation(.easeInOut(duration: 0.6), value: showAddView)
+        
+        // Edit view can keep the default bottom-to-top animation
+        .overlay(
+            Group {
+                if showEditView, let selectedCategory = selectedCategory {
+                    NavigationView {
+                        EditCategoryView(isPresented: $showEditView, category: selectedCategory)
+                            .environmentObject(categoryStore)
+                    }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .trailing)
+                    ))
+                    .zIndex(1)
+                }
+            }
+        )
+        .animation(.easeInOut(duration: 0.6), value: showEditView)
     }
 }
 

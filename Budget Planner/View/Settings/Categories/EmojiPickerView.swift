@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct EmojiPickerView: View {
-    @Environment(\.dismiss) var dismiss
     @Binding var selectedEmoji: String
+    @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
+    @State private var currentSelection = "" // Local state to track selection
     
     // Comprehensive emoji collection organized by categories
     private let emojiCategories: [(String, [String])] = [
@@ -27,86 +28,140 @@ struct EmojiPickerView: View {
         ("Smileys & Emotion", ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "☺️", "😚", "😙", "🥲", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔"])
     ]
     
-    var filteredEmojis: [String] {
+    // Filter emojis based on search text
+    private var filteredCategories: [(String, [String])] {
         if searchText.isEmpty {
-            return emojiCategories.flatMap { $0.1 }
+            return emojiCategories
         } else {
-            return emojiCategories.flatMap { $0.1 }.filter { emoji in
-                // Simple search - you could enhance this with emoji descriptions
-                true
-            }
+            let allEmojis = emojiCategories.flatMap { $0.1 }
+            return [("Search Results", allEmojis)]
         }
     }
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search bar
-                TextField("Search", text: $searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
+                // Search Bar
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    
+                    TextField("Search emojis...", text: $searchText)
+                        .textFieldStyle(.plain)
+                }
+                .padding(12)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                .padding(.top, 12)
                 
-                ScrollView(showsIndicators: false) {
-                    if searchText.isEmpty {
-                        // Show categorized emojis
-                        LazyVStack(alignment: .leading, spacing: 20) {
-                            ForEach(emojiCategories, id: \.0) { category in
-                                VStack(alignment: .leading, spacing: 12) {
+                // Emoji Grid
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 24) {
+                        ForEach(filteredCategories, id: \.0) { category in
+                            VStack(alignment: .leading, spacing: 12) {
+                                // Category Title
+                                if searchText.isEmpty {
                                     Text(category.0)
                                         .font(.headline)
+                                        .fontWeight(.semibold)
                                         .padding(.horizontal)
-                                    
-                                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 8), spacing: 8) {
-                                        ForEach(category.1, id: \.self) { emoji in
-                                            Button(action: {
-                                                selectedEmoji = emoji
-                                                dismiss()
-                                            }) {
-                                                Text(emoji)
-                                                    .font(.system(size: 28))
-                                                    .frame(width: 40, height: 40)
-                                                    .background(selectedEmoji == emoji ? Color.blue.opacity(0.3) : Color.clear)
-                                                    .cornerRadius(8)
+                                }
+                                
+                                // Emoji Grid
+                                LazyVGrid(
+                                    columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 7),
+                                    spacing: 8
+                                ) {
+                                    ForEach(category.1, id: \.self) { emoji in
+                                        EmojiButton(
+                                            emoji: emoji,
+                                            isSelected: currentSelection == emoji,
+                                            onTap: {
+                                                selectEmoji(emoji)
                                             }
-                                        }
+                                        )
                                     }
-                                    .padding(.horizontal)
                                 }
+                                .padding(.horizontal)
                             }
                         }
-                        .padding(.vertical)
-                    } else {
-                        // Show filtered emojis
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 8), spacing: 8) {
-                            ForEach(filteredEmojis, id: \.self) { emoji in
-                                Button(action: {
-                                    selectedEmoji = emoji
-                                    dismiss()
-                                }) {
-                                    Text(emoji)
-                                        .font(.system(size: 28))
-                                        .frame(width: 40, height: 40)
-                                        .background(selectedEmoji == emoji ? Color.blue.opacity(0.3) : Color.clear)
-                                        .cornerRadius(8)
-                                }
-                            }
-                        }
-                        .padding()
                     }
+                    .padding(.vertical)
                 }
             }
             .navigationTitle("Choose Emoji")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        if !currentSelection.isEmpty {
+                            selectedEmoji = currentSelection
+                        }
+                        dismiss()
+                    }
+                    .disabled(currentSelection.isEmpty)
+                }
             }
         }
+        .onAppear {
+            currentSelection = selectedEmoji
+        }
+    }
+    
+    // MARK: - Actions
+    
+    private func selectEmoji(_ emoji: String) {
+        withAnimation(.easeInOut(duration: 0.1)) {
+            currentSelection = emoji
+        }
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
     }
 }
+
+// MARK: - Emoji Button Component
+
+struct EmojiButton: View {
+    let emoji: String
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            Text(emoji)
+                .font(.system(size: 28))
+                .frame(width: 44, height: 44)
+                .background(
+                    isSelected ?
+                    Color.blue.opacity(0.3) :
+                    Color(.clear)
+                )
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(
+                            isSelected ? Color.blue : Color.clear,
+                            lineWidth: 2
+                        )
+                )
+                .scaleEffect(isSelected ? 1.1 : 1.0)
+        }
+        .buttonStyle(.plain)
+        .animation(.easeInOut(duration: 0.1), value: isSelected)
+    }
+}
+
+// MARK: - Preview
 
 struct EmojiPickerView_Previews: PreviewProvider {
     static var previews: some View {

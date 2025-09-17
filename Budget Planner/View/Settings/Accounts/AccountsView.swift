@@ -66,6 +66,7 @@ struct AccountsView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
+                        .cornerRadius(12)
                     }
                     .padding(.horizontal)
                     .padding(.top, 20)
@@ -90,8 +91,7 @@ struct AccountRow: View {
             Text(account.emoji)
                 .font(.system(size: 24))
                 .frame(width: 40, height: 40)
-                .background(Color(.systemGray5))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             
             // Account Info
             VStack(alignment: .leading, spacing: 4) {
@@ -114,7 +114,10 @@ struct AccountRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.gray, lineWidth: 1)
+        )
     }
 }
 

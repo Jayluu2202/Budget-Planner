@@ -16,8 +16,9 @@ struct Transaction: Identifiable, Codable {
     var date: Date
     var account: Account
     var category: TransactionCategory
-    var isRecurring: Bool // Changed from isRepeating to isRecurring for consistency
+    var isRecurring: Bool
     
+    //create
     init(type: TransactionType, amount: Double, description: String, date: Date, account: Account, category: TransactionCategory, isRecurring: Bool = false) {
         self.id = UUID()
         self.type = type
@@ -29,6 +30,7 @@ struct Transaction: Identifiable, Codable {
         self.isRecurring = isRecurring
     }
     
+    ///update
     // Additional initializer with id parameter for when loading from storage
     init(id: UUID, type: TransactionType, amount: Double, description: String, date: Date, account: Account, category: TransactionCategory, isRecurring: Bool = false) {
         self.id = id
