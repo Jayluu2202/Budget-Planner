@@ -12,8 +12,7 @@ struct transactionViewTab: View {
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
     @Environment(\.dismiss) private var dismiss
-    
-    
+    var isInsideTab : Bool = true
     // Make category an optional property
     let category: TransactionCategory?
     
@@ -30,43 +29,47 @@ struct transactionViewTab: View {
     }
     
     var body: some View {
-            NavigationView {
-                VStack(spacing: 0) {
-                    if category != nil {
-                        buildCategoryHeader()
-                    }
-
-                    buildTransactionsList()
+        NavigationView {
+            VStack(spacing: 0) {
+                if category != nil {
+                    buildCategoryHeader()
+//                        .padding(.top, category == nil ? 0 : -50)
                 }
-                .navigationTitle(category == nil ? "Transactions" : "")
-                .navigationBarTitleDisplayMode(.large)
-                .toolbar {
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        if category == nil {
-                            Button {
-                                showFilterSheet = true
-                            } label: {
-                                Image(systemName: "slider.horizontal.3")
-                                    .font(.system(size: 18, weight: .medium))
-                                    .foregroundColor(.primary)
-                            }
+                buildTransactionsList()
+                    
+            }
+            .navigationBarBackButtonHidden(true)
+            .navigationTitle(category == nil ? "Transactions" : "")
+//            .edgesIgnoringSafeArea(category == nil ? [] : .top)
+//            .padding(.top, category == nil ? 0 : -10)
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    if category == nil {
+                        Button {
+                            showFilterSheet = true
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
                         }
                     }
                 }
             }
-            .navigationBarHidden(true)
-            .onAppear {
-                transactionManager.loadData()
-            }
-            .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
-                ForEach(FilterType.allCases, id: \.self) { filter in
-                    Button(filter.rawValue) {
-                        selectedFilter = filter
-                    }
-                }
-                Button("Cancel", role: .cancel) { }
-            }
         }
+        .navigationBarHidden(true)
+        .onAppear {
+            transactionManager.loadData()
+        }
+        .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
+            ForEach(FilterType.allCases, id: \.self) { filter in
+                Button(filter.rawValue) {
+                    selectedFilter = filter
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+    }
     
     private func buildCategoryHeader() -> some View {
         HStack {
@@ -88,6 +91,8 @@ struct transactionViewTab: View {
             Spacer()
         }
         .navigationBarBackButtonHidden(true)
+        .edgesIgnoringSafeArea(category == nil ? [] : .top)
+        .padding(.top, category == nil ? 0 : -100)
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .background(Color(.systemBackground))

@@ -16,8 +16,8 @@ struct BudgetDetailsView: View {
     @State private var showEditBudget = false
     @State private var showDeleteAlert = false
     @State private var selectedMonth = Date()
+    @State private var showTransactions = false
     @State private var navigate = false
-    @State private var showCategoryTransactions = false
 
     // Computed properties for budget calculations
     private var dailyBudget: Double {
@@ -83,51 +83,54 @@ struct BudgetDetailsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Custom Navigation Bar
-            buildNavigationBar()
-            
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Month Selection
-                    buildMonthSelection()
-                    
-                    // Budget Overview Card
-                    buildBudgetOverviewCard()
-                    
-                    // Action Buttons
-                    buildActionButtons()
-                    
-                    // View Transactions Button
-                    buildViewTransactionsButton()
-                    
-                    // Recent Transactions (if any)
-                    if !categoryTransactions.isEmpty {
-                        buildRecentTransactions()
+        NavigationView {
+            VStack(spacing: 0) {
+                // Custom Navigation Bar
+                buildNavigationBar()
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Month Selection
+                        buildMonthSelection()
+                        
+                        // Budget Overview Card
+                        buildBudgetOverviewCard()
+                        
+                        // Action Buttons
+                        buildActionButtons()
+                        
+                        // View Transactions Button
+                        buildViewTransactionsButton()
+                        
+                        // Recent Transactions (if any)
+                        if !categoryTransactions.isEmpty {
+                            buildRecentTransactions()
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 100)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 100)
+                
+            }
+            .background(Color(.systemGray6))
+            .sheet(isPresented: $showEditBudget) {
+                EditBudgetView(
+                    budget: budget,
+                    budgetManager: budgetManager,
+                    transactionManager: transactionManager
+                )
+            }
+            .alert("Delete Budget", isPresented: $showDeleteAlert) {
+                Button("Delete", role: .destructive) {
+                    deleteBudget()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete this budget? This action cannot be undone.")
             }
         }
-        .background(Color(.systemGray6))
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
-        .sheet(isPresented: $showEditBudget) {
-            EditBudgetView(
-                budget: budget,
-                budgetManager: budgetManager,
-                transactionManager: transactionManager
-            )
-        }
-        .alert("Delete Budget", isPresented: $showDeleteAlert) {
-            Button("Delete", role: .destructive) {
-                deleteBudget()
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Are you sure you want to delete this budget? This action cannot be undone.")
-        }
+        
     }
     
     // MARK: - View Builders
@@ -156,9 +159,10 @@ struct BudgetDetailsView: View {
             Spacer()
         }
         .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 20)
+        .padding(.top, 60)
+        .padding(.bottom, -100)
         .background(Color(.systemGray6))
+        .edgesIgnoringSafeArea(.top)
     }
     
     @ViewBuilder
@@ -422,9 +426,9 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildViewTransactionsButton() -> some View {
-        Button(action: {
-            navigate = true
-        }) {
+        NavigationLink(
+            destination: transactionViewTab(category: budget.category)
+        ) {
             Text("View Transactions")
                 .font(.headline)
                 .fontWeight(.medium)
@@ -438,14 +442,6 @@ struct BudgetDetailsView: View {
                         .stroke(Color(.systemGray4), lineWidth: 1)
                 )
         }
-        .background(
-            NavigationLink(
-                destination: transactionViewTab(category: budget.category),
-                isActive: $navigate,
-                label: { EmptyView() }
-            )
-            .hidden()
-        )
         .buttonStyle(PlainButtonStyle())
     }
     
