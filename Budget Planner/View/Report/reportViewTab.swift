@@ -11,15 +11,13 @@ import Charts
 struct ReportViewTab: View {
     @ObservedObject var transactionManager: TransactionManager
     @ObservedObject var budgetManager: BudgetManager
-    @State private var selectedTab: ReportTab = .expense
+    @State private var selectedTab: ReportTab = .income
     @State private var selectedPeriod: TimePeriod = .thisMonth
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Header
-                    headerView
                     
                     // Tab Selector
                     tabSelector
@@ -32,9 +30,6 @@ struct ReportViewTab: View {
                         incomeReportView
                     }
                     
-                    // Period Summary
-                    periodSummaryView
-                    
                     Spacer(minLength: 100)
                 }
                 .padding()
@@ -44,41 +39,28 @@ struct ReportViewTab: View {
         }
     }
     
-    // MARK: - Header View
-    private var headerView: some View {
-        VStack {
-            // Period Selector
-            Picker("Period", selection: $selectedPeriod) {
-                ForEach(TimePeriod.allCases, id: \.self) { period in
-                    Text(period.rawValue).tag(period)
-                }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-        }
-    }
-    
     // MARK: - Tab Selector
     private var tabSelector: some View {
         HStack(spacing: 0) {
             Button(action: { selectedTab = .income }) {
                 Text("Income")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(selectedTab == .income ? .primary : .secondary)
+                    .foregroundColor(selectedTab == .income ? .white : .black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(
-                        selectedTab == .income ? Color.clear : Color.gray.opacity(0.1)
+                        selectedTab == .income ? Color.black : Color.clear
                     )
             }
             
             Button(action: { selectedTab = .expense }) {
                 Text("Expense")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(selectedTab == .expense ? .primary : .secondary)
+                    .foregroundColor(selectedTab == .expense ? .white : .black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(
-                        selectedTab == .expense ? Color.clear : Color.gray.opacity(0.1)
+                        selectedTab == .expense ? Color.black : Color.clear
                     )
             }
         }
@@ -200,64 +182,6 @@ struct ReportViewTab: View {
                 .cornerRadius(10)
             }
         }
-    }
-    
-    // MARK: - Period Summary
-    private var periodSummaryView: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("Summary")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            HStack {
-                summaryCard(
-                    title: "Income",
-                    amount: totalIncome,
-                    color: .green,
-                    icon: "arrow.up.circle.fill"
-                )
-                
-                Spacer()
-                
-                summaryCard(
-                    title: "Expense",
-                    amount: totalExpense,
-                    color: .red,
-                    icon: "arrow.down.circle.fill"
-                )
-                
-                Spacer()
-                
-                summaryCard(
-                    title: "Balance",
-                    amount: totalIncome - totalExpense,
-                    color: totalIncome >= totalExpense ? .green : .red,
-                    icon: "equal.circle.fill"
-                )
-            }
-        }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(15)
-        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
-    }
-    
-    // MARK: - Summary Card
-    private func summaryCard(title: String, amount: Double, color: Color, icon: String) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
-            Text("₹\(formatAmount(amount))")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(color)
-        }
-        .frame(maxWidth: .infinity)
     }
 }
 
