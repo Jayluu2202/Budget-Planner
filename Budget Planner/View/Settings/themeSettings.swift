@@ -9,7 +9,7 @@ import SwiftUI
 
 struct themeSettings: View {
     @Environment(\.dismiss) var dismiss
-    @State private var selectedTheme : String = "Light"
+    @Binding var selectedTheme : String
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 0) {
@@ -23,8 +23,8 @@ struct themeSettings: View {
                             .foregroundColor(.black)
                         
                         Text("Theme Settings")
-                            .font(.title)
-                            .fontWeight(.bold)
+                            .font(.title2)
+                            .fontWeight(.semibold)
                             .foregroundColor(.black)
                     }
                 }
@@ -40,9 +40,9 @@ struct themeSettings: View {
             
             // Options
             VStack(spacing: 12) {
-                themeOption(title: "Light", systemImage: "sun.max", selectedTheme: $selectedTheme)
-                themeOption(title: "Dark", systemImage: "moon", selectedTheme: $selectedTheme)
-                themeOption(title: "System", systemImage: "circle.lefthalf.fill", selectedTheme: $selectedTheme)
+                themeOption(title: "Light", systemImage: "light", selectedTheme: $selectedTheme)
+                themeOption(title: "Dark", systemImage: "dark", selectedTheme: $selectedTheme)
+                themeOption(title: "System", systemImage: "system", selectedTheme: $selectedTheme)
             }
             .padding(.horizontal)
             
@@ -61,18 +61,22 @@ struct themeOption: View {
     var body: some View {
         Button(action: {
             selectedTheme = title
+            print("Checking theme Selected: \(selectedTheme)")
         }) {
             HStack {
-                Image(systemName: systemImage)
+                Image(systemImage)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 24, height: 24)
                 Text(title)
                     .font(.body)
                 Spacer()
                 
-                if selectedTheme == title {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.blue)
-                }
+                
+                
+//                if selectedTheme == title {
+//                    print("Checking theme Selected: \(selectedTheme)")
+//                }
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -85,8 +89,10 @@ struct themeOption: View {
     }
 }
 
-struct themeSettings_Previews: PreviewProvider {
-    static var previews: some View {
-        themeSettings()
-    }
-}
+//struct themeSettings_Previews: PreviewProvider {
+//    @State var selectedState : String = "Light"
+//    static var previews: some View {
+//
+//        themeSettings(selectedTheme: $selectedState)
+//    }
+//}

@@ -74,7 +74,7 @@ struct AccountsView: View {
                 
                 Spacer()
             }
-            .background(Color(.systemGray6))
+            .background(Color(.white))
             .navigationBarHidden(true)
         }
         .navigationBarHidden(true)

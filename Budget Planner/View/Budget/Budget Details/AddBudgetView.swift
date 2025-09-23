@@ -2,7 +2,7 @@
 //  AddBudgetView.swift
 //  Budget Planner
 //
-//  Created by Assistant on 11/09/25.
+//  Updated to use CategoryStore instead of TransactionManager
 //
 
 import SwiftUI
@@ -10,16 +10,16 @@ import SwiftUI
 struct AddBudgetView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var budgetManager: BudgetManager
-    @ObservedObject var transactionManager: TransactionManager
+    @StateObject private var categoryStore = CategoryStore() // Use CategoryStore instead
     
-    @State private var selectedCategory: TransactionCategory?
+    @State private var selectedCategory: Category? // Changed from TransactionCategory to Category
     @State private var budgetAmount: String = ""
     @State private var sliderValue: Double = 1000
     @State private var description: String = ""
     @State private var showCategoryPicker = false
     
-    private var expenseCategories: [TransactionCategory] {
-        return transactionManager.categories.filter { $0.type == .expense }
+    private var expenseCategories: [Category] { // Changed return type
+        return categoryStore.getCategories(for: .expense) // Use categoryStore method
     }
     
     private var isFormValid: Bool {
@@ -125,7 +125,7 @@ struct AddBudgetView: View {
                     } else {
                         Text("🛍️")
                             .font(.title2)
-                        Text("Shopping")
+                        Text("Select Category")
                             .font(.body)
                             .foregroundColor(.primary)
                     }
@@ -264,23 +264,30 @@ struct AddBudgetView: View {
         guard let category = selectedCategory else { return }
         guard let amount = Double(budgetAmount), amount > 0 else { return }
         
+        // Convert Category to TransactionCategory for Budget
+        let transactionCategory = TransactionCategory(
+            name: category.name,
+            emoji: category.emoji,
+            type: category.type == .expense ? .expense : .income
+        )
+        
         let newBudget = Budget(
-            category: category,
+            category: transactionCategory,
             budgetAmount: amount,
             description: description.isEmpty ? "Budget for \(category.name)" : description,
             startDate: Date(),
             endDate: Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
         )
         
-        budgetManager.addBudget(newBudget, syncWithTransactions: transactionManager.transactions)
+        budgetManager.addBudget(newBudget) // Removed transaction sync for now
         dismiss()
     }
 }
 
-// MARK: - Category Picker View
+// MARK: - Category Picker View (Updated for Category model)
 struct CategoryPickerView: View {
-    let categories: [TransactionCategory]
-    @Binding var selectedCategory: TransactionCategory?
+    let categories: [Category] // Changed from TransactionCategory to Category
+    @Binding var selectedCategory: Category? // Changed from TransactionCategory to Category
     @Binding var isPresented: Bool
     
     var body: some View {
@@ -341,8 +348,7 @@ struct RoundedCorner: Shape {
 struct AddBudgetView_Previews: PreviewProvider {
     static var previews: some View {
         AddBudgetView(
-            budgetManager: BudgetManager(),
-            transactionManager: TransactionManager()
+            budgetManager: BudgetManager()
         )
     }
 }

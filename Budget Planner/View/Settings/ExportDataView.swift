@@ -8,8 +8,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-
-
 struct ExportDataView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var transactionManager = TransactionManager()
@@ -71,9 +69,12 @@ struct ExportDataView: View {
                 // Date Range Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image(systemName: "calendar")
-                            .foregroundColor(.primary)
-                            .font(.system(size: 18, weight: .medium))
+                        Image("calendar")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            
+                            
                         Text("Date Range")
                             .font(.headline)
                             .fontWeight(.medium)
@@ -91,7 +92,7 @@ struct ExportDataView: View {
                                         .font(.system(size: 13, weight: .medium))
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
-                                        .background(selectedDateRange == range ? Color.blue : Color.gray.opacity(0.15))
+                                        .background(selectedDateRange == range ? Color.black : Color.gray.opacity(0.15))
                                         .foregroundColor(selectedDateRange == range ? .white : .primary)
                                         .cornerRadius(20)
                                 }
@@ -111,11 +112,18 @@ struct ExportDataView: View {
                             DatePicker("", selection: $fromDate, displayedComponents: .date)
                                 .labelsHidden()
                                 .scaleEffect(0.9)
+                                .padding(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
+                                
                         }
+                        .padding(.horizontal)
                         
-                        Divider()
-                            .padding(.horizontal, -16)
-                        
+                                                
                         HStack {
                             Text("To")
                                 .font(.subheadline)
@@ -125,28 +133,41 @@ struct ExportDataView: View {
                             DatePicker("", selection: $toDate, displayedComponents: .date)
                                 .labelsHidden()
                                 .scaleEffect(0.9)
+                                .padding(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(16)
-                    .background(Color.gray.opacity(0.08))
+                    .padding(.vertical)
+                    .background(Color.white)
                     .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                    )
                     
-                    Text("\(daysSelectedText) • \(filteredTransactions.count) transactions")
+                    Text("\(daysSelectedText)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .padding(.horizontal, 4)
+                        .frame(maxWidth: .infinity ,alignment: .center)
                 }
                 .padding()
-                
-                Divider()
-                    .padding(.horizontal)
                 
                 // Export Format Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image(systemName: "folder.fill")
+                        Image("folder")
+                            .resizable()
+                            .scaledToFit()
+                            .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.primary)
-                            .font(.system(size: 18, weight: .medium))
+                            .frame(width: 24, height: 24)
                         Text("Export Format")
                             .font(.headline)
                             .fontWeight(.medium)
@@ -158,23 +179,21 @@ struct ExportDataView: View {
                             selectedFormat = "CSV File"
                         }) {
                             HStack(spacing: 12) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.blue)
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text("CSV")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundColor(.white)
-                                    )
+                                Image("csv")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(.primary)
+                                    .frame(width: 35, height: 35)
                                 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("CSV File")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(.black)
                                     Text("Comma-separated values for Excel")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(Color.gray)
                                 }
                                 
                                 Spacer()
@@ -184,11 +203,11 @@ struct ExportDataView: View {
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.gray.opacity(0.05))
+                            .background(Color.white)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "CSV File" ? Color.blue : Color.clear, lineWidth: 2)
+                                    .stroke(selectedFormat == "CSV File" ? Color.black : Color.gray.opacity(0.4), lineWidth: 2)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -198,23 +217,21 @@ struct ExportDataView: View {
                             selectedFormat = "Excel File"
                         }) {
                             HStack(spacing: 12) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.green)
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text("XLS")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundColor(.white)
-                                    )
+                                Image("xls")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(.primary)
+                                    .frame(width: 35, height: 35)
                                 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Excel File")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(.black)
                                     Text("Microsoft Excel format")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.gray)
                                 }
                                 
                                 Spacer()
@@ -224,11 +241,12 @@ struct ExportDataView: View {
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.gray.opacity(0.05))
+                            .background(Color.white)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "Excel File" ? Color.blue : Color.clear, lineWidth: 2)
+                                    .stroke(selectedFormat == "Excel File" ? Color.black : Color.gray
+                                                .opacity(0.4), lineWidth: 2)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -238,23 +256,21 @@ struct ExportDataView: View {
                             selectedFormat = "PDF Report"
                         }) {
                             HStack(spacing: 12) {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.red)
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text("PDF")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundColor(.white)
-                                    )
+                                Image("pdf")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(.primary)
+                                    .frame(width: 35, height: 35)
                                 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("PDF Report")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(.black)
                                     Text("Formatted document with charts")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.gray)
                                 }
                                 
                                 Spacer()
@@ -264,11 +280,11 @@ struct ExportDataView: View {
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.gray.opacity(0.05))
+                            .background(Color.white)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "PDF Report" ? Color.blue : Color.clear, lineWidth: 2)
+                                    .stroke(selectedFormat == "PDF Report" ? Color.black : Color.gray.opacity(0.4), lineWidth: 2)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -276,15 +292,17 @@ struct ExportDataView: View {
                 }
                 .padding()
                 
-                Divider()
-                    .padding(.horizontal)
-                
                 // Export Options Section
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image(systemName: "gearshape.fill")
+                        Image("options")
+                            .resizable()
+                            .scaledToFit()
+                            .font(.system(size: 20, weight: .medium))
                             .foregroundColor(.primary)
-                            .font(.system(size: 18, weight: .medium))
+                            .frame(width: 24, height: 24)
+                        
+                            
                         Text("Export Options")
                             .font(.headline)
                             .fontWeight(.medium)
@@ -305,10 +323,12 @@ struct ExportDataView: View {
                             Spacer()
                             Toggle("", isOn: $includeCategories)
                         }
-                        .padding(.vertical, 12)
+                        .padding(16)
                         
                         Divider()
-                        
+                            .frame(height: 2)
+                            .background(Color.gray.opacity(0.4))
+                            
                         // Include Accounts
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
@@ -323,9 +343,12 @@ struct ExportDataView: View {
                             Spacer()
                             Toggle("", isOn: $includeAccounts)
                         }
-                        .padding(.vertical, 12)
+                        .padding(16)
                         
                         Divider()
+                            .frame(height: 2)
+                            .background(Color.gray.opacity(0.4))
+                            
                         
                         // Include Notes
                         HStack {
@@ -341,9 +364,11 @@ struct ExportDataView: View {
                             Spacer()
                             Toggle("", isOn: $includeNotes)
                         }
-                        .padding(.vertical, 12)
+                        .padding(16)
                         
                         Divider()
+                            .frame(height: 2)
+                            .background(Color.gray.opacity(0.4))
                         
                         // Include Recurring Info
                         HStack {
@@ -359,9 +384,11 @@ struct ExportDataView: View {
                             Spacer()
                             Toggle("", isOn: $includeRecurringInfo)
                         }
-                        .padding(.vertical, 12)
+                        .padding(16)
                         
                         Divider()
+                            .frame(height: 2)
+                            .background(Color.gray.opacity(0.4))
                         
                         // Group by Month
                         HStack {
@@ -377,11 +404,15 @@ struct ExportDataView: View {
                             Spacer()
                             Toggle("", isOn: $groupByMonth)
                         }
-                        .padding(.vertical, 12)
+                        .padding(16)
                     }
-                    .padding(16)
-                    .background(Color.gray.opacity(0.05))
+//                    .padding(5)
+                    .background(Color.white)
                     .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                    )
                 }
                 .padding()
                 
@@ -399,17 +430,6 @@ struct ExportDataView: View {
                                 .foregroundColor(.secondary)
                             Spacer()
                             Text(dateRangeText)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
-                        }
-                        
-                        HStack {
-                            Text("Transactions:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                            Text("\(filteredTransactions.count)")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundColor(.primary)
@@ -438,11 +458,11 @@ struct ExportDataView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color.gray.opacity(0.05))
+                    .background(Color.white)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            .stroke(Color.black, lineWidth: 1)
                     )
                 }
                 .padding()
@@ -474,24 +494,41 @@ struct ExportDataView: View {
                 .padding()
                 .padding(.bottom, 20)
             }
+            .padding(.top, scaleH(110))
         }
+        .ignoresSafeArea(edges: .top)
         .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 20){
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(.black)
-                        
-                        Text("Export Data")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.black)
+                VStack{
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        HStack(spacing: 10){
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundColor(.black)
+                                .frame(width: 20, height: 20)
+                            
+                            Text("Export Data")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                            
+                        }
+                        .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 8)
+                    
+                    Divider()
+//                        .frame(height: 2)
+                        .background(.gray)
+//                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, scaleW(-250))
                 }
+                .frame(maxWidth: .infinity)
             }
         }
         .onAppear {
@@ -507,6 +544,18 @@ struct ExportDataView: View {
         } message: {
             Text(alertMessage)
         }
+    }
+    
+    private func scaleH(_ value: CGFloat) -> CGFloat {
+        let deviceHeight = UIScreen.main.bounds.height
+        let screenvalue = deviceHeight / 956
+        return value * screenvalue
+    }
+    
+    private func scaleW(_ value: CGFloat) -> CGFloat {
+        let deviceWidth = UIScreen.main.bounds.width
+        let screenValue = deviceWidth / 452
+        return value * screenValue
     }
     
     // MARK: - Helper Methods

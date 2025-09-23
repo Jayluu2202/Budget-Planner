@@ -257,6 +257,8 @@ struct FilterChip: View {
 
 // MARK: - Transaction Row Component
 struct TransactionRow: View {
+    @StateObject private var currencyManager = CurrencyManager()
+    @State var selectedCurrency: Currency?
     let transaction: Transaction
     let onDelete: () -> Void
     
@@ -340,8 +342,9 @@ struct TransactionRow: View {
     }
     
     private var amountText: String {
+        let appCurrency = currencyManager.selectedCurrency.symbol
         let prefix = transaction.type == .income ? "+" : "-"
-        return "\(prefix)₹\(Int(transaction.amount))"
+        return "\(prefix)\(appCurrency)\(Int(transaction.amount))"
     }
     
     private var amountColor: Color {

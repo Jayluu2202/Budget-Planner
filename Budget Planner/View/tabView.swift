@@ -12,7 +12,8 @@ struct tabView: View {
     @EnvironmentObject var appLockManager: AppLockManager
     @StateObject private var transactionManager = TransactionManager()
     @StateObject private var budgetManager = BudgetManager()
-    
+    @StateObject var currencyManager = CurrencyManager()
+    @State var selectedCurrency: Currency?
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -65,13 +66,15 @@ struct tabView: View {
         }
         .tint(.black)
         .environmentObject(appLockManager)
+        .environmentObject(currencyManager)
     }
 }
 
 struct tabView_Previews: PreviewProvider {
     static var previews: some View {
         tabView()
-            .environmentObject(AppLockManager()) // Add this for preview
+            .environmentObject(AppLockManager())
+            .environmentObject(CurrencyManager())
             .previewInterfaceOrientation(.portrait)
     }
 }

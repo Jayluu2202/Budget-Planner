@@ -12,7 +12,6 @@ struct OnboardingView: View {
     @StateObject private var categoryStore = CategoryStore()
     @StateObject private var currencyManager = CurrencyManager()
     @ObservedObject var onboardingManager: OnboardingManager
-    
     @State private var currentPage = 0
     
     var body: some View {
@@ -54,6 +53,7 @@ struct OnboardingView: View {
 struct OnboardingCurrencyPage: View {
     @ObservedObject var currencyManager: CurrencyManager
     @Binding var currentPage: Int
+//    @State private var currencySelected: Currency?
     
     var body: some View {
         VStack(spacing: 30) {
@@ -93,7 +93,7 @@ struct OnboardingCurrencyPage: View {
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(12)
                 
-                NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager)) {
+                NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager, selectedCurrency: .constant(nil))) {
                     Text("Change Currency")
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)

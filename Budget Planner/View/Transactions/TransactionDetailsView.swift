@@ -10,9 +10,12 @@ import SwiftUI
 struct TransactionDetailsView: View {
     let transaction: Transaction
     @ObservedObject var transactionManager: TransactionManager
+    @StateObject private var currencyManager = CurrencyManager()
     @Environment(\.presentationMode) var presentationMode
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
+    
+    @State var selectedCurrency: Currency?
     
     var body: some View {
         VStack(spacing: 24) {
@@ -126,8 +129,9 @@ struct TransactionDetailsView: View {
     }
     
     private var amountText: String {
+        let appCurrency = currencyManager.selectedCurrency.symbol
         let prefix = transaction.type == .expense ? "-" : "+"
-        return "\(prefix)₹\(Int(transaction.amount))"
+        return "\(prefix)\(appCurrency)\(Int(transaction.amount))"
     }
     
     private var amountColor: Color {

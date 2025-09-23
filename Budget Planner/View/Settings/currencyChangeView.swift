@@ -12,16 +12,16 @@ struct CurrencyChangeView: View {
     @ObservedObject private var currencyManager: CurrencyManager
     @State private var searchText = ""
     @Environment(\.dismiss) var dismiss
-    @State private var selectedCurrency: Currency?
+    @Binding private var selectedCurrency: Currency?
     
     // MARK: - Initializers
-    init(currencyManager: CurrencyManager) {
+    init(currencyManager: CurrencyManager, selectedCurrency: Binding<Currency?>) {
         self.currencyManager = currencyManager
+        self._selectedCurrency = selectedCurrency
     }
     
-    // Convenience initializer for previews
-    init() {
-        self.currencyManager = CurrencyManager()
+    var filteredCurrency: [Currency] {
+        currencyManager.filterCurrencies(by: searchText)
     }
     
     // MARK: - Computed Properties
@@ -55,8 +55,8 @@ struct CurrencyChangeView: View {
                         .foregroundColor(.black)
                     
                     Text("Select Currency")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -94,6 +94,7 @@ struct CurrencyChangeView: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(selectedCurrency?.code == currency.code ? Color.black : Color(.systemGray6), lineWidth: 2)
+                            .padding(.horizontal, 10)
                     )
                 }
             }
@@ -157,9 +158,9 @@ struct CurrencyRowView: View {
     }
 }
 
-// MARK: - Preview
-struct CurrencyChangeView_Previews: PreviewProvider {
-    static var previews: some View {
-        CurrencyChangeView()
-    }
-}
+//// MARK: - Preview
+//struct CurrencyChangeView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CurrencyChangeView(currencyManager: CurrencyManager, selectedCurrency: $currencySelected)
+//    }
+//}

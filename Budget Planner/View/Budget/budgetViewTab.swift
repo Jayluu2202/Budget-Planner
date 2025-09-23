@@ -66,8 +66,7 @@ struct budgetViewTab: View {
             }
             .sheet(isPresented: $showAddBudget) {
                 AddBudgetView(
-                    budgetManager: budgetManager,
-                    transactionManager: transactionManager
+                    budgetManager: budgetManager
                 )
             }
         }

@@ -10,6 +10,12 @@ struct settingsViewTab: View {
     @StateObject private var currencyManager = CurrencyManager()
     @EnvironmentObject var appLockManager: AppLockManager
     @State private var showMailErrorAlert = false
+    
+    
+    @State var currencySelected: Currency?
+    
+    
+    @State var selectedState : String = "Light"
     @Environment(\.openURL) var openURL
     var body: some View {
         NavigationView {
@@ -26,6 +32,7 @@ struct settingsViewTab: View {
                 .padding(.bottom, 10)
                 
                 Divider()
+                    .padding(.bottom, 10)
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -44,16 +51,21 @@ struct settingsViewTab: View {
                             VStack(spacing: 1) {
                                 NavigationLink(destination: ExportDataView()) {
                                     SettingsRow(
-                                        icon: "arrow.up.doc",
+                                        icon: "import-export",
                                         title: "Export Data",
                                         subtitle: nil
                                     )
                                 }
                             }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
+                            .frame(height: 60)
+                            .background(Color(.white))
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                            )
                             .padding(.horizontal, 20)
-                            .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
+                            
                         }
                         
                         // ACCOUNT Section
@@ -71,60 +83,68 @@ struct settingsViewTab: View {
                             VStack(spacing: 1) {
                                 NavigationLink(destination: AccountsView()) {
                                     SettingsRow(
-                                        icon: "creditcard",
+                                        icon: "bank-account",
                                         title: "Accounts",
                                         subtitle: "Number of accounts"
                                     )
                                 }
+                                .frame(height: 60)
                                 
                                 Divider()
                                     .padding(.leading, 60)
                                 
-                                NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager)) {
+                                NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager, selectedCurrency: $currencySelected)) {
                                     SettingsRow(
-                                        icon: "dollarsign.circle",
+                                        icon: "coin",
                                         title: "Currency",
-                                        subtitle: "USD"
+                                        subtitle: currencyManager.selectedCurrency.code
                                     )
                                 }
-                                
+                                .frame(height: 60)
                                 Divider()
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: CategoriesView()) {
                                     SettingsRow(
-                                        icon: "square.grid.2x2",
+                                        icon: "category",
                                         title: "Categories",
                                         subtitle: "Manage Categories"
                                     )
                                 }
+                                .frame(height: 60)
                                 
                                 Divider()
                                     .padding(.leading, 60)
                                 
-                                NavigationLink(destination: themeSettings()) {
+                                NavigationLink(destination: themeSettings(selectedTheme: $selectedState)) {
                                     SettingsRow(
-                                        icon: "circle.lefthalf.filled",
+                                        icon: "contrast",
                                         title: "Theme",
-                                        subtitle: "Selected Theme"
+                                        subtitle: selectedState
                                     )
                                 }
+                                .frame(height: 60)
                                 
                                 Divider()
                                     .padding(.leading, 60)
                                 
                                 NavigationLink(destination: AppLockView().environmentObject(appLockManager)) {
                                     SettingsRow(
-                                        icon: "checkmark.shield",
+                                        icon: "security",
                                         title: "App Lock",
                                         subtitle: getLockStatusText()
                                     )
                                 }
+                                .frame(height: 60)
                             }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
+                            
+                            .background(Color(.white))
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                            )
                             .padding(.horizontal, 20)
-                            .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
                         }
                         
                         // SUPPORT Section
@@ -144,28 +164,35 @@ struct settingsViewTab: View {
                                     openSupportEmail()
                                 } label: {
                                     SettingsRow(
-                                        icon: "headphones",
+                                        icon: "support",
                                         title: "Help & Support",
                                         subtitle: nil
                                     )
                                 }
+                                .frame(height: 60)
                                 
                                 Divider()
                                     .padding(.leading, 60)
                                 
                                 Link(destination: URL(string: "https://www.freeprivacypolicy.com/live/dc173f25-99d8-4dfd-88ec-39adf553fb9d")!) {
                                     SettingsRow(
-                                        icon: "info.circle",
+                                        icon: "info",
                                         title: "Privacy Policy",
                                         subtitle: nil
                                     )
                                 }
+                                .frame(height: 60)
                             }
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
+                            .background(Color(.white))
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                            )
                             .padding(.horizontal, 20)
-                            .shadow(color: Color.black.opacity(0.05), radius: 1, x: 0, y: 1)
+                            
                         }
+                                                
                         
                         // Version
                         if let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
@@ -179,7 +206,7 @@ struct settingsViewTab: View {
                     }
                 }
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(.white))
             .navigationBarHidden(true)
             .alert("Mail Not Available", isPresented: $showMailErrorAlert) {
                 Button("Copy Email") {
@@ -225,7 +252,9 @@ struct settingsViewTab: View {
         var body: some View {
             HStack(spacing: 15) {
                 // Icon
-                Image(systemName: icon)
+                Image(icon)
+                    .resizable()
+                    .scaledToFit()
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.primary)
                     .frame(width: 24, height: 24)
@@ -256,21 +285,12 @@ struct settingsViewTab: View {
         }
     }
 
-// Preview
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        settingsViewTab()
-            .environmentObject(AppLockManager())
-    }
-}
-
-
-
-
-
-
-
-
-
-
+//// Preview
+//struct SettingsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        settingsViewTab(currencySelected: .constant(Currency(code: "USD", name: "US Dollar", symbol: "$")))
+//            .environmentObject(AppLockManager())
+//    }
+//}
+//
 
