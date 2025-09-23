@@ -64,7 +64,7 @@ struct tabView: View {
                 }.tag(4)
         }
         .tint(.black)
-        .environmentObject(appLockManager) // Pass the appLockManager to child views
+        .environmentObject(appLockManager)
     }
 }
 

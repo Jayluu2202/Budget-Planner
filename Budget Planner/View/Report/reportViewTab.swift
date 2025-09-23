@@ -17,26 +17,45 @@ struct ReportViewTab: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
+                HStack{
+                    Text("Report")
+                        .font(.largeTitle)
+                        .fontWeight(.semibold)
                     
-                    // Tab Selector
+                    Spacer()
+                    
+                    Button(action: {
+                        print("++++++")
+                    }){
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(.black)
+                            .font(.system(size: 30, weight: .medium))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal)
+                Divider()
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.red)
+                    .padding(.top, -20)
+                
+                VStack{
                     tabSelector
                     
-                    // Main Content based on selected tab
                     switch selectedTab {
                     case .expense:
                         expenseReportView
                     case .income:
                         incomeReportView
                     }
-                    
                     Spacer(minLength: 100)
                 }
-                .padding()
+                .padding(.horizontal)
             }
-            .navigationTitle("Report")
-            .navigationBarTitleDisplayMode(.large)
+            .ignoresSafeArea()
+
         }
+        .padding(.top)
     }
     
     // MARK: - Tab Selector

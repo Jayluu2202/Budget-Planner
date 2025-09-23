@@ -228,9 +228,10 @@ struct AddBudgetView: View {
                     .frame(height: 100)
                 
                 TextEditor(text: $description)
+                    .padding(10)
+                    .frame(height: 100)
                     .background(Color.clear)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 
                 if description.isEmpty {
                     Text("Add description...")

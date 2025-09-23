@@ -47,6 +47,8 @@
 		04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C0FE2E712E960024FFF4 /* ApplockController.swift */; };
 		04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */; };
 		04D4C9B32E72E5F50041B09A /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4C9B22E72E5F50041B09A /* TransactionDetailsView.swift */; };
+		04FADDEB2E8176E1003BE3E1 /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */; };
+		04FADDED2E817727003BE3E1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FADDEC2E817727003BE3E1 /* OnboardingView.swift */; };
 		84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +94,8 @@
 		04D2C0FE2E712E960024FFF4 /* ApplockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplockController.swift; sourceTree = "<group>"; };
 		04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordUnlockView.swift; sourceTree = "<group>"; };
 		04D4C9B22E72E5F50041B09A /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
+		04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingManager.swift; sourceTree = "<group>"; };
+		04FADDEC2E817727003BE3E1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = budgetViewTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -167,6 +171,7 @@
 		047FB63A2E684C050080D024 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				04FADDE92E815B05003BE3E1 /* On-Boarding */,
 				047FB6472E6856050080D024 /* tabView.swift */,
 				04D2C1062E713E210024FFF4 /* Home */,
 				04D2C1052E713E140024FFF4 /* Transactions */,
@@ -258,6 +263,14 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		04FADDE92E815B05003BE3E1 /* On-Boarding */ = {
+			isa = PBXGroup;
+			children = (
+				04FADDEC2E817727003BE3E1 /* OnboardingView.swift */,
+			);
+			path = "On-Boarding";
+			sourceTree = "<group>";
+		};
 		84D9E1CF2E68B45200919A0F /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -279,6 +292,7 @@
 				04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
 				042023F12E73D91000598928 /* BudgetManager.swift */,
+				04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -365,6 +379,7 @@
 				042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */,
 				04D4C9B32E72E5F50041B09A /* TransactionDetailsView.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
+				04FADDED2E817727003BE3E1 /* OnboardingView.swift in Sources */,
 				042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */,
 				042023F22E73D91000598928 /* BudgetManager.swift in Sources */,
 				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
@@ -390,6 +405,7 @@
 				04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */,
 				04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */,
 				04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */,
+				04FADDEB2E8176E1003BE3E1 /* OnboardingManager.swift in Sources */,
 				04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */,
 				047FB6482E6856050080D024 /* tabView.swift in Sources */,
 				04443F972E702D4100514154 /* AccountModel.swift in Sources */,
@@ -524,6 +540,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -554,6 +571,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;

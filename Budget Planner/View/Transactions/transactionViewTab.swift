@@ -2,16 +2,17 @@
 //  transactionViewTab.swift
 //  Budget Planner
 //
-//  Updated to pass TransactionManager to TransactionDetailsView for proper deletion
+//  Updated to fix navigation title display
 //
 
 import SwiftUI
-//change check
+
 struct transactionViewTab: View {
     @StateObject var transactionManager = TransactionManager()
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
     @Environment(\.dismiss) private var dismiss
+    
     var isInsideTab : Bool = true
     // Make category an optional property
     let category: TransactionCategory?
@@ -29,46 +30,59 @@ struct transactionViewTab: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationView{
             VStack(spacing: 0) {
-                if category != nil {
+                // Add custom header when no category is specified
+                if category == nil {
+                    buildTransactionsHeader()
+                } else {
                     buildCategoryHeader()
-//                        .padding(.top, category == nil ? 0 : -50)
                 }
+                Divider()
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 4)
+                    .padding(.bottom)
                 buildTransactionsList()
-                    
             }
             .navigationBarBackButtonHidden(true)
-            .navigationTitle(category == nil ? "Transactions" : "")
-//            .edgesIgnoringSafeArea(category == nil ? [] : .top)
-//            .padding(.top, category == nil ? 0 : -10)
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    if category == nil {
-                        Button {
-                            showFilterSheet = true
-                        } label: {
-                            Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundColor(.primary)
-                        }
+            .navigationBarHidden(true)
+            .ignoresSafeArea(edges: .bottom)
+            .onAppear {
+                transactionManager.loadData()
+            }
+            .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
+                ForEach(FilterType.allCases, id: \.self) { filter in
+                    Button(filter.rawValue) {
+                        selectedFilter = filter
                     }
                 }
+                Button("Cancel", role: .cancel) { }
             }
         }
+        .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
-        .onAppear {
-            transactionManager.loadData()
-        }
-        .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
-            ForEach(FilterType.allCases, id: \.self) { filter in
-                Button(filter.rawValue) {
-                    selectedFilter = filter
-                }
+    }
+    
+    // New method to build transactions header
+    private func buildTransactionsHeader() -> some View {
+        HStack {
+            Text("Transactions")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            
+            Spacer()
+            
+            Button {
+                showFilterSheet = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 30, weight: .medium))
+                    .foregroundColor(.primary)
             }
-            Button("Cancel", role: .cancel) { }
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 15)
+        .background(Color(.systemBackground))
     }
     
     private func buildCategoryHeader() -> some View {
@@ -79,22 +93,20 @@ struct transactionViewTab: View {
                 Image(systemName: "chevron.left")
                     .font(.title2)
                     .foregroundColor(.black)
+                
+                Text(category?.emoji ?? "")
+                    .font(.title2)
+                
+                Text("Transactions")
+                    .font(.title2)
+                    .fontWeight(.semibold)
             }
-            
-            Text(category?.emoji ?? "")
-                .font(.title2)
-            
-            Text("Transactions")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
             Spacer()
         }
         .navigationBarBackButtonHidden(true)
-        .edgesIgnoringSafeArea(category == nil ? [] : .top)
-        .padding(.top, category == nil ? 0 : -100)
+        .padding(.top, category == nil ? 0 : 10)
         .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .padding(.top, 8)
         .background(Color(.systemBackground))
     }
     
@@ -110,7 +122,6 @@ struct transactionViewTab: View {
                     ForEach(groupedTransactions.keys.sorted(by: >), id: \.self) { date in
                         Section {
                             ForEach(groupedTransactions[date] ?? []) { transaction in
-                                // FIXED: Pass transactionManager to TransactionDetailsView
                                 NavigationLink(destination: TransactionDetailsView(
                                     transaction: transaction,
                                     transactionManager: transactionManager
@@ -122,16 +133,20 @@ struct transactionViewTab: View {
                                         }
                                     )
                                     .padding(.horizontal)
+//                                    .contentShape(Rectangle())
                                 }
-                                .buttonStyle(PlainButtonStyle())
+                                
+//                                .buttonStyle(PlainButtonStyle())
                             }
                         } header: {
                             buildDateHeader(date)
                         }
+                        
                     }
                 }
                 .padding(.bottom, 100) // Safe area for tab bar
             }
+            .padding(.top, 5)
         }
     }
     
@@ -179,7 +194,6 @@ struct transactionViewTab: View {
         // Apply type filter based on recurring status
         switch selectedFilter {
         case .all:
-            
             break
         case .recurring:
             transactions = transactions.filter { $0.isRecurring ?? false }

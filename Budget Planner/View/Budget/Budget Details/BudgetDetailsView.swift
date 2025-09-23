@@ -83,53 +83,52 @@ struct BudgetDetailsView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Custom Navigation Bar
-                buildNavigationBar()
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Month Selection
-                        buildMonthSelection()
-                        
-                        // Budget Overview Card
-                        buildBudgetOverviewCard()
-                        
-                        // Action Buttons
-                        buildActionButtons()
-                        
-                        // View Transactions Button
-                        buildViewTransactionsButton()
-                        
-                        // Recent Transactions (if any)
-                        if !categoryTransactions.isEmpty {
-                            buildRecentTransactions()
-                        }
+        VStack(spacing: 0) {
+            // Custom Navigation Bar
+            buildNavigationBar()
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Month Selection
+                    buildMonthSelection()
+                    
+                    // Budget Overview Card
+                    buildBudgetOverviewCard()
+                    
+                    // Action Buttons
+                    buildActionButtons()
+                    
+                    // View Transactions Button
+                    buildViewTransactionsButton()
+                    
+                    // Recent Transactions (if any)
+                    if !categoryTransactions.isEmpty {
+                        buildRecentTransactions()
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 100)
                 }
+//                .padding(.top, 55)
+                .padding(.horizontal, 20)
                 
             }
-            .background(Color(.systemGray6))
-            .sheet(isPresented: $showEditBudget) {
-                EditBudgetView(
-                    budget: budget,
-                    budgetManager: budgetManager,
-                    transactionManager: transactionManager
-                )
-            }
-            .alert("Delete Budget", isPresented: $showDeleteAlert) {
-                Button("Delete", role: .destructive) {
-                    deleteBudget()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Are you sure you want to delete this budget? This action cannot be undone.")
-            }
+            
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+        .background(Color(.systemGray6))
+        .sheet(isPresented: $showEditBudget) {
+            EditBudgetView(
+                budget: budget,
+                budgetManager: budgetManager,
+                transactionManager: transactionManager
+            )
+        }
+        .alert("Delete Budget", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                deleteBudget()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Are you sure you want to delete this budget? This action cannot be undone.")
+        }
         
     }
     
@@ -141,26 +140,25 @@ struct BudgetDetailsView: View {
             // Back Button
             Button(action: {
                 dismiss()
+                print("--------------")
             }) {
                 Image(systemName: "chevron.left")
                     .font(.title2)
                     .foregroundColor(.black)
+                
+                // Category Icon and Name
+                Text(budget.category.emoji)
+                    .font(.title2)
+                
+                Text(budget.category.name)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
             }
-            
-            // Category Icon and Name
-            Text(budget.category.emoji)
-                .font(.title2)
-            
-            Text(budget.category.name)
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundColor(.black)
-            
             Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.top, 60)
-        .padding(.bottom, -100)
         .background(Color(.systemGray6))
         .edgesIgnoringSafeArea(.top)
     }
@@ -554,8 +552,6 @@ struct BudgetDetailsView: View {
         return "\(Int(abs(amount)))"
     }
     
-    
-    
     private func deleteBudget() {
         budgetManager.deleteBudget(budget)
         dismiss()
@@ -685,9 +681,11 @@ struct EditBudgetView: View {
                             .frame(height: 100)
                         
                         TextEditor(text: $description)
+                            .padding(10)
+                            .frame(height: 100)
                             .background(Color.clear)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        
                         
                         if description.isEmpty {
                             Text("Add description...")
@@ -723,131 +721,6 @@ struct EditBudgetView: View {
         
         budgetManager.updateBudget(updatedBudget)
         dismiss()
-    }
-}
-
-// MARK: - Category Transactions View
-struct CategoryTransactionsView: View {
-    let category: TransactionCategory
-    let transactions: [Transaction]
-    @ObservedObject var transactionManager: TransactionManager
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Navigation Bar
-            HStack {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .font(.title2)
-                        .foregroundColor(.black)
-                }
-                
-                Text(category.emoji)
-                    .font(.title2)
-                
-                Text("\(category.name) Transactions")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .background(Color(.systemBackground))
-            
-            if transactions.isEmpty {
-                VStack(spacing: 16) {
-                    Image(systemName: "receipt")
-                        .font(.system(size: 48))
-                        .foregroundColor(.secondary)
-                    
-                    Text("No Transactions")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                    
-                    Text("No transactions found for this category")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(transactions, id: \.id) { transaction in
-                            TransactionRowView(transaction: transaction)
-                                .padding(.horizontal, 20)
-                        }
-                    }
-                    .padding(.vertical, 16)
-                }
-            }
-        }
-        .navigationBarHidden(true)
-        .background(Color(.systemGray6))
-    }
-}
-
-// MARK: - Transaction Row View
-struct TransactionRowView: View {
-    let transaction: Transaction
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Text(transaction.category.emoji)
-                .font(.title2)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(transaction.description.isEmpty ? transaction.category.name : transaction.description)
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-                
-                Text(formatDate(transaction.date))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            Text("\(transaction.type == .income ? "+" : "-")₹\(formatAmount(transaction.amount))")
-                .font(.body)
-                .fontWeight(.semibold)
-                .foregroundColor(transaction.type == .income ? .green : .red)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        let calendar = Calendar.current
-        
-        if calendar.isDateInToday(date) {
-            return "Today"
-        } else if calendar.isDateInYesterday(date) {
-            return "Yesterday"
-        } else {
-            formatter.dateFormat = "dd MMM yyyy"
-            return formatter.string(from: date)
-        }
-    }
-    
-    private func formatAmount(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 0
-        
-        if let formattedNumber = formatter.string(from: NSNumber(value: abs(amount))) {
-            return formattedNumber
-        }
-        return "\(Int(abs(amount)))"
     }
 }
 

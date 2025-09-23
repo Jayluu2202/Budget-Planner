@@ -26,11 +26,22 @@ struct budgetViewTab: View {
         NavigationView {
             ZStack {
                 VStack(spacing: 0) {
+                    
+                    Text("Budget Overview")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        .padding(.top, 65)
+                    Divider()
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
+                        .padding(.bottom)
+                    
                     // Budgets List
                     buildBudgetsList()
                 }
-                .navigationTitle("Budget Overview")
-                .navigationBarTitleDisplayMode(.large)
+                .ignoresSafeArea()
                 
                 // Floating Action Button
                 VStack {
@@ -53,7 +64,6 @@ struct budgetViewTab: View {
                     }
                 }
             }
-            
             .sheet(isPresented: $showAddBudget) {
                 AddBudgetView(
                     budgetManager: budgetManager,
@@ -71,7 +81,6 @@ struct budgetViewTab: View {
                 syncAllBudgetsWithTransactions()
             }
         }
-        // CRITICAL FIX: Listen for transaction changes
         .onReceive(transactionManager.$transactions) { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 syncAllBudgetsWithTransactions()
@@ -84,7 +93,7 @@ struct budgetViewTab: View {
     private func setupManagerLinking() {
         // CRITICAL: Link managers properly
 //        transactionManager.setBudgetManager(budgetManager)
-        print("🔗 Managers linked successfully")
+//        print("🔗 Managers linked successfully")
     }
     
     private func loadAndSyncData() {
@@ -93,7 +102,7 @@ struct budgetViewTab: View {
         
         // Always sync budgets with transactions when view appears
         syncAllBudgetsWithTransactions()
-        print("📂 Data loaded and synced")
+//        print("📂 Data loaded and synced")
     }
     
     private func syncAllBudgetsWithTransactions() {
