@@ -2,13 +2,14 @@
 //  transactionViewTab.swift
 //  Budget Planner
 //
-//  Updated to fix navigation title display
+//  Updated to use shared TransactionManager instance
 //
 
 import SwiftUI
 
 struct transactionViewTab: View {
-    @StateObject var transactionManager = TransactionManager()
+    // CHANGED: Use shared instance instead of creating new one
+    @ObservedObject var transactionManager = TransactionManager.shared
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
     @Environment(\.dismiss) private var dismiss
@@ -17,10 +18,9 @@ struct transactionViewTab: View {
     // Make category an optional property
     let category: TransactionCategory?
     
-    // Initializer to handle both cases
+    // Updated initializer - no longer creates new TransactionManager
     init(category: TransactionCategory? = nil) {
         self.category = category
-        _transactionManager = StateObject(wrappedValue: TransactionManager())
     }
     
     enum FilterType: String, CaseIterable {
@@ -133,15 +133,11 @@ struct transactionViewTab: View {
                                         }
                                     )
                                     .padding(.horizontal)
-//                                    .contentShape(Rectangle())
                                 }
-                                
-//                                .buttonStyle(PlainButtonStyle())
                             }
                         } header: {
                             buildDateHeader(date)
                         }
-                        
                     }
                 }
                 .padding(.bottom, 100) // Safe area for tab bar

@@ -2,7 +2,7 @@
 //  ReportViewTab.swift
 //  Budget Planner
 //
-//  Updated for iOS 15 with ChartsOrg/Charts library
+//  Fixed version with proper chart updates
 //
 
 import SwiftUI
@@ -13,11 +13,12 @@ struct ReportViewTab: View {
     @ObservedObject var budgetManager: BudgetManager
     @State private var selectedTab: ReportTab = .income
     @State private var selectedPeriod: TimePeriod = .thisMonth
+    @StateObject private var currencyManager = CurrencyManager()
     
     var body: some View {
         NavigationView {
             ScrollView {
-                HStack{
+                HStack {
                     Text("Report")
                         .font(.largeTitle)
                         .fontWeight(.semibold)
@@ -25,8 +26,8 @@ struct ReportViewTab: View {
                     Spacer()
                     
                     Button(action: {
-                        print("++++++")
-                    }){
+                        print("Filter button tapped")
+                    }) {
                         Image(systemName: "slider.horizontal.3")
                             .foregroundColor(.black)
                             .font(.system(size: 30, weight: .medium))
@@ -34,13 +35,25 @@ struct ReportViewTab: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal)
+                
                 Divider()
                     .frame(maxWidth: .infinity)
                     .foregroundColor(.red)
                     .padding(.top, -20)
                 
-                VStack{
+                VStack {
                     tabSelector
+                    
+                    // Debug info
+//                    VStack {
+//                        Text("Total Transactions: \(transactionManager.transactions.count)")
+//                        Text("Filtered: \(filteredTransactions.count)")
+//                        Text("Income: \(incomeTransactions.count)")
+//                        Text("Expense: \(expenseTransactions.count)")
+//                    }
+//                    .padding()
+//                    .background(Color.gray.opacity(0.1))
+//                    .cornerRadius(8)
                     
                     switch selectedTab {
                     case .expense:
@@ -48,12 +61,12 @@ struct ReportViewTab: View {
                     case .income:
                         incomeReportView
                     }
+                    
                     Spacer(minLength: 100)
                 }
                 .padding(.horizontal)
             }
             .ignoresSafeArea()
-
         }
         .padding(.top)
     }
@@ -93,6 +106,8 @@ struct ReportViewTab: View {
             // Expense Trend Chart
             if !expenseTransactions.isEmpty {
                 lineChartView(transactions: expenseTransactions, title: "Expense", color: .red)
+            } else {
+                noDataView(message: "No expense transactions found")
             }
             
             // Category Distribution
@@ -106,11 +121,31 @@ struct ReportViewTab: View {
             // Income Trend Chart
             if !incomeTransactions.isEmpty {
                 lineChartView(transactions: incomeTransactions, title: "Income", color: .green)
+            } else {
+                noDataView(message: "No income transactions found")
             }
             
             // Category Distribution
             categoryDistributionView(transactions: incomeTransactions)
         }
+    }
+    
+    // MARK: - No Data View
+    private func noDataView(message: String) -> some View {
+        VStack(spacing: 15) {
+            Text("No Data")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Text(message)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 40)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(15)
+        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
     
     // MARK: - Line Chart View (Using Charts library)
@@ -120,9 +155,20 @@ struct ReportViewTab: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            // Using Charts library for line chart
-            LineChartWrapper(data: dailyAmounts(for: transactions), title: title, color: UIColor(color))
-                .frame(height: 200)
+            // Debug the data being passed
+            let dailyData = dailyAmounts(for: transactions)
+            
+            if dailyData.isEmpty {
+                Text("No data to display")
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 40)
+            } else {
+                // Using Charts library for line chart
+                LineChartWrapper(data: dailyData, title: title, color: UIColor(color))
+                    .frame(height: 200)
+                    .id(UUID()) // Force refresh when data changes
+            }
         }
         .padding()
         .background(Color(.systemBackground))
@@ -137,6 +183,8 @@ struct ReportViewTab: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
+            let appCurrency = currencyManager.selectedCurrency.symbol
+            
             if transactions.isEmpty {
                 Text("No transactions found")
                     .foregroundColor(.secondary)
@@ -148,19 +196,27 @@ struct ReportViewTab: View {
                     let categoryData = categoryTotals(for: transactions)
                     let total = categoryData.reduce(0) { $0 + $1.amount }
                     
-                    VStack {
-                        PieChartView(
-                            data: categoryData.map { $0.amount },
-                            title: "Total\n₹\(formatAmount(total))",
-                            colors: categoryData.enumerated().map { index, _ in
-                                UIColor(colorForCategory(at: index))
-                            }
-                        )
-                        .frame(height: 200)
+                    if categoryData.isEmpty {
+                        Text("No category data available")
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 40)
+                    } else {
+                        VStack {
+                            PieChartView(
+                                data: categoryData.map { $0.amount },
+                                title: "Total\n\(appCurrency)\(formatAmount(total))",
+                                colors: categoryData.enumerated().map { index, _ in
+                                    UIColor(colorForCategory(at: index))
+                                }
+                            )
+                            .frame(height: 200)
+                            .id(UUID()) // Force refresh when data changes
+                        }
+                        
+                        // Category List
+                        categoryList(for: transactions)
                     }
-                    
-                    // Category List
-                    categoryList(for: transactions)
                 }
             }
         }
@@ -190,9 +246,14 @@ struct ReportViewTab: View {
                         
                         Spacer()
                         
-                        Text("\(Int((data.amount / total) * 100))%")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.secondary)
+                        VStack(alignment: .trailing) {
+                            Text("\(Int((data.amount / total) * 100))%")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Text(currencyManager.selectedCurrency.symbol + formatAmount(data.amount))
+                                .font(.system(size: 12, weight: .regular))
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
@@ -255,6 +316,8 @@ extension ReportViewTab {
     
     // MARK: - Helper Functions
     private func dailyAmounts(for transactions: [Transaction]) -> [Double] {
+        guard !transactions.isEmpty else { return [] }
+        
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: transactions) { transaction in
             calendar.startOfDay(for: transaction.date)
@@ -267,6 +330,8 @@ extension ReportViewTab {
     }
     
     private func categoryTotals(for transactions: [Transaction]) -> [CategoryTotal] {
+        guard !transactions.isEmpty else { return [] }
+        
         let grouped = Dictionary(grouping: transactions) { $0.category.id }
         
         return grouped.compactMap { _, transactions in
@@ -300,6 +365,15 @@ struct LineChartWrapper: UIViewRepresentable {
     
     func makeUIView(context: Context) -> LineChartView {
         let chartView = Charts.LineChartView()
+        setupChartView(chartView)
+        return chartView
+    }
+    
+    func updateUIView(_ uiView: LineChartView, context: Context) {
+        updateChartData(uiView)
+    }
+    
+    private func setupChartView(_ chartView: LineChartView) {
         chartView.backgroundColor = UIColor.systemBackground
         chartView.gridBackgroundColor = UIColor.systemBackground
         chartView.drawBordersEnabled = false
@@ -320,11 +394,14 @@ struct LineChartWrapper: UIViewRepresentable {
         chartView.leftAxis.drawLabelsEnabled = false
         
         chartView.rightAxis.enabled = false
-        
-        return chartView
     }
     
-    func updateUIView(_ uiView: LineChartView, context: Context) {
+    private func updateChartData(_ chartView: LineChartView) {
+        guard !data.isEmpty else {
+            chartView.data = nil
+            return
+        }
+        
         let entries = data.enumerated().map { index, value in
             ChartDataEntry(x: Double(index), y: value)
         }
@@ -341,8 +418,8 @@ struct LineChartWrapper: UIViewRepresentable {
         dataSet.drawValuesEnabled = false
         
         let chartData = LineChartData(dataSet: dataSet)
-        uiView.data = chartData
-        uiView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
+        chartView.data = chartData
+        chartView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
     }
 }
 
@@ -353,6 +430,15 @@ struct PieChartView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> Charts.PieChartView {
         let chartView = Charts.PieChartView()
+        setupChartView(chartView)
+        return chartView
+    }
+    
+    func updateUIView(_ uiView: Charts.PieChartView, context: Context) {
+        updateChartData(uiView)
+    }
+    
+    private func setupChartView(_ chartView: Charts.PieChartView) {
         chartView.backgroundColor = UIColor.systemBackground
         chartView.holeRadiusPercent = 0.4
         chartView.transparentCircleRadiusPercent = 0.45
@@ -364,11 +450,14 @@ struct PieChartView: UIViewRepresentable {
         // Center text
         chartView.centerText = title
         chartView.centerTextRadiusPercent = 1.0
-        
-        return chartView
     }
     
-    func updateUIView(_ uiView: Charts.PieChartView, context: Context) {
+    private func updateChartData(_ uiView: Charts.PieChartView) {
+        guard !data.isEmpty else {
+            uiView.data = nil
+            return
+        }
+        
         let entries = data.enumerated().map { index, value in
             PieChartDataEntry(value: value)
         }
@@ -384,7 +473,7 @@ struct PieChartView: UIViewRepresentable {
     }
 }
 
-// MARK: - Supporting Types (Same as before)
+// MARK: - Supporting Types
 enum ReportTab {
     case income
     case expense

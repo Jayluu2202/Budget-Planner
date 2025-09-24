@@ -11,6 +11,7 @@ import SwiftUI
 struct Budget_PlannerApp: App {
     @StateObject private var appLockManager = AppLockManager()
     @StateObject private var onboardingManager = OnboardingManager()
+    @StateObject private var transactionManager = TransactionManager.shared
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
@@ -28,6 +29,7 @@ struct Budget_PlannerApp: App {
                     // Show main app
                     tabView()
                         .environmentObject(appLockManager)
+                        .environmentObject(transactionManager)
                 }
             }
             .onChange(of: scenePhase) { newPhase in

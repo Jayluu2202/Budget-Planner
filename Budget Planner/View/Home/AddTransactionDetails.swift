@@ -11,7 +11,7 @@ import ContactsUI
 struct AddTransactionDetails: View {
     @Environment(\.dismiss) var dismiss
     
-    @ObservedObject var transactionManager: TransactionManager
+    @ObservedObject var transactionManager = TransactionManager.shared
     @ObservedObject var budgetManager: BudgetManager
     
     @State private var selectedType: TransactionType = .income

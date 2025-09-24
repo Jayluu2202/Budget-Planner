@@ -15,8 +15,6 @@ struct TransactionDetailsView: View {
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
     
-    @State var selectedCurrency: Currency?
-    
     var body: some View {
         VStack(spacing: 24) {
             // Amount section

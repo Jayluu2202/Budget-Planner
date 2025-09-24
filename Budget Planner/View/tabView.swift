@@ -12,7 +12,7 @@ struct tabView: View {
     @EnvironmentObject var appLockManager: AppLockManager
     @StateObject private var transactionManager = TransactionManager()
     @StateObject private var budgetManager = BudgetManager()
-    @StateObject var currencyManager = CurrencyManager()
+    @StateObject private var currencyManager = CurrencyManager()
     @State var selectedCurrency: Currency?
     init() {
         let appearance = UITabBarAppearance()
@@ -48,7 +48,7 @@ struct tabView: View {
                     Image(selectedTab == 1 ? "TransactionFilled" : "TransactionOutline")
                     Text("Transactions")
                 }.tag(1)
-            ReportViewTab(transactionManager: transactionManager, budgetManager: budgetManager)
+            ReportViewTab(transactionManager: TransactionManager.shared, budgetManager: budgetManager)
                 .tabItem{
                     Image(selectedTab == 2 ? "ReportFilled" : "ReportOutline")
                     Text("Report")

@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - Transaction Manager
 class TransactionManager: ObservableObject {
-    
+    static let shared = TransactionManager()
     @Published var transactions: [Transaction] = []
     @Published var accounts: [Account] = []
     @Published var categories: [TransactionCategory] = []

@@ -171,8 +171,8 @@
 		047FB63A2E684C050080D024 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				04FADDE92E815B05003BE3E1 /* On-Boarding */,
 				047FB6472E6856050080D024 /* tabView.swift */,
+				04FADDE92E815B05003BE3E1 /* On-Boarding */,
 				04D2C1062E713E210024FFF4 /* Home */,
 				04D2C1052E713E140024FFF4 /* Transactions */,
 				04D2C1042E713DDD0024FFF4 /* Report */,
