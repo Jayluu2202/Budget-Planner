@@ -2,7 +2,7 @@
 //  BudgetDetailsView.swift
 //  Budget Planner
 //
-//  Created by Assistant on 12/09/25.
+//  FIXED VERSION: Proper navigation handling
 //
 
 import SwiftUI
@@ -11,7 +11,11 @@ struct BudgetDetailsView: View {
     let budget: Budget
     @ObservedObject var budgetManager: BudgetManager
     @ObservedObject var transactionManager: TransactionManager
-    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var currencyManager = CurrencyManager()
+    
+    
+    // Use presentationMode for NavigationView back navigation
+    @Environment(\.presentationMode) var presentationMode
     
     @State private var showEditBudget = false
     @State private var showDeleteAlert = false
@@ -19,6 +23,7 @@ struct BudgetDetailsView: View {
     @State private var showTransactions = false
     @State private var navigate = false
 
+    
     // Computed properties for budget calculations
     private var dailyBudget: Double {
         let calendar = Calendar.current
@@ -37,6 +42,10 @@ struct BudgetDetailsView: View {
         return remainingDaysInSelectedMonth > 0 ? remainingAmount / Double(remainingDaysInSelectedMonth) : 0
     }
 
+    private var currencySymbol: String {
+            currencyManager.selectedCurrency.symbol
+        }
+    
     private var remainingDays: Int {
         let calendar = Calendar.current
         let today = Date()
@@ -83,7 +92,7 @@ struct BudgetDetailsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack {
             // Custom Navigation Bar
             buildNavigationBar()
             ScrollView {
@@ -99,26 +108,25 @@ struct BudgetDetailsView: View {
                     
                     // View Transactions Button
                     buildViewTransactionsButton()
-                    
+                        .padding(.horizontal, 20)
                     // Recent Transactions (if any)
                     if !categoryTransactions.isEmpty {
                         buildRecentTransactions()
+                    
                     }
                 }
-//                .padding(.top, 55)
                 .padding(.horizontal, 20)
-                
             }
-            
+            .padding(.vertical, -40)
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
-        .background(Color(.systemGray6))
+        .background(Color(.white))
         .sheet(isPresented: $showEditBudget) {
             EditBudgetView(
                 budget: budget,
                 budgetManager: budgetManager,
-                transactionManager: transactionManager
+                transactionManager: transactionManager, currencyManager: currencyManager
             )
         }
         .alert("Delete Budget", isPresented: $showDeleteAlert) {
@@ -136,30 +144,34 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildNavigationBar() -> some View {
-        HStack(spacing: 12) {
-            // Back Button
-            Button(action: {
-                dismiss()
-                print("--------------")
-            }) {
-                Image(systemName: "chevron.left")
-                    .font(.title2)
-                    .foregroundColor(.black)
-                
-                // Category Icon and Name
-                Text(budget.category.emoji)
-                    .font(.title2)
-                
-                Text(budget.category.name)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
+        VStack{
+            HStack(spacing: 12) {
+                // Back Button - FIXED: Use presentationMode.wrappedValue.dismiss()
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                    print("Navigating back to budget overview")
+                }) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2)
+                        .foregroundColor(.black)
+                    
+                    // Category Icon and Name
+                    Text(budget.category.emoji)
+                        .font(.title2)
+                    
+                    Text(budget.category.name)
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.black)
+                }
+                Spacer()
             }
-            Spacer()
+            .padding(.horizontal, 20)
+            
+            Divider()
         }
-        .padding(.horizontal, 20)
         .padding(.top, 60)
-        .background(Color(.systemGray6))
+        .background(Color(.white))
         .edgesIgnoringSafeArea(.top)
     }
     
@@ -169,7 +181,7 @@ struct BudgetDetailsView: View {
         let today = Date()
         
         ScrollView(.horizontal, showsIndicators: false){
-            HStack(spacing: 12) {
+            HStack {
                 // Previous months (lighter)
                 ForEach(getPreviousMonths(around: today), id: \.self) { month in
                     let isSelected = calendar.isDate(month, equalTo: selectedMonth, toGranularity: .month)
@@ -180,13 +192,19 @@ struct BudgetDetailsView: View {
                         Text(formatMonthYear(month))
                             .font(.body)
                             .fontWeight(.medium)
-                            .foregroundColor(isSelected ? .white : .secondary)
+                            .foregroundColor(isSelected ? .white : .black)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(isSelected ? Color.black : Color(.systemBackground))
+                            .background(isSelected ? Color.black : Color(.white))
                             .cornerRadius(20)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(isSelected ? .clear: .gray, lineWidth: 2)
+                            )
                     }
                 }
+                .padding(.horizontal, 1)
+                .padding(.vertical, 1)
                 
                 let isSelected = calendar.isDate(today, equalTo: selectedMonth, toGranularity: .month)
                 Button(action: {
@@ -196,36 +214,24 @@ struct BudgetDetailsView: View {
                     Text(formatMonthYear(today))
                         .font(.body)
                         .fontWeight(.medium)
-                        .foregroundColor(isSelected ? .white : .secondary)
+                        .foregroundColor(isSelected ? .white : .black)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(isSelected ? Color.black : Color(.systemBackground))
+                        .background(isSelected ? Color.black : Color(.white))
                         .cornerRadius(20)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(isSelected ? .clear : .gray)
+                        )
                 }
-                
-                // Future months (lighter)
-//                ForEach(getNextMonths(), id: \.self) { month in
-//                    Button(action: {
-//                        selectedMonth = month
-//                    }) {
-//                        Text(formatMonthYear(month))
-//                            .font(.body)
-//                            .fontWeight(.medium)
-//                            .foregroundColor(.secondary)
-//                            .padding(.horizontal, 16)
-//                            .padding(.vertical, 8)
-//                            .background(Color(.systemBackground))
-//                            .cornerRadius(20)
-//                    }
-//                }
-                
-                Spacer()
             }
         }
     }
     
     @ViewBuilder
     private func buildBudgetOverviewCard() -> some View {
+        let actualCurrency = currencyManager.selectedCurrency.symbol
+        
         VStack(spacing: 12) {
             // Top Row - Daily Budget and Spent So Far
             HStack(spacing: 0) {
@@ -235,7 +241,7 @@ struct BudgetDetailsView: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                         
-                    Text("₹\(formatAmount(max(0, dailyBudget)))")
+                    Text("\(actualCurrency)\(formatAmount(max(0, dailyBudget)))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -258,7 +264,7 @@ struct BudgetDetailsView: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("₹\(String(format: "%.2f", spentForThisBudget))")
+                    Text("\(actualCurrency)\(String(format: "%.2f", spentForThisBudget))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -284,7 +290,7 @@ struct BudgetDetailsView: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("₹\(String(format: "%.2f", budget.budgetAmount - spentForThisBudget))")
+                    Text("\(actualCurrency)\(String(format: "%.2f", budget.budgetAmount - spentForThisBudget))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(budget.remainingAmount < 0 ? .red : .primary)
@@ -302,7 +308,7 @@ struct BudgetDetailsView: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("₹\(formatAmount(budget.budgetAmount))")
+                    Text("\(actualCurrency)\(formatAmount(budget.budgetAmount))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -445,6 +451,7 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildRecentTransactions() -> some View {
+        let actualCurrency = currencyManager.selectedCurrency.symbol
         VStack(alignment: .leading, spacing: 16) {
             Text("Recent Transactions")
                 .font(.headline)
@@ -470,7 +477,7 @@ struct BudgetDetailsView: View {
                         
                         Spacer()
                         
-                        Text("-₹\(formatAmount(transaction.amount))")
+                        Text("-\(actualCurrency)\(formatAmount(transaction.amount))")
                             .font(.body)
                             .fontWeight(.semibold)
                             .foregroundColor(.red)
@@ -499,20 +506,6 @@ struct BudgetDetailsView: View {
         
         return months.reversed()
     }
-    
-//    private func getNextMonths() -> [Date] {
-//        let calendar = Calendar.current
-//        let currentDate = Date()
-//        var months: [Date] = []
-//
-//        for i in 1...2 {
-//            if let month = calendar.date(byAdding: .month, value: i, to: currentDate) {
-//                months.append(month)
-//            }
-//        }
-//
-//        return months
-//    }
     
     private func formatMonthYear(_ date: Date) -> String {
         let formatter = DateFormatter()
@@ -554,25 +547,30 @@ struct BudgetDetailsView: View {
     
     private func deleteBudget() {
         budgetManager.deleteBudget(budget)
-        dismiss()
+        presentationMode.wrappedValue.dismiss() // FIXED: Use presentationMode for delete as well
     }
 }
 
 // MARK: - Edit Budget View
 struct EditBudgetView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) private var dismiss // This is correct for sheets
     let budget: Budget
     @ObservedObject var budgetManager: BudgetManager
     @ObservedObject var transactionManager: TransactionManager
-    
+    @ObservedObject var currencyManager: CurrencyManager
     @State private var budgetAmount: String
     @State private var description: String
     @State private var sliderValue: Double
     
-    init(budget: Budget, budgetManager: BudgetManager, transactionManager: TransactionManager) {
+    private var actualCurrency: String{
+        currencyManager.selectedCurrency.symbol
+    }
+    
+    init(budget: Budget, budgetManager: BudgetManager, transactionManager: TransactionManager, currencyManager: CurrencyManager) {
         self.budget = budget
         self.budgetManager = budgetManager
         self.transactionManager = transactionManager
+        self.currencyManager = currencyManager
         
         self._budgetAmount = State(initialValue: String(Int(budget.budgetAmount)))
         self._description = State(initialValue: budget.description)
@@ -639,11 +637,11 @@ struct EditBudgetView: View {
                     
                     VStack(spacing: 12) {
                         HStack {
-                            Text("₹0")
+                            Text("\(actualCurrency)0")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text("₹10,000")
+                            Text("\(actualCurrency)10,000")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -654,7 +652,7 @@ struct EditBudgetView: View {
                     .padding(.horizontal, 4)
                     
                     HStack {
-                        Text("₹")
+                        Text("\(actualCurrency)")
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
@@ -729,7 +727,7 @@ struct BudgetDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         let budgetManager = BudgetManager()
         let transactionManager = TransactionManager()
-        
+        let currenctManager = CurrencyManager()
         // Sample Account
         let sampleAccount = Account(id: UUID(), name: "Cash", emoji: "💰", balance: 5000)
         
@@ -768,7 +766,7 @@ struct BudgetDetailsView_Previews: PreviewProvider {
         BudgetDetailsView(
             budget: sampleBudget,
             budgetManager: budgetManager,
-            transactionManager: transactionManager
+            transactionManager: transactionManager, currencyManager: currenctManager
         )
     }
 }

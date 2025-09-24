@@ -2,7 +2,7 @@
 //  budgetViewTab.swift
 //  Budget Planner
 //
-//  FIXED VERSION: Proper budget-transaction synchronization
+//  FIXED VERSION: Use shared CurrencyManager from environment
 //
 
 import SwiftUI
@@ -10,7 +10,10 @@ import SwiftUI
 struct budgetViewTab: View {
     @StateObject var budgetManager = BudgetManager()
     @StateObject var transactionManager = TransactionManager()
+    // CHANGE: Use EnvironmentObject instead of StateObject
+    @ObservedObject var currencyManager = CurrencyManager()
     @State private var showAddBudget = false
+    
     var transportTotal: Double {
         var sum = 0.0
         for cat in transactionManager.transactions {
@@ -26,17 +29,21 @@ struct budgetViewTab: View {
         NavigationView {
             ZStack {
                 VStack(spacing: 0) {
-                    
-                    Text("Budget Overview")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.top, 65)
-                    Divider()
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 4)
-                        .padding(.bottom)
+                    // Custom header since we're hiding the navigation bar
+                    VStack(spacing: 0) {
+                        Text("Budget Overview")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .padding(.top, 65)
+                        
+                        Divider()
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 4)
+                            .padding(.bottom)
+                    }
+                    .background(Color(.systemBackground))
                     
                     // Budgets List
                     buildBudgetsList()
@@ -60,22 +67,23 @@ struct budgetViewTab: View {
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
                         .padding(.trailing, 24)
-                        .padding(.bottom, 16) // Account for tab bar
+                        .padding(.bottom, 16)
                     }
                 }
             }
+            .navigationBarHidden(true)
             .sheet(isPresented: $showAddBudget) {
                 AddBudgetView(
                     budgetManager: budgetManager
                 )
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
             setupManagerLinking()
             loadAndSyncData()
         }
         .onChange(of: showAddBudget) { isShowing in
-            // When AddBudgetView is dismissed, sync all budgets
             if !isShowing {
                 syncAllBudgetsWithTransactions()
             }
@@ -106,8 +114,6 @@ struct budgetViewTab: View {
     
     private func syncAllBudgetsWithTransactions() {
         budgetManager.syncAllBudgetsWithTransactions(transactionManager.transactions)
-        
-
     }
     
     // MARK: - View Builders
@@ -122,17 +128,24 @@ struct budgetViewTab: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(filteredBudgets) { budget in
-                        NavigationLink(destination: BudgetDetailsView(budget: budget, budgetManager: budgetManager, transactionManager: transactionManager))
-                        {
+                        NavigationLink(
+                            destination: BudgetDetailsView(
+                                budget: budget,
+                                budgetManager: budgetManager,
+                                transactionManager: transactionManager
+                            )
+                        ) {
                             BudgetCard(
                                 budget: budget,
                                 transactions: transactionManager.transactions,
+                                currencyManager: currencyManager, // CHANGE: Pass currencyManager
                                 onDelete: {
                                     deleteBudget(budget)
                                 }
                             )
-                                .padding(.horizontal, 16)
+                            .padding(.horizontal, 16)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.bottom, 100)
@@ -193,10 +206,11 @@ struct budgetViewTab: View {
     }
 }
 
-// MARK: - Budget Card Component (UNCHANGED)
+// MARK: - Budget Card Component (UPDATED)
 struct BudgetCard: View {
     let budget: Budget
     let transactions: [Transaction]
+    let currencyManager: CurrencyManager // CHANGE: Add currencyManager parameter
     let onDelete: () -> Void
     
     // Calculate spending just for this budget
@@ -242,14 +256,14 @@ struct BudgetCard: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("₹\(formatAmount(remainingAmount))")
+                    // CHANGE: Use currencyManager.selectedCurrency.symbol
+                    Text("\(currencyManager.selectedCurrency.symbol)\(formatAmount(remainingAmount))")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
-                    Text("₹\(String(format: "%.2f", spentForThisBudget)) / ₹\(String(format: "%.2f", budget.budgetAmount))")
+                    Text("\(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", spentForThisBudget)) / \(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", budget.budgetAmount))")
                         .font(.caption)
-
                 }
             }
             
@@ -317,10 +331,10 @@ struct BudgetCard: View {
     }
 }
 
-
 // MARK: - Preview
 struct budgetViewTab_Previews: PreviewProvider {
     static var previews: some View {
         budgetViewTab()
+            .environmentObject(CurrencyManager()) // CHANGE: Add environment object
     }
 }
