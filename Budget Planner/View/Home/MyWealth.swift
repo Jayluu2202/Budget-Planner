@@ -10,7 +10,7 @@ import SwiftUI
 struct MyWealth: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var accountStore = AccountStore()
-    
+    let actualCurrency = CurrencyManager().selectedCurrency.symbol
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -44,7 +44,7 @@ struct MyWealth: View {
                             .foregroundColor(.gray)
                             .tracking(0.5)
                         
-                        Text("₹\(formattedTotalBalance)")
+                        Text("\(actualCurrency)\(formattedTotalBalance)")
                             .font(.system(size: 36, weight: .bold))
                             .foregroundColor(.black)
                     }
@@ -182,9 +182,9 @@ struct AccountBalanceRow: View {
                 .foregroundColor(.black)
             
             Spacer()
-            
+            let actualCurrency = CurrencyManager().selectedCurrency.symbol
             // Balance (Color changes based on positive/negative)
-            Text("₹\(formattedBalance)")
+            Text("\(actualCurrency)\(formattedBalance)")
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(account.balance >= 0 ? .green : .red)
         }

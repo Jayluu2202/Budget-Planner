@@ -183,7 +183,7 @@ struct ReportViewTab: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            let appCurrency = currencyManager.selectedCurrency.symbol
+            let actualCurrency = CurrencyManager().selectedCurrency.symbol
             
             if transactions.isEmpty {
                 Text("No transactions found")
@@ -205,7 +205,7 @@ struct ReportViewTab: View {
                         VStack {
                             PieChartView(
                                 data: categoryData.map { $0.amount },
-                                title: "Total\n\(appCurrency)\(formatAmount(total))",
+                                title: "Total\n\(actualCurrency)\(formatAmount(total))",
                                 colors: categoryData.enumerated().map { index, _ in
                                     UIColor(colorForCategory(at: index))
                                 }

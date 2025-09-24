@@ -68,10 +68,10 @@ class AccountStore: ObservableObject {
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 0
-        
+        let actualCurrency = CurrencyManager().selectedCurrency.symbol
         if let formattedNumber = formatter.string(from: NSNumber(value: balance)) {
-            return "₹\(formattedNumber)"
+            return "\(actualCurrency)\(formattedNumber)"
         }
-        return "₹\(Int(balance))"
+        return "\(actualCurrency)\(Int(balance))"
     }
 }

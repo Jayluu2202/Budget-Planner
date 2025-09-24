@@ -2,7 +2,7 @@
 //  transactionViewTab.swift
 //  Budget Planner
 //
-//  Updated to use shared TransactionManager instance
+//  Updated to use shared TransactionManager instance and fix CurrencyManager
 //
 
 import SwiftUI
@@ -10,9 +10,12 @@ import SwiftUI
 struct transactionViewTab: View {
     // CHANGED: Use shared instance instead of creating new one
     @ObservedObject var transactionManager = TransactionManager.shared
+    // FIXED: Use @StateObject for shared CurrencyManager to ensure proper observation
+    @StateObject var currencyManager = CurrencyManager()
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
     @Environment(\.dismiss) private var dismiss
+    
     
     var isInsideTab : Bool = true
     // Make category an optional property
@@ -126,6 +129,8 @@ struct transactionViewTab: View {
                                     transaction: transaction,
                                     transactionManager: transactionManager
                                 )) {
+                                    // FIXED: Create TransactionRow without passing currencyManager
+                                    // Let it use its own @StateObject
                                     TransactionRow(
                                         transaction: transaction,
                                         onDelete: {
@@ -254,9 +259,15 @@ struct FilterChip: View {
 // MARK: - Transaction Row Component
 struct TransactionRow: View {
     @StateObject private var currencyManager = CurrencyManager()
-    @State var selectedCurrency: Currency?
+    @State private var selectedCurrency = CurrencyManager().selectedCurrency
     let transaction: Transaction
     let onDelete: () -> Void
+    
+//     FIXED: Simplified initializer - no longer accepts CurrencyManager
+    init(transaction: Transaction, onDelete: @escaping () -> Void) {
+        self.transaction = transaction
+        self.onDelete = onDelete
+    }
     
     var body: some View {
         HStack(spacing: 16) {
@@ -338,7 +349,7 @@ struct TransactionRow: View {
     }
     
     private var amountText: String {
-        let appCurrency = currencyManager.selectedCurrency.symbol
+        let appCurrency = CurrencyManager().selectedCurrency.symbol
         let prefix = transaction.type == .income ? "+" : "-"
         return "\(prefix)\(appCurrency)\(Int(transaction.amount))"
     }

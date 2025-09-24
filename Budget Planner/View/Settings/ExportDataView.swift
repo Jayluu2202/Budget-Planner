@@ -842,7 +842,7 @@ struct ExportDataView: View {
     private func generatePDFReport() throws -> URL {
         let fileName = "transaction_report_\(DateFormatter.fileNameFormatter.string(from: Date())).pdf"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-
+        let actualCurrency = CurrencyManager().selectedCurrency.symbol
         // Build HTML content first (keep your old code here)
         var htmlContent = """
         <!DOCTYPE html>
@@ -870,8 +870,8 @@ struct ExportDataView: View {
             <div class="summary">
                 <h3>Summary</h3>
                 <p>Total Transactions: \(filteredTransactions.count)</p>
-                <p>Total Income: ₹\(String(format: "%.2f", filteredTransactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }))</p>
-                <p>Total Expenses: ₹\(String(format: "%.2f", filteredTransactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }))</p>
+                <p>Total Income: \(actualCurrency)\(String(format: "%.2f", filteredTransactions.filter { $0.type == .income }.reduce(0) { $0 + $1.amount }))</p>
+                <p>Total Expenses: \(actualCurrency)\(String(format: "%.2f", filteredTransactions.filter { $0.type == .expense }.reduce(0) { $0 + $1.amount }))</p>
             </div>
             
             <table>
@@ -900,7 +900,7 @@ struct ExportDataView: View {
             htmlContent += "<tr>"
             htmlContent += "<td>\(dateFormatter.string(from: transaction.date))</td>"
             htmlContent += "<td class=\"\(transaction.type.rawValue.lowercased())\">\(transaction.type.rawValue)</td>"
-            htmlContent += "<td>₹\(String(format: "%.2f", transaction.amount))</td>"
+            htmlContent += "<td>\(actualCurrency)\(String(format: "%.2f", transaction.amount))</td>"
             
             if includeAccounts {
                 htmlContent += "<td>\(transaction.account.emoji) \(transaction.account.name)</td>"

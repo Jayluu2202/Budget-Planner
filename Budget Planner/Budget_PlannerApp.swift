@@ -12,6 +12,7 @@ struct Budget_PlannerApp: App {
     @StateObject private var appLockManager = AppLockManager()
     @StateObject private var onboardingManager = OnboardingManager()
     @StateObject private var transactionManager = TransactionManager.shared
+    @StateObject private var currencyManager = CurrencyManager()
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
@@ -30,6 +31,7 @@ struct Budget_PlannerApp: App {
                     tabView()
                         .environmentObject(appLockManager)
                         .environmentObject(transactionManager)
+                        .environmentObject(currencyManager)
                 }
             }
             .onChange(of: scenePhase) { newPhase in

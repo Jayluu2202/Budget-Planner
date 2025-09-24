@@ -165,12 +165,13 @@ struct AddBudgetView: View {
             // Single Slider - Removed the duplicate rectangles
             VStack(spacing: 12) {
                 // Range labels
+                let actualCurrency = CurrencyManager().selectedCurrency.symbol
                 HStack {
-                    Text("₹0")
+                    Text("\(actualCurrency)0")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("₹10,000")
+                    Text("\(actualCurrency)10,000")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -183,7 +184,8 @@ struct AddBudgetView: View {
             
             // Amount Input Field
             HStack {
-                Text("₹")
+                let actualCurrency = CurrencyManager().selectedCurrency.symbol
+                Text("\(actualCurrency)")
                     .font(.title2)
                     .foregroundColor(.secondary)
                 

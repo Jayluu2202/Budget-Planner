@@ -73,7 +73,8 @@ struct AddTransactionDetails: View {
                                 .font(.largeTitle)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.center)
-                            Text("INR")
+                            let actualCurrency = CurrencyManager().selectedCurrency.code
+                            Text("\(actualCurrency)")
                                 .font(.largeTitle)
                                 .foregroundColor(.gray)
                         }
@@ -173,7 +174,8 @@ struct AddTransactionDetails: View {
                                 .font(.largeTitle)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.center)
-                            Text("INR")
+                            let actualCurrency = CurrencyManager().selectedCurrency.code
+                            Text("\(actualCurrency)")
                                 .font(.largeTitle)
                                 .foregroundColor(.gray)
                         }

@@ -176,7 +176,7 @@ struct homeViewTab: View {
                         
                         Spacer()
                         
-                        Text("₹\(Int(transaction.amount))")
+                        Text("\(CurrencyManager().selectedCurrency.symbol)\(Int(transaction.amount))")
                             .font(.body)
                             .fontWeight(.medium)
                             .foregroundColor(transaction.type == .income ? .green : .red)
@@ -313,15 +313,15 @@ struct DayView: View {
                 return total
             }
         }
-        
+        let actualCurrency = CurrencyManager().selectedCurrency.symbol
         if totalAmount == 0 && hasTransactions {
-            return "₹0"
+            return "\(actualCurrency)0"
         } else if totalAmount == 0 {
             return ""
         } else if totalAmount > 0 {
-            return "₹\(Int(totalAmount))"
+            return "\(actualCurrency)\(Int(totalAmount))"
         } else {
-            return "₹\(Int(abs(totalAmount)))"
+            return "\(actualCurrency)\(Int(abs(totalAmount)))"
         }
     }
     
@@ -361,8 +361,8 @@ struct DayView: View {
                 Text(budgetValue)
                     .font(.system(size: 10, weight: .regular))
                     .foregroundColor(budgetValueColor)
-                
-                if hasTransactions && budgetValue == "₹0" {
+                let actualCurrency = CurrencyManager().selectedCurrency.symbol
+                if hasTransactions && budgetValue == "\(actualCurrency)0" {
                     Circle()
                         .fill(Color.orange)
                         .frame(width: 4, height: 4)

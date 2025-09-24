@@ -132,8 +132,6 @@ class BudgetManager: ObservableObject {
         // Update budget spent amount
         budgets[budgetIndex].spentAmount = totalSpent
         
-        print("🔄 Synced budget \(budget.category.name): spent ₹\(totalSpent)")
-        
         // Force UI update
         objectWillChange.send()
     }
@@ -160,7 +158,6 @@ class BudgetManager: ObservableObject {
                 if budgets[index].spentAmount != totalSpent {
                     budgets[index].spentAmount = totalSpent
                     hasChanges = true
-                    print("🔄 Synced budget \(budget.category.name): ₹\(totalSpent)")
                 }
             }
         }
@@ -174,7 +171,6 @@ class BudgetManager: ObservableObject {
     // MARK: - Budget Updates from Transactions (IMPROVED)
     
     func updateBudgetSpending(for category: TransactionCategory, amount: Double, isAdding: Bool = true) {
-        print("🎯 Updating budget spending for: \(category.name), amount: ₹\(amount), adding: \(isAdding)")
         
         let multiplier: Double = isAdding ? 1.0 : -1.0
         
@@ -193,8 +189,6 @@ class BudgetManager: ObservableObject {
                     budgets[index].spentAmount += (amount * multiplier)
                     // Ensure spent amount doesn't go negative
                     budgets[index].spentAmount = max(0, budgets[index].spentAmount)
-                    
-                    print("📈 Budget updated: \(category.name) - Old: ₹\(oldAmount) -> New: ₹\(budgets[index].spentAmount)")
                     
                     budgetUpdated = true
                     break

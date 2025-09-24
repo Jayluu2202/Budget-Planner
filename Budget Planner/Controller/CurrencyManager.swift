@@ -52,6 +52,7 @@ class CurrencyManager: ObservableObject {
         }
         
         selectedCurrency = Currency(code: savedCode, name: savedName, symbol: savedSymbol)
+//        print("Selected currency \(selectedCurrency)")
     }
     
     private func saveCurrencyToUserDefaults(_ currency: Currency) {
