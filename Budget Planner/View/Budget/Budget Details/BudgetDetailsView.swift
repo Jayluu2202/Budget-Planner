@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-
+import UIKit
 struct BudgetDetailsView: View {
     let budget: Budget
     @ObservedObject var budgetManager: BudgetManager
     @ObservedObject var transactionManager: TransactionManager
     @ObservedObject var currencyManager = CurrencyManager()
-    
     
     // Use presentationMode for NavigationView back navigation
     @Environment(\.presentationMode) var presentationMode
@@ -92,52 +91,64 @@ struct BudgetDetailsView: View {
     }
     
     var body: some View {
-        VStack {
-            // Custom Navigation Bar
-            buildNavigationBar()
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Month Selection
-                    buildMonthSelection()
-                    
-                    // Budget Overview Card
-                    buildBudgetOverviewCard()
-                    
-                    // Action Buttons
-                    buildActionButtons()
-                    
-                    // View Transactions Button
-                    buildViewTransactionsButton()
-                        .padding(.horizontal, 20)
-                    // Recent Transactions (if any)
-                    if !categoryTransactions.isEmpty {
-                        buildRecentTransactions()
-                    
+        ZStack{
+            VStack {
+                // Custom Navigation Bar
+                buildNavigationBar()
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Month Selection
+                        buildMonthSelection()
+                        
+                        // Budget Overview Card
+                        buildBudgetOverviewCard()
+                        
+                        // Action Buttons
+                        buildActionButtons()
+                        
+                        // View Transactions Button
+                        buildViewTransactionsButton()
+                            .padding(.horizontal, 20)
+                        // Recent Transactions (if any)
+                        if !categoryTransactions.isEmpty {
+                            buildRecentTransactions()
+                        }
                     }
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                .padding(.vertical, -40)
             }
-            .padding(.vertical, -40)
-        }
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden(true)
-        .background(Color(.white))
-        .sheet(isPresented: $showEditBudget) {
-            EditBudgetView(
-                budget: budget,
-                budgetManager: budgetManager,
-                transactionManager: transactionManager, currencyManager: currencyManager
-            )
-        }
-        .alert("Delete Budget", isPresented: $showDeleteAlert) {
-            Button("Delete", role: .destructive) {
-                deleteBudget()
+            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
+            .background(Color(.white))
+            .onAppear{
+                hideTabBarLegacy()
             }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Are you sure you want to delete this budget? This action cannot be undone.")
+            .onDisappear{
+                showTabBarLegacy()
+            }
+            .sheet(isPresented: $showEditBudget) {
+                EditBudgetView(
+                    budget: budget,
+                    budgetManager: budgetManager,
+                    transactionManager: transactionManager,
+                    currencyManager: currencyManager
+                )
+            }
+            .alert("Delete Budget", isPresented: $showDeleteAlert) {
+                Button("Delete", role: .destructive) {
+                    deleteBudget()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete this budget? This action cannot be undone.")
+            }
+            if showTransactions {
+                transactionViewTab(category: budget.category, showTransactions: $showTransactions)
+                    .transition(.move(edge: .trailing))
+                    .zIndex(1)
+            }
         }
-        
     }
     
     // MARK: - View Builders
@@ -430,9 +441,11 @@ struct BudgetDetailsView: View {
     
     @ViewBuilder
     private func buildViewTransactionsButton() -> some View {
-        NavigationLink(
-            destination: transactionViewTab(category: budget.category)
-        ) {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showTransactions = true
+            }
+        }) {
             Text("View Transactions")
                 .font(.headline)
                 .fontWeight(.medium)
@@ -446,7 +459,6 @@ struct BudgetDetailsView: View {
                         .stroke(Color(.systemGray4), lineWidth: 1)
                 )
         }
-        .buttonStyle(PlainButtonStyle())
     }
     
     @ViewBuilder
@@ -548,6 +560,67 @@ struct BudgetDetailsView: View {
     private func deleteBudget() {
         budgetManager.deleteBudget(budget)
         presentationMode.wrappedValue.dismiss() // FIXED: Use presentationMode for delete as well
+    }
+}
+
+
+extension BudgetDetailsView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
     }
 }
 

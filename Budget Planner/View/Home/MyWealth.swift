@@ -2,15 +2,17 @@
 //  MyWealth.swift
 //  Budget Planner
 //
-//  Created by mac on 10/09/25.
+//  Updated with proper tab bar hiding solutions
 //
 
 import SwiftUI
+import UIKit
 
 struct MyWealth: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var accountStore = AccountStore()
     let actualCurrency = CurrencyManager().selectedCurrency.symbol
+    
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -28,8 +30,6 @@ struct MyWealth: View {
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
-                
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
@@ -60,7 +60,6 @@ struct MyWealth: View {
                     
                     // Check Future Wealth Button
                     Button(action: {
-                        // Add your future wealth navigation logic here
                         print("Check Future Wealth tapped")
                     }) {
                         HStack(spacing: 12) {
@@ -137,10 +136,15 @@ struct MyWealth: View {
         .navigationBarHidden(true)
         .onAppear {
             accountStore.loadAccounts()
+            // SOLUTION 2: Fallback for older iOS versions
+            hideTabBarLegacy()
+        }
+        .onDisappear {
+            showTabBarLegacy()
         }
     }
     
-    // MARK: - Computed Properties (Now using dynamic data)
+    // MARK: - Computed Properties
     
     private var totalBalance: Double {
         accountStore.accounts.reduce(0) { $0 + $1.balance }
@@ -162,28 +166,88 @@ struct MyWealth: View {
     }
 }
 
-// MARK: - Supporting Views
+// MARK: - Tab Bar Helper Methods
+
+extension MyWealth {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Views (unchanged)
 
 struct AccountBalanceRow: View {
     let account: Account
     
     var body: some View {
         HStack(spacing: 16) {
-            // Account Icon
             Text(account.emoji)
                 .font(.system(size: 24))
                 .frame(width: 44, height: 44)
                 .background(Color(.systemGray5))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            // Account Name
             Text(account.name)
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.black)
             
             Spacer()
             let actualCurrency = CurrencyManager().selectedCurrency.symbol
-            // Balance (Color changes based on positive/negative)
+            
             Text("\(actualCurrency)\(formattedBalance)")
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(account.balance >= 0 ? .green : .red)
@@ -232,8 +296,6 @@ struct AccountSummaryCard: View {
         )
     }
 }
-
-// MARK: - Preview
 
 struct MyWealth_Previews: PreviewProvider {
     static var previews: some View {

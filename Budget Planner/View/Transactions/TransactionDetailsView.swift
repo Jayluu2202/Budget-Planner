@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import UIKit
 struct TransactionDetailsView: View {
     let transaction: Transaction
     @ObservedObject var transactionManager: TransactionManager
@@ -109,6 +109,12 @@ struct TransactionDetailsView: View {
         .navigationTitle("Transaction detail")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
+        .onAppear{
+            hideTabBarLegacy()
+        }
+        .onDisappear{
+            showTabBarLegacy()
+        }
         .sheet(isPresented: $showEditSheet) {
             EditTransactionView(
                 transaction: transaction,
@@ -153,6 +159,66 @@ struct TransactionDetailsView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+}
+
+extension TransactionDetailsView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
     }
 }
 

@@ -10,20 +10,22 @@ import SwiftUI
 struct transactionViewTab: View {
     // CHANGED: Use shared instance instead of creating new one
     @ObservedObject var transactionManager = TransactionManager.shared
-    // FIXED: Use @StateObject for shared CurrencyManager to ensure proper observation
     @StateObject var currencyManager = CurrencyManager()
     @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
+
     @Environment(\.dismiss) private var dismiss
     
+    @Binding var showTransactions: Bool
     
     var isInsideTab : Bool = true
     // Make category an optional property
     let category: TransactionCategory?
     
     // Updated initializer - no longer creates new TransactionManager
-    init(category: TransactionCategory? = nil) {
+    init(category: TransactionCategory? = nil, showTransactions: Binding<Bool> = .constant(false)) {
         self.category = category
+        self._showTransactions = showTransactions
     }
     
     enum FilterType: String, CaseIterable {
@@ -37,10 +39,13 @@ struct transactionViewTab: View {
             VStack(spacing: 0) {
                 // Add custom header when no category is specified
                 if category == nil {
+                    // for the transaction tab
                     buildTransactionsHeader()
                 } else {
+                    // for budget details transaction view
                     buildCategoryHeader()
                 }
+                
                 Divider()
                     .frame(maxWidth: .infinity)
                     .padding(.top, 4)
@@ -51,7 +56,11 @@ struct transactionViewTab: View {
             .navigationBarHidden(true)
             .ignoresSafeArea(edges: .bottom)
             .onAppear {
+                // Only execute once on first appearance
                 transactionManager.loadData()
+                if category != nil {
+                    hideTabBarLegacy()
+                }
             }
             .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
                 ForEach(FilterType.allCases, id: \.self) { filter in
@@ -91,7 +100,10 @@ struct transactionViewTab: View {
     private func buildCategoryHeader() -> some View {
         HStack {
             Button(action: {
-                dismiss()
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showTransactions = false
+                }
+//                dismiss()
             }) {
                 Image(systemName: "chevron.left")
                     .font(.title2)
@@ -235,6 +247,66 @@ struct transactionViewTab: View {
     }
 }
 
+extension transactionViewTab {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
+
 // MARK: - Filter Chip Component
 struct FilterChip: View {
     let title: String
@@ -278,9 +350,8 @@ struct TransactionRow: View {
                     .frame(width: 50, height: 50)
                 
                 Text(transaction.category.emoji)
-                    .font(.title2)
+                    .font(.title2)   
             }
-            
             // Transaction details
             VStack(alignment: .leading, spacing: 4) {
                 HStack {

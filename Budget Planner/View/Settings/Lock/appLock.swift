@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import UIKit
 struct AppLockView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var appLockManager = AppLockManager()
@@ -171,6 +171,12 @@ struct AppLockView: View {
             
             Spacer()
         }
+        .onAppear{
+            hideTabBarLegacy()
+        }
+        .onDisappear{
+            showTabBarLegacy()
+        }
         .sheet(isPresented: $showPasswordSetup) {
             PasswordKeyPadView(appLockManager: appLockManager)
         }
@@ -199,6 +205,65 @@ struct AppLockView: View {
     }
 }
 
+extension AppLockView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
 struct AppLockView_Previews: PreviewProvider {
     static var previews: some View {
         AppLockView()
