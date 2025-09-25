@@ -77,7 +77,7 @@ struct homeViewTab: View {
     @ViewBuilder
     private func buildGreetingSection() -> some View {
         HStack {
-            Text("Hey! Greetings")
+            Text("Hey! \(getGreeting())")
                 .font(.headline)
             
             Image("WaveHand")
@@ -96,6 +96,21 @@ struct homeViewTab: View {
                     .scaledToFit()
                     .frame(width: 25, height: 25)
             }
+        }
+    }
+    
+    func getGreeting() -> String{
+        let hour = Calendar.current.component(.hour, from: Date())
+        
+        switch hour{
+        case 5..<12:
+                return "Good Morning"
+            case 12..<17:
+                return "Good Afternoon"
+            case 17..<21:
+                return "Good Evening"
+            default:
+                return "Good Night"
         }
     }
     
