@@ -141,7 +141,7 @@ struct budgetViewTab: View {
                                 currencyManager: currencyManager, // CHANGE: Pass currencyManager
                                 onDelete: {
                                     deleteBudget(budget)
-                                }
+                                }, transactionManager: transactionManager
                             )
                             .padding(.horizontal, 16)
                         }
@@ -212,21 +212,36 @@ struct BudgetCard: View {
     let transactions: [Transaction]
     let currencyManager: CurrencyManager // CHANGE: Add currencyManager parameter
     let onDelete: () -> Void
+    @ObservedObject var transactionManager: TransactionManager
+    @State private var selectedMonth = Date()
     
     // Calculate spending just for this budget
-    private var spentForThisBudget: Double {
-        transactions
-            .filter { $0.category.name == budget.category.name }
+//    private var spentForThisBudget: Double {
+//        transactions
+//            .filter { $0.category.name == budget.category.name }
+//            .reduce(0) { $0 + $1.amount }
+//    }
+    
+    private var sspentForThisBudget: Double {
+        let calendar = Calendar.current
+        return transactionManager.transactions
+            .filter { transaction in
+                // Filter by category name, type, and selected month/year
+                return transaction.category.name == budget.category.name &&
+                transaction.type == .expense &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .month) &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .year)
+            }
             .reduce(0) { $0 + $1.amount }
     }
     
     private var remainingAmount: Double {
-        budget.budgetAmount - spentForThisBudget
+        budget.budgetAmount - sspentForThisBudget
     }
     
     private var progressPercentage: Double {
         guard budget.budgetAmount > 0 else { return 0 }
-        return (spentForThisBudget / budget.budgetAmount) * 100
+        return (sspentForThisBudget / budget.budgetAmount) * 100
     }
     
     var body: some View {
@@ -262,7 +277,7 @@ struct BudgetCard: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
                     
-                    Text("\(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", spentForThisBudget)) / \(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", budget.budgetAmount))")
+                    Text("\(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", sspentForThisBudget)) / \(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", budget.budgetAmount))")
                         .font(.caption)
                 }
             }

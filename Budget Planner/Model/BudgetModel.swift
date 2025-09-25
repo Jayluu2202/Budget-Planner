@@ -2,7 +2,7 @@
 //  BudgetModel.swift
 //  Budget Planner
 //
-//  Updated to remove 'safe' status and add monthly reset functionality
+//  Updated with explicit month/year tracking
 //
 
 import Foundation
@@ -19,6 +19,10 @@ struct Budget: Identifiable, Codable {
     var isActive: Bool
     var monthYear: String // Track which month/year this budget belongs to
     
+    // ADD THESE NEW PROPERTIES:
+    var month: Int // 1-12
+    var year: Int // 2024, 2025, etc.
+    
     init(category: TransactionCategory, budgetAmount: Double, description: String = "", startDate: Date = Date(), endDate: Date = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()) {
         self.id = UUID()
         self.category = category
@@ -33,9 +37,14 @@ struct Budget: Identifiable, Codable {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM-yyyy"
         self.monthYear = formatter.string(from: startDate)
+        
+        // ADD THESE LINES:
+        let calendar = Calendar.current
+        self.month = calendar.component(.month, from: startDate)
+        self.year = calendar.component(.year, from: startDate)
     }
     
-    init(id: UUID, category: TransactionCategory, budgetAmount: Double, spentAmount: Double, description: String, startDate: Date, endDate: Date, isActive: Bool, monthYear: String? = nil) {
+    init(id: UUID, category: TransactionCategory, budgetAmount: Double, spentAmount: Double, description: String, startDate: Date, endDate: Date, isActive: Bool, monthYear: String? = nil, month: Int? = nil, year: Int? = nil) {
         self.id = id
         self.category = category
         self.budgetAmount = budgetAmount
@@ -52,6 +61,16 @@ struct Budget: Identifiable, Codable {
             let formatter = DateFormatter()
             formatter.dateFormat = "MM-yyyy"
             self.monthYear = formatter.string(from: startDate)
+        }
+        
+        // ADD THESE LINES:
+        let calendar = Calendar.current
+        if let month = month, let year = year {
+            self.month = month
+            self.year = year
+        } else {
+            self.month = calendar.component(.month, from: startDate)
+            self.year = calendar.component(.year, from: startDate)
         }
     }
     
@@ -93,10 +112,10 @@ struct Budget: Identifiable, Codable {
     
     // Check if budget needs to be reset (new month)
     var needsMonthlyReset: Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM-yyyy"
-        let currentMonthYear = formatter.string(from: Date())
-        return monthYear != currentMonthYear
+        let calendar = Calendar.current
+        let currentMonth = calendar.component(.month, from: Date())
+        let currentYear = calendar.component(.year, from: Date())
+        return month != currentMonth || year != currentYear
     }
     
     var budgetStatus: BudgetStatus {
@@ -107,7 +126,7 @@ struct Budget: Identifiable, Codable {
         } else if percentage >= 80 {
             return .warning
         } else {
-            return .onTrack // Removed .safe, now defaults to .onTrack
+            return .onTrack
         }
     }
 }

@@ -86,9 +86,21 @@ struct BudgetDetailsView: View {
     }
     
     private var progressPercentage: Double {
-        guard budget.budgetAmount > 0 else { return 0 }
-        return (spentForThisBudget / budget.budgetAmount) * 100
-    }
+            // Get budget amount for selected month
+            let calendar = Calendar.current
+            let selectedMonthComponent = calendar.component(.month, from: selectedMonth)
+            let selectedYearComponent = calendar.component(.year, from: selectedMonth)
+            
+            let budgetAmountForMonth: Double
+            if let monthBudget = budgetManager.budgetForCategory(budget.category, month: selectedMonthComponent, year: selectedYearComponent) {
+                budgetAmountForMonth = monthBudget.budgetAmount
+            } else {
+                budgetAmountForMonth = budget.budgetAmount
+            }
+            
+            guard budgetAmountForMonth > 0 else { return 0 }
+            return (spentForThisBudget / budgetAmountForMonth) * 100
+        }
     
     var body: some View {
         ZStack{
@@ -300,8 +312,8 @@ struct BudgetDetailsView: View {
                     Text("Remaining")
                         .font(.body)
                         .foregroundColor(.secondary)
-                    
-                    Text("\(actualCurrency)\(String(format: "%.2f", budget.budgetAmount - spentForThisBudget))")
+                    let amountRemaining = budget.budgetAmount - spentForThisBudget
+                    Text("\(actualCurrency)\(String(format: "%.2f", amountRemaining))")
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(budget.remainingAmount < 0 ? .red : .primary)
@@ -381,7 +393,7 @@ struct BudgetDetailsView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 24)
-        .background(Color(.systemGray6))
+        .background(Color(.white))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color(.systemGray4), lineWidth: 4)
@@ -562,7 +574,6 @@ struct BudgetDetailsView: View {
         presentationMode.wrappedValue.dismiss() // FIXED: Use presentationMode for delete as well
     }
 }
-
 
 extension BudgetDetailsView {
     // Updated method for hiding tab bar

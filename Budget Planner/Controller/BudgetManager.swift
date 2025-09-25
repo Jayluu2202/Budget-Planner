@@ -2,7 +2,7 @@
 //  BudgetManager.swift
 //  Budget Planner
 //
-//  Fixed version with proper transaction synchronization
+//  Fixed version with proper monthly budget isolation
 //
 
 import Foundation
@@ -40,32 +40,39 @@ class BudgetManager: ObservableObject {
         }
     }
     
-    // MARK: - Monthly Reset Logic
+    // MARK: - Monthly Reset Logic (IMPROVED)
     
     func checkAndResetMonthlyBudgets() {
         var hasChanges = false
+        let calendar = Calendar.current
+        let today = Date()
+        let currentMonth = calendar.component(.month, from: today)
+        let currentYear = calendar.component(.year, from: today)
         
         for index in budgets.indices {
-            if budgets[index].needsMonthlyReset && budgets[index].isActive {
-                // Reset the budget for new month
-                let calendar = Calendar.current
-                let today = Date()
-                let startOfMonth = calendar.dateInterval(of: .month, for: today)?.start ?? today
-                let endOfMonth = calendar.dateInterval(of: .month, for: today)?.end ?? calendar.date(byAdding: .month, value: 1, to: today) ?? today
-                
-                // Update month/year identifier
-                let formatter = DateFormatter()
-                formatter.dateFormat = "MM-yyyy"
-                let newMonthYear = formatter.string(from: today)
-                
-                // Reset spent amount and update dates
-                budgets[index].spentAmount = 0.0
-                budgets[index].startDate = startOfMonth
-                budgets[index].endDate = endOfMonth
-                budgets[index].monthYear = newMonthYear
-                
-                hasChanges = true
-                print("Reset budget for \(budgets[index].category.name) for month: \(newMonthYear)")
+            // Check if budget needs monthly reset
+            if budgets[index].month != currentMonth || budgets[index].year != currentYear {
+                if budgets[index].isActive {
+                    // Reset the budget for new month
+                    let startOfMonth = calendar.dateInterval(of: .month, for: today)?.start ?? today
+                    let endOfMonth = calendar.dateInterval(of: .month, for: today)?.end ?? calendar.date(byAdding: .month, value: 1, to: today) ?? today
+                    
+                    // Update month/year identifier
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM-yyyy"
+                    let newMonthYear = formatter.string(from: today)
+                    
+                    // Reset spent amount and update dates and month/year
+                    budgets[index].spentAmount = 0.0
+                    budgets[index].startDate = startOfMonth
+                    budgets[index].endDate = endOfMonth
+                    budgets[index].monthYear = newMonthYear
+                    budgets[index].month = currentMonth
+                    budgets[index].year = currentYear
+                    
+                    hasChanges = true
+                    print("✅ Reset budget for \(budgets[index].category.name) for month: \(newMonthYear)")
+                }
             }
         }
         
@@ -81,11 +88,9 @@ class BudgetManager: ObservableObject {
         saveBudgets()
     }
     
-    // FIXED: New method to add budget and sync with existing transactions
     func addBudget(_ budget: Budget, syncWithTransactions transactions: [Transaction]) {
         budgets.append(budget)
         
-        // Sync with existing transactions for this category
         syncBudgetWithTransactions(budgetId: budget.id, transactions: transactions)
         
         saveBudgets()
@@ -108,9 +113,9 @@ class BudgetManager: ObservableObject {
         saveBudgets()
     }
     
-    // MARK: - Transaction Synchronization (NEW)
+    // MARK: - Transaction Synchronization (FIXED FOR MONTHLY ISOLATION)
     
-    // Sync a specific budget with existing transactions
+    // Sync a specific budget with existing transactions FOR ITS SPECIFIC MONTH/YEAR ONLY
     func syncBudgetWithTransactions(budgetId: UUID, transactions: [Transaction]) {
         guard let budgetIndex = budgets.firstIndex(where: { $0.id == budgetId }) else {
             print("⚠️ Budget not found for sync: \(budgetId)")
@@ -118,39 +123,48 @@ class BudgetManager: ObservableObject {
         }
         
         let budget = budgets[budgetIndex]
+        let calendar = Calendar.current
         
-        // Calculate total spending for this category within budget period
+        // Calculate total spending for this category within the budget's specific month/year
         let totalSpent = transactions
             .filter { transaction in
-                transaction.category.id == budget.category.id &&
+                let transactionMonth = calendar.component(.month, from: transaction.date)
+                let transactionYear = calendar.component(.year, from: transaction.date)
+                
+                return transaction.category.id == budget.category.id &&
                 transaction.type == .expense &&
-                transaction.date >= budget.startDate &&
-                transaction.date <= budget.endDate
+                transactionMonth == budget.month &&
+                transactionYear == budget.year
             }
             .reduce(0) { $0 + $1.amount }
         
         // Update budget spent amount
         budgets[budgetIndex].spentAmount = totalSpent
+        print("📊 Synced budget \(budget.category.name) for \(budget.month)/\(budget.year): spent = \(totalSpent)")
         
         // Force UI update
         objectWillChange.send()
     }
     
-    // Sync all budgets with transactions
+    // Sync all budgets with transactions (FIXED FOR MONTHLY ISOLATION)
     func syncAllBudgetsWithTransactions(_ transactions: [Transaction]) {
         var hasChanges = false
+        let calendar = Calendar.current
         
         for index in budgets.indices {
             if budgets[index].isActive {
                 let budget = budgets[index]
                 
-                // Calculate actual spending for this category in the budget period
+                // Calculate actual spending for this category in the budget's specific month/year
                 let totalSpent = transactions
                     .filter { transaction in
-                        transaction.category.id == budget.category.id &&
+                        let transactionMonth = calendar.component(.month, from: transaction.date)
+                        let transactionYear = calendar.component(.year, from: transaction.date)
+                        
+                        return transaction.category.id == budget.category.id &&
                         transaction.type == .expense &&
-                        transaction.date >= budget.startDate &&
-                        transaction.date <= budget.endDate
+                        transactionMonth == budget.month &&
+                        transactionYear == budget.year
                     }
                     .reduce(0) { $0 + $1.amount }
                 
@@ -158,6 +172,7 @@ class BudgetManager: ObservableObject {
                 if budgets[index].spentAmount != totalSpent {
                     budgets[index].spentAmount = totalSpent
                     hasChanges = true
+                    print("📊 Updated budget \(budget.category.name) for \(budget.month)/\(budget.year): spent = \(totalSpent)")
                 }
             }
         }
@@ -168,11 +183,14 @@ class BudgetManager: ObservableObject {
         }
     }
     
-    // MARK: - Budget Updates from Transactions (IMPROVED)
+    // MARK: - Budget Updates from Transactions (FIXED FOR MONTHLY ISOLATION)
     
     func updateBudgetSpending(for category: TransactionCategory, amount: Double, isAdding: Bool = true) {
-        
         let multiplier: Double = isAdding ? 1.0 : -1.0
+        let calendar = Calendar.current
+        let currentDate = Date()
+        let currentMonth = calendar.component(.month, from: currentDate)
+        let currentYear = calendar.component(.year, from: currentDate)
         
         // First check for monthly resets
         checkAndResetMonthlyBudgets()
@@ -180,19 +198,20 @@ class BudgetManager: ObservableObject {
         var budgetUpdated = false
         
         for index in budgets.indices {
-            if budgets[index].category.id == category.id && budgets[index].isActive {
-                let currentDate = Date()
+            // FIXED: Only update budget if it's for the current month/year and same category
+            if budgets[index].category.id == category.id &&
+               budgets[index].isActive &&
+               budgets[index].month == currentMonth &&
+               budgets[index].year == currentYear {
                 
-                // Check if the budget period is still active and in current month
-                if currentDate >= budgets[index].startDate && currentDate <= budgets[index].endDate {
-                    let oldAmount = budgets[index].spentAmount
-                    budgets[index].spentAmount += (amount * multiplier)
-                    // Ensure spent amount doesn't go negative
-                    budgets[index].spentAmount = max(0, budgets[index].spentAmount)
-                    
-                    budgetUpdated = true
-                    break
-                }
+                let oldAmount = budgets[index].spentAmount
+                budgets[index].spentAmount += (amount * multiplier)
+                // Ensure spent amount doesn't go negative
+                budgets[index].spentAmount = max(0, budgets[index].spentAmount)
+                
+                budgetUpdated = true
+                print("💰 Updated budget spending for \(category.name) in \(currentMonth)/\(currentYear): \(oldAmount) -> \(budgets[index].spentAmount)")
+                break
             }
         }
         
@@ -202,40 +221,74 @@ class BudgetManager: ObservableObject {
             saveBudgets()
             print("✅ Budget spending updated and saved")
         } else {
-            print("⚠️ No active budget found for category: \(category.name)")
+            print("⚠️ No active budget found for category: \(category.name) in month \(currentMonth)/\(currentYear)")
         }
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Helper Methods (UPDATED)
     
     func activeBudgets() -> [Budget] {
         // Check for monthly resets first
         checkAndResetMonthlyBudgets()
         
+        let calendar = Calendar.current
         let currentDate = Date()
+        let currentMonth = calendar.component(.month, from: currentDate)
+        let currentYear = calendar.component(.year, from: currentDate)
+        
         return budgets.filter { budget in
-            budget.isActive && currentDate >= budget.startDate && currentDate <= budget.endDate
+            budget.isActive &&
+            budget.month == currentMonth &&
+            budget.year == currentYear
         }
     }
     
     func expiredBudgets() -> [Budget] {
+        let calendar = Calendar.current
         let currentDate = Date()
+        let currentMonth = calendar.component(.month, from: currentDate)
+        let currentYear = calendar.component(.year, from: currentDate)
+        
         return budgets.filter { budget in
-            currentDate > budget.endDate
+            (budget.year < currentYear) ||
+            (budget.year == currentYear && budget.month < currentMonth)
         }
     }
     
     func budgetForCategory(_ category: TransactionCategory) -> Budget? {
         checkAndResetMonthlyBudgets()
         
+        let calendar = Calendar.current
         let currentDate = Date()
+        let currentMonth = calendar.component(.month, from: currentDate)
+        let currentYear = calendar.component(.year, from: currentDate)
+        
         return budgets.first { budget in
             budget.category.id == category.id &&
             budget.isActive &&
-            currentDate >= budget.startDate &&
-            currentDate <= budget.endDate
+            budget.month == currentMonth &&
+            budget.year == currentYear
         }
     }
+    
+    // MARK: - Month-specific budget retrieval methods (NEW)
+    
+    func budgetForCategory(_ category: TransactionCategory, month: Int, year: Int) -> Budget? {
+        return budgets.first { budget in
+            budget.category.id == category.id &&
+            budget.isActive &&
+            budget.month == month &&
+            budget.year == year
+        }
+    }
+    
+    func budgetsForMonth(_ month: Int, year: Int) -> [Budget] {
+        return budgets.filter { budget in
+            budget.month == month && budget.year == year && budget.isActive
+        }
+    }
+    
+    // MARK: - Analytics (Updated to work with current month)
     
     func totalBudgetAmount() -> Double {
         return activeBudgets().reduce(0) { $0 + $1.budgetAmount }
@@ -254,8 +307,6 @@ class BudgetManager: ObservableObject {
             budget.budgetStatus == .warning || budget.budgetStatus == .overBudget
         }
     }
-    
-    // MARK: - Analytics
     
     func budgetPerformanceData() -> (onTrack: Int, warning: Int, overBudget: Int) {
         let active = activeBudgets()

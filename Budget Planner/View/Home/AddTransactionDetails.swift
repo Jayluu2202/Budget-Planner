@@ -2,7 +2,7 @@
 //  AddTransactionDetails.swift
 //  Budget Planner
 //
-//  Fixed to include BudgetManager integration
+//  FIXED: Only update budgets for current month transactions
 //
 
 import SwiftUI
@@ -53,9 +53,11 @@ struct AddTransactionDetails: View {
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
                     
+                    
                     DatePicker(
                         "",
                         selection: $transactionDate,
+                        in: startOfMonth()...endOfMonth(),
                         displayedComponents: [.date, .hourAndMinute]
                     )
                         .labelsHidden()
@@ -281,8 +283,14 @@ struct AddTransactionDetails: View {
             }
         }
     }
+    private func startOfMonth() -> Date {
+        Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
+    }
     
-    // MARK: - Save Transaction Function (UPDATED)
+    private func endOfMonth() -> Date {
+        Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth())!
+    }
+    // MARK: - Save Transaction Function (FIXED FOR MONTHLY BUDGET ISOLATION)
     private func saveTransaction() {
         // Validate input
         guard let amountValue = Double(amount), amountValue > 0 else {
@@ -325,9 +333,21 @@ struct AddTransactionDetails: View {
         // Save transaction
         transactionManager.addTransaction(transaction)
         
-        // UPDATE BUDGET SPENDING - THIS IS THE KEY ADDITION
+        // FIXED: Only update budget spending if it's an expense AND for current month
         if selectedType == .expense {
-            budgetManager.updateBudgetSpending(for: transactionCategory, amount: amountValue, isAdding: true)
+            let calendar = Calendar.current
+            let currentMonth = calendar.component(.month, from: Date())
+            let currentYear = calendar.component(.year, from: Date())
+            let transactionMonth = calendar.component(.month, from: transactionDate)
+            let transactionYear = calendar.component(.year, from: transactionDate)
+            
+            // Only update budget if transaction is for current month/year
+            if transactionMonth == currentMonth && transactionYear == currentYear {
+                budgetManager.updateBudgetSpending(for: transactionCategory, amount: amountValue, isAdding: true)
+                print("✅ Updated current month budget for \(transactionCategory.name)")
+            } else {
+                print("ℹ️ Transaction is for \(transactionMonth)/\(transactionYear), not current month \(currentMonth)/\(currentYear). Budget not updated.")
+            }
         }
         
         // Clear form and dismiss
