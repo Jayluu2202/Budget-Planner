@@ -126,9 +126,9 @@ struct BudgetDetailsView: View {
                             buildRecentTransactions()
                         }
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, scaleW(20))
                 }
-                .padding(.vertical, -40)
+                .padding(.vertical, scaleH(-40))
             }
             .navigationBarHidden(true)
             .navigationBarBackButtonHidden(true)
@@ -162,7 +162,17 @@ struct BudgetDetailsView: View {
             }
         }
     }
+    private func scaleH(_ value: CGFloat) -> CGFloat {
+        let deviceHeight = UIScreen.main.bounds.height
+        let screenvalue = deviceHeight / 956
+        return value * screenvalue
+    }
     
+    private func scaleW(_ value: CGFloat) -> CGFloat {
+        let deviceWidth = UIScreen.main.bounds.width
+        let screenValue = deviceWidth / 452
+        return value * screenValue
+    }
     // MARK: - View Builders
     
     @ViewBuilder
@@ -279,7 +289,7 @@ struct BudgetDetailsView: View {
                 Rectangle()
                     .fill(Color(.systemGray4))
                     .frame(width: 1, height: 80)
-                    .padding(.bottom, -25)
+                    .padding(.bottom, scaleH(-25))
                 
                 // Spent So Far
                 VStack(spacing: 4) {
@@ -324,7 +334,7 @@ struct BudgetDetailsView: View {
                 Rectangle()
                     .fill(Color(.systemGray4))
                     .frame(width: 1, height: 80)
-                    .padding(.top, -25)
+                    .padding(.top, scaleH(-25))
                 // Total Budget
                 VStack(spacing: 8) {
                     Text("Budget")

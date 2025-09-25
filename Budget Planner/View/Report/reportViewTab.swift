@@ -90,10 +90,21 @@ struct ReportViewTab: View {
                 .allowsHitTesting(false) // Prevents interference when not presented
             )
         }
-        .padding(.vertical, -150)
+        .padding(.vertical, scaleH(-150))
         .navigationBarHidden(true) // Hide default navigation bar
     }
     
+    private func scaleH(_ value: CGFloat) -> CGFloat {
+        let deviceHeight = UIScreen.main.bounds.height
+        let screenvalue = deviceHeight / 956
+        return value * screenvalue
+    }
+    
+    private func scaleW(_ value: CGFloat) -> CGFloat {
+        let deviceWidth = UIScreen.main.bounds.width
+        let screenValue = deviceWidth / 452
+        return value * screenValue
+    }
     // MARK: - Tab Selector
     private var tabSelector: some View {
         HStack(spacing: 0) {

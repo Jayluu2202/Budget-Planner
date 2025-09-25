@@ -39,8 +39,8 @@ struct AddAccountView: View {
                     Spacer()
                 }
                 .padding(.horizontal)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
+                .padding(.vertical, scaleH(20))
+                
                 
                 Divider()
                     .background(Color.gray.opacity(0.3))
@@ -110,7 +110,7 @@ struct AddAccountView: View {
                     
                     Spacer()
                 }
-                .padding(.top, 20)
+                .padding(.top, scaleH(20))
                 
                 // Existing Accounts List
                 if !accountStore.accounts.isEmpty {
@@ -131,8 +131,8 @@ struct AddAccountView: View {
                                     .font(.system(size: 15))
                                     .foregroundColor(.green)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
+                            .padding(.horizontal, scaleW(16))
+                            .padding(.vertical, scaleH(12))
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
@@ -149,6 +149,18 @@ struct AddAccountView: View {
         }
         
         .navigationBarHidden(true)
+    }
+    
+    private func scaleH(_ value: CGFloat) -> CGFloat {
+        let deviceHeight = UIScreen.main.bounds.height
+        let screenvalue = deviceHeight / 956
+        return value * screenvalue
+    }
+    
+    private func scaleW(_ value: CGFloat) -> CGFloat {
+        let deviceWidth = UIScreen.main.bounds.width
+        let screenValue = deviceWidth / 452
+        return value * screenValue
     }
     
     private func addAccount() {

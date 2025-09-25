@@ -10,6 +10,7 @@ import UIKit
 struct themeSettings: View {
     @Environment(\.dismiss) var dismiss
     @Binding var selectedTheme : String
+//    @AppStorage("selectedTheme") var selectedTheme: String = "System"
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 0) {
@@ -20,18 +21,18 @@ struct themeSettings: View {
                     HStack(spacing: 20){
                         Image(systemName: "chevron.left")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Theme Settings")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 
                 Text("Choose your preferred theme mode")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             .padding(.horizontal)
             .padding(.top)
@@ -40,14 +41,19 @@ struct themeSettings: View {
             
             // Options
             VStack(spacing: 12) {
-                themeOption(title: "Light", systemImage: "light", selectedTheme: $selectedTheme)
-                themeOption(title: "Dark", systemImage: "dark", selectedTheme: $selectedTheme)
-                themeOption(title: "System", systemImage: "system", selectedTheme: $selectedTheme)
+                themeOption(title: "Light", systemImage: "lightModeLight", selectedTheme: $selectedTheme)
+                themeOption(title: "Dark", systemImage: "darkModeLight", selectedTheme: $selectedTheme)
+                themeOption(title: "System", systemImage: "systemDark", selectedTheme: $selectedTheme)
             }
             .padding(.horizontal)
             
             Spacer()
         }
+        .preferredColorScheme(
+            selectedTheme == "Light" ? .light :
+                selectedTheme == "Dark" ? .dark :
+                nil // nil = system
+        )
         .onAppear{
             hideTabBarLegacy()
         }
@@ -122,13 +128,28 @@ struct themeOption: View {
     let systemImage: String
     @Binding var selectedTheme: String
     
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var dynamicImageName: String {
+        if colorScheme == .dark {
+            switch systemImage {
+            case "lightModeLight": return "lightModeDark"
+            case "darkModeLight": return "darkModeDark"
+            case "systemDark": return "systemLight"
+            default: return systemImage
+            }
+        } else {
+            return systemImage
+        }
+    }
+    
     var body: some View {
         Button(action: {
             selectedTheme = title
             print("Checking theme Selected: \(selectedTheme)")
         }) {
             HStack {
-                Image(systemImage)
+                Image(dynamicImageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
@@ -136,17 +157,13 @@ struct themeOption: View {
                     .font(.body)
                 Spacer()
                 
-                
-                
-//                if selectedTheme == title {
-//                    print("Checking theme Selected: \(selectedTheme)")
-//                }
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(selectedTheme == title ? Color.black : Color.gray.opacity(0.3), lineWidth: selectedTheme == title ? 1.5 : 1)
+                    .stroke(selectedTheme == title ? Color.primary : Color.secondary.opacity(0.5), lineWidth: selectedTheme == title ? 1.5 : 1)
+                
             )
         }
         .buttonStyle(PlainButtonStyle())

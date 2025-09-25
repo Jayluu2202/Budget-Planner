@@ -14,6 +14,7 @@ struct tabView: View {
     @StateObject private var budgetManager = BudgetManager()
     @StateObject private var currencyManager = CurrencyManager()
     @State var selectedCurrency: Currency?
+    
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
