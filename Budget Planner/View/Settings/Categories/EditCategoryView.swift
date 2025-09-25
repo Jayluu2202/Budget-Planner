@@ -116,12 +116,11 @@ struct EditCategoryView: View {
                     }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
+                        Text("Edit Category")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.black)
                     }
-                    
-                    Text("Edit Category")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
                 }
             }
 
