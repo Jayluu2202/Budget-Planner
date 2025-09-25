@@ -57,7 +57,7 @@ struct AddTransactionDetails: View {
                     DatePicker(
                         "",
                         selection: $transactionDate,
-                        in: startOfMonth()...endOfMonth(),
+                        in: ...endOfMonth(),
                         displayedComponents: [.date, .hourAndMinute]
                     )
                         .labelsHidden()

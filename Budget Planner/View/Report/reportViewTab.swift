@@ -2,7 +2,7 @@
 //  ReportViewTab.swift
 //  Budget Planner
 //
-//  Fixed version with proper chart updates
+//  Updated version with HalfSheet implementation
 //
 
 import SwiftUI
@@ -13,62 +13,85 @@ struct ReportViewTab: View {
     @ObservedObject var budgetManager: BudgetManager
     @State private var selectedTab: ReportTab = .income
     @State private var selectedPeriod: TimePeriod = .thisMonth
+    @State private var showingFilterSheet = false
     @StateObject private var currencyManager = CurrencyManager()
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                HStack {
-                    Text("Report")
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        print("Filter button tapped")
-                    }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(.black)
-                            .font(.system(size: 30, weight: .medium))
+            VStack(spacing: 0) {
+                // Header section - fixed positioning
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Report")
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showingFilterSheet = true
+                        }) {
+                            Image(systemName: "slider.horizontal.3")
+                                .foregroundColor(.black)
+                                .font(.system(size: 24, weight: .medium))
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    
+                    Divider()
+                        .padding(.top, 8)
+                        .padding(.horizontal)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
+                .background(Color(.systemBackground))
                 
-                Divider()
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.red)
-                    .padding(.top, -20)
-                
-                VStack {
-                    tabSelector
-                    
-                    // Debug info
-//                    VStack {
-//                        Text("Total Transactions: \(transactionManager.transactions.count)")
-//                        Text("Filtered: \(filteredTransactions.count)")
-//                        Text("Income: \(incomeTransactions.count)")
-//                        Text("Expense: \(expenseTransactions.count)")
-//                    }
-//                    .padding()
-//                    .background(Color.gray.opacity(0.1))
-//                    .cornerRadius(8)
-                    
-                    switch selectedTab {
-                    case .expense:
-                        expenseReportView
-                    case .income:
-                        incomeReportView
+                // Scrollable content
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Tab selector
+                        tabSelector
+                            .padding(.horizontal)
+                        
+                        // Period info
+                        HStack {
+                            Text("Period: \(selectedPeriod.rawValue)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(filteredTransactions.count) transactions")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        
+                        // Content based on selected tab
+                        Group {
+                            switch selectedTab {
+                            case .expense:
+                                expenseReportView
+                            case .income:
+                                incomeReportView
+                            }
+                        }
+                        .padding(.horizontal)
+                        
+                        // Bottom spacing for tab bar
+                        Spacer(minLength: 100)
                     }
-                    
-                    Spacer(minLength: 100)
+                    .padding(.top, 16)
                 }
-                .padding(.horizontal)
             }
-            .ignoresSafeArea()
+            .background(
+                // HalfSheet overlay - this ensures it doesn't interfere with tab bar
+                HalfSheet(isPresented: $showingFilterSheet) {
+                    TimeFilterHalfSheet(selectedPeriod: $selectedPeriod, isPresented: $showingFilterSheet)
+                }
+                .allowsHitTesting(false) // Prevents interference when not presented
+            )
         }
-        .padding(.top)
+        .padding(.vertical, -150)
+        .navigationBarHidden(true) // Hide default navigation bar
     }
     
     // MARK: - Tab Selector
@@ -105,9 +128,9 @@ struct ReportViewTab: View {
         VStack(spacing: 20) {
             // Expense Trend Chart
             if !expenseTransactions.isEmpty {
-                lineChartView(transactions: expenseTransactions, title: "Expense", color: .red)
+                lineChartView(transactions: expenseTransactions, title: "Expense Trend", color: .red)
             } else {
-                noDataView(message: "No expense transactions found")
+                noDataView(message: "No expense transactions found for \(selectedPeriod.rawValue.lowercased())")
             }
             
             // Category Distribution
@@ -120,9 +143,9 @@ struct ReportViewTab: View {
         VStack(spacing: 20) {
             // Income Trend Chart
             if !incomeTransactions.isEmpty {
-                lineChartView(transactions: incomeTransactions, title: "Income", color: .green)
+                lineChartView(transactions: incomeTransactions, title: "Income Trend", color: .green)
             } else {
-                noDataView(message: "No income transactions found")
+                noDataView(message: "No income transactions found for \(selectedPeriod.rawValue.lowercased())")
             }
             
             // Category Distribution
@@ -133,14 +156,19 @@ struct ReportViewTab: View {
     // MARK: - No Data View
     private func noDataView(message: String) -> some View {
         VStack(spacing: 15) {
+            Image(systemName: "chart.line.uptrend.xyaxis")
+                .font(.system(size: 48))
+                .foregroundColor(.secondary)
+            
             Text("No Data")
                 .font(.title2)
                 .fontWeight(.semibold)
             
             Text(message)
                 .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 40)
+                .padding(.vertical, 20)
         }
         .padding()
         .background(Color(.systemBackground))
@@ -151,23 +179,41 @@ struct ReportViewTab: View {
     // MARK: - Line Chart View (Using Charts library)
     private func lineChartView(transactions: [Transaction], title: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text(title)
-                .font(.title2)
-                .fontWeight(.semibold)
+            HStack {
+                Text(title)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                VStack(alignment: .trailing) {
+                    let total = transactions.reduce(0) { $0 + $1.amount }
+                    Text("Total")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(currencyManager.selectedCurrency.symbol)\(formatAmount(total))")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(color)
+                }
+            }
             
-            // Debug the data being passed
-            let dailyData = dailyAmounts(for: transactions)
+            let chartData = prepareChartData(for: transactions)
             
-            if dailyData.isEmpty {
+            if chartData.isEmpty {
                 Text("No data to display")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 40)
             } else {
-                // Using Charts library for line chart
-                LineChartWrapper(data: dailyData, title: title, color: UIColor(color))
-                    .frame(height: 200)
-                    .id(UUID()) // Force refresh when data changes
+                LineChartWrapper(
+                    data: chartData,
+                    title: title,
+                    color: UIColor(color),
+                    period: selectedPeriod
+                )
+                .frame(height: 200)
+                .id("\(selectedPeriod)-\(selectedTab)-\(UUID())") // Force refresh when period/tab changes
             }
         }
         .padding()
@@ -183,16 +229,13 @@ struct ReportViewTab: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            let actualCurrency = CurrencyManager().selectedCurrency.symbol
-            
             if transactions.isEmpty {
-                Text("No transactions found")
+                Text("No transactions found for \(selectedPeriod.rawValue.lowercased())")
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 40)
             } else {
                 VStack(spacing: 15) {
-                    // Pie Chart using Charts library
                     let categoryData = categoryTotals(for: transactions)
                     let total = categoryData.reduce(0) { $0 + $1.amount }
                     
@@ -205,13 +248,13 @@ struct ReportViewTab: View {
                         VStack {
                             PieChartView(
                                 data: categoryData.map { $0.amount },
-                                title: "Total\n\(actualCurrency)\(formatAmount(total))",
+                                title: "Total\n\(currencyManager.selectedCurrency.symbol)\(formatAmount(total))",
                                 colors: categoryData.enumerated().map { index, _ in
                                     UIColor(colorForCategory(at: index))
                                 }
                             )
                             .frame(height: 200)
-                            .id(UUID()) // Force refresh when data changes
+                            .id("\(selectedPeriod)-\(selectedTab)-pie-\(UUID())") // Force refresh
                         }
                         
                         // Category List
@@ -268,7 +311,7 @@ struct ReportViewTab: View {
 // MARK: - Extensions and Helper Methods
 extension ReportViewTab {
     
-    // MARK: - Computed Properties
+    // MARK: - UPDATED Computed Properties with Dynamic Filtering
     private var dateRange: (start: Date, end: Date) {
         let calendar = Calendar.current
         let now = Date()
@@ -283,6 +326,22 @@ extension ReportViewTab {
             let startOfMonth = calendar.dateInterval(of: .month, for: now)?.start ?? now
             let endOfMonth = calendar.dateInterval(of: .month, for: now)?.end ?? now
             return (startOfMonth, endOfMonth)
+            
+        case .lastMonth:
+            let lastMonth = calendar.date(byAdding: .month, value: -1, to: now) ?? now
+            let startOfLastMonth = calendar.dateInterval(of: .month, for: lastMonth)?.start ?? now
+            let endOfLastMonth = calendar.dateInterval(of: .month, for: lastMonth)?.end ?? now
+            return (startOfLastMonth, endOfLastMonth)
+            
+        case .last3Months:
+            let threeMonthsAgo = calendar.date(byAdding: .month, value: -3, to: now) ?? now
+            let startOfThreeMonthsAgo = calendar.dateInterval(of: .month, for: threeMonthsAgo)?.start ?? now
+            return (startOfThreeMonthsAgo, now)
+            
+        case .last6Months:
+            let sixMonthsAgo = calendar.date(byAdding: .month, value: -6, to: now) ?? now
+            let startOfSixMonthsAgo = calendar.dateInterval(of: .month, for: sixMonthsAgo)?.start ?? now
+            return (startOfSixMonthsAgo, now)
             
         case .thisYear:
             let startOfYear = calendar.dateInterval(of: .year, for: now)?.start ?? now
@@ -306,27 +365,51 @@ extension ReportViewTab {
         filteredTransactions.filter { $0.type == .income }
     }
     
-    private var totalIncome: Double {
-        incomeTransactions.reduce(0) { $0 + $1.amount }
-    }
-    
-    private var totalExpense: Double {
-        expenseTransactions.reduce(0) { $0 + $1.amount }
-    }
-    
-    // MARK: - Helper Functions
-    private func dailyAmounts(for transactions: [Transaction]) -> [Double] {
+    // MARK: - UPDATED Helper Functions for Chart Data
+    private func prepareChartData(for transactions: [Transaction]) -> [(Date, Double)] {
         guard !transactions.isEmpty else { return [] }
         
         let calendar = Calendar.current
-        let grouped = Dictionary(grouping: transactions) { transaction in
-            calendar.startOfDay(for: transaction.date)
+        let range = dateRange
+        
+        // Group transactions by appropriate time unit based on selected period
+        let groupedData: [Date: Double]
+        
+        switch selectedPeriod {
+        case .thisWeek, .thisMonth, .lastMonth:
+            // Group by day
+            groupedData = Dictionary(grouping: transactions) { transaction in
+                calendar.startOfDay(for: transaction.date)
+            }.mapValues { dayTransactions in
+                dayTransactions.reduce(0) { $0 + $1.amount }
+            }
+            
+        case .last3Months, .last6Months:
+            // Group by week
+            groupedData = Dictionary(grouping: transactions) { transaction in
+                let weekInterval = calendar.dateInterval(of: .weekOfYear, for: transaction.date)
+                return weekInterval?.start ?? transaction.date
+            }.mapValues { weekTransactions in
+                weekTransactions.reduce(0) { $0 + $1.amount }
+            }
+            
+        case .thisYear:
+            // Group by month
+            groupedData = Dictionary(grouping: transactions) { transaction in
+                let monthInterval = calendar.dateInterval(of: .month, for: transaction.date)
+                return monthInterval?.start ?? transaction.date
+            }.mapValues { monthTransactions in
+                monthTransactions.reduce(0) { $0 + $1.amount }
+            }
         }
         
-        let sorted = grouped.sorted { $0.key < $1.key }
-        return sorted.map { _, transactions in
-            transactions.reduce(0) { $0 + $1.amount }
-        }
+        // Convert to sorted array
+        return groupedData.sorted { $0.key < $1.key }
+    }
+    
+    private func dailyAmounts(for transactions: [Transaction]) -> [Double] {
+        let chartData = prepareChartData(for: transactions)
+        return chartData.map { $0.1 }
     }
     
     private func categoryTotals(for transactions: [Transaction]) -> [CategoryTotal] {
@@ -344,7 +427,7 @@ extension ReportViewTab {
     }
     
     private func colorForCategory(at index: Int) -> Color {
-        let colors: [Color] = [.blue, .green, .orange, .purple, .pink, .yellow, .red, .gray]
+        let colors: [Color] = [.blue, .green, .orange, .purple, .pink, .yellow, .red, .gray, .mint, .cyan]
         return colors[index % colors.count]
     }
     
@@ -356,12 +439,13 @@ extension ReportViewTab {
     }
 }
 
-// MARK: - Custom Chart Views using Charts library
+// MARK: - Updated Chart Components
 
 struct LineChartWrapper: UIViewRepresentable {
-    var data: [Double]
+    var data: [(Date, Double)]
     let title: String
     let color: UIColor
+    let period: TimePeriod
     
     func makeUIView(context: Context) -> LineChartView {
         let chartView = Charts.LineChartView()
@@ -385,13 +469,20 @@ struct LineChartWrapper: UIViewRepresentable {
         chartView.doubleTapToZoomEnabled = false
         
         // Configure axes
-        chartView.xAxis.drawGridLinesEnabled = false
+        chartView.xAxis.drawGridLinesEnabled = true
+        chartView.xAxis.gridColor = UIColor.systemGray5
         chartView.xAxis.drawAxisLineEnabled = false
-        chartView.xAxis.drawLabelsEnabled = false
+        chartView.xAxis.drawLabelsEnabled = true
+        chartView.xAxis.labelPosition = .bottom
+        chartView.xAxis.labelFont = UIFont.systemFont(ofSize: 10)
+        chartView.xAxis.labelTextColor = UIColor.secondaryLabel
         
-        chartView.leftAxis.drawGridLinesEnabled = false
+        chartView.leftAxis.drawGridLinesEnabled = true
+        chartView.leftAxis.gridColor = UIColor.systemGray5
         chartView.leftAxis.drawAxisLineEnabled = false
-        chartView.leftAxis.drawLabelsEnabled = false
+        chartView.leftAxis.drawLabelsEnabled = true
+        chartView.leftAxis.labelFont = UIFont.systemFont(ofSize: 10)
+        chartView.leftAxis.labelTextColor = UIColor.secondaryLabel
         
         chartView.rightAxis.enabled = false
     }
@@ -402,8 +493,8 @@ struct LineChartWrapper: UIViewRepresentable {
             return
         }
         
-        let entries = data.enumerated().map { index, value in
-            ChartDataEntry(x: Double(index), y: value)
+        let entries = data.enumerated().map { index, dateValue in
+            ChartDataEntry(x: Double(index), y: dateValue.1)
         }
         
         let dataSet = LineChartDataSet(entries: entries, label: title)
@@ -413,16 +504,32 @@ struct LineChartWrapper: UIViewRepresentable {
         dataSet.circleColors = [color]
         dataSet.mode = .cubicBezier
         dataSet.fillColor = color
-        dataSet.fillAlpha = 0.3
+        dataSet.fillAlpha = 0.2
         dataSet.drawFilledEnabled = true
         dataSet.drawValuesEnabled = false
         
+        // Set up X-axis labels based on period
+        let formatter = DateFormatter()
+        switch period {
+        case .thisWeek, .thisMonth, .lastMonth:
+            formatter.dateFormat = "MMM dd"
+        case .last3Months, .last6Months:
+            formatter.dateFormat = "MMM dd"
+        case .thisYear:
+            formatter.dateFormat = "MMM"
+        }
+        
+        chartView.xAxis.valueFormatter = IndexAxisValueFormatter(values: data.map {
+            formatter.string(from: $0.0)
+        })
+        
         let chartData = LineChartData(dataSet: dataSet)
         chartView.data = chartData
-        chartView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
+        chartView.animate(xAxisDuration: 0.8, yAxisDuration: 0.8)
     }
 }
 
+// PieChartView remains the same as before
 struct PieChartView: UIViewRepresentable {
     let data: [Double]
     let title: String
@@ -469,10 +576,184 @@ struct PieChartView: UIViewRepresentable {
         
         let chartData = PieChartData(dataSet: dataSet)
         uiView.data = chartData
-        uiView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
+        uiView.animate(xAxisDuration: 0.8, yAxisDuration: 0.8)
     }
 }
 
+// MARK: - New HalfSheet Filter View
+struct TimeFilterHalfSheet: View {
+    @Binding var selectedPeriod: TimePeriod
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Grab handle
+            RoundedRectangle(cornerRadius: 2.5)
+                .fill(Color(.systemGray4))
+                .frame(width: 36, height: 5)
+                .padding(.top, 8)
+            
+            // Header
+            HStack {
+                Button("Reset") {
+                    selectedPeriod = .thisMonth
+                }
+                .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Text("Filter")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Button("Done") {
+                    isPresented = false
+                }
+                .foregroundColor(.primary)
+//                .fontWeight(.medium)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            
+            Divider()
+            
+            // Period options
+            ScrollView {
+                LazyVStack(spacing: 8) {
+                    ForEach(TimePeriod.allCases, id: \.self) { period in
+                        Button(action: {
+                            selectedPeriod = period
+                        }) {
+                            HStack {
+                                Text(period.rawValue)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                                
+                                Spacer()
+                                
+                                if selectedPeriod == period {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.accentColor)
+//                                        .fontWeight(.medium)
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 16)
+                            .background(
+                                Rectangle()
+                                    .fill(selectedPeriod == period ? Color.accentColor.opacity(0.1) : Color.clear)
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+            }
+            
+            Spacer()
+        }
+        .background(Color(.systemBackground))
+        .cornerRadius(16, corners: [.topLeft, .topRight])
+    }
+}
+
+// MARK: - Helper extension for corner radius
+//extension View {
+//    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+//        clipShape(RoundedCorner(radius: radius, corners: corners))
+//    }
+//}
+
+//struct RoundedCorner: Shape {
+//    var radius: CGFloat = .infinity
+//    var corners: UIRectCorner = .allCorners
+//
+//    func path(in rect: CGRect) -> Path {
+//        let path = UIBezierPath(
+//            roundedRect: rect,
+//            byRoundingCorners: corners,
+//            cornerRadii: CGSize(width: radius, height: radius)
+//        )
+//        return Path(path.cgPath)
+//    }
+//}
+
+// MARK: - Updated HalfSheet Implementation
+struct HalfSheet<Content: View>: UIViewControllerRepresentable {
+    var content: Content
+    @Binding var isPresented: Bool
+    
+    init(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) {
+        self._isPresented = isPresented
+        self.content = content()
+    }
+    
+    func makeUIViewController(context: Context) -> HalfSheetViewController {
+            let controller = HalfSheetViewController()
+            controller.onDismiss = {
+                DispatchQueue.main.async {
+                    self.isPresented = false
+                }
+            }
+            return controller
+        }
+    
+    func updateUIViewController(_ uiViewController: HalfSheetViewController, context: Context) {
+            if isPresented && !uiViewController.isPresenting {
+                uiViewController.presentSheet(with: content)
+            } else if !isPresented && uiViewController.isPresenting {
+                uiViewController.dismissSheet()
+            }
+        }
+}
+// MARK: - Helper UIViewController for HalfSheet
+class HalfSheetViewController: UIViewController {
+    var isPresenting = false
+    var onDismiss: (() -> Void)?
+    private var currentHostingController: UIHostingController<AnyView>?
+    
+    func presentSheet<Content: View>(with content: Content) {
+        guard !isPresenting else { return }
+        
+        let hostingController = UIHostingController(rootView: AnyView(content))
+        hostingController.modalPresentationStyle = .pageSheet
+        
+        if let sheet = hostingController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = false
+            sheet.preferredCornerRadius = 16
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+        }
+        
+        // Set up dismiss handling
+        hostingController.presentationController?.delegate = self
+        
+        currentHostingController = hostingController
+        isPresenting = true
+        
+        present(hostingController, animated: true)
+    }
+    
+    func dismissSheet() {
+        guard isPresenting, let hostingController = currentHostingController else { return }
+        
+        isPresenting = false
+        hostingController.dismiss(animated: true) { [weak self] in
+            self?.currentHostingController = nil
+        }
+    }
+}
+
+extension HalfSheetViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        isPresenting = false
+        currentHostingController = nil
+        onDismiss?()
+    }
+}
 // MARK: - Supporting Types
 enum ReportTab {
     case income
@@ -480,9 +761,12 @@ enum ReportTab {
 }
 
 enum TimePeriod: String, CaseIterable {
-    case thisWeek = "This Week"
     case thisMonth = "This Month"
+    case lastMonth = "Last Month"
+    case last3Months = "Last 3 Months"
+    case last6Months = "Last 6 Months"
     case thisYear = "This Year"
+    case thisWeek = "This Week"
 }
 
 struct CategoryTotal {

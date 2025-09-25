@@ -213,15 +213,11 @@ struct homeViewTab: View {
     }
     
     private func previousMonth() {
-        withAnimation(.linear(duration: 0.3)) {
-            currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
-        }
+        currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
     }
     
     private func nextMonth() {
-        withAnimation(.linear(duration: 0.3)) {
-            currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
-        }
+        currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
     }
     
     private var monthYearString: String {
