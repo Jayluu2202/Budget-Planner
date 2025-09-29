@@ -1,5 +1,5 @@
 //
-//  CurrencyModel.swift
+//  Currency.swift
 //  Budget Planner
 //
 //  Created by mac on 09/09/25.
@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - Model
 struct Currency: Identifiable, Hashable {
     let id = UUID()
     let code: String
@@ -14,10 +15,9 @@ struct Currency: Identifiable, Hashable {
     let symbol: String
 }
 
-class CurrencyManager: ObservableObject {
-    @Published var selectedCurrency: Currency = Currency(code: "USD", name: "US Dollar", symbol: "$")
-    
-    let currencies: [Currency] = [
+// MARK: - Data Source
+struct CurrencyData {
+    static let allCurrencies: [Currency] = [
         Currency(code: "AED", name: "UAE Dirham", symbol: "د.إ"),
         Currency(code: "AFN", name: "Afghan Afghani", symbol: "؋"),
         Currency(code: "ALL", name: "Albanian Lek", symbol: "L"),
@@ -180,21 +180,4 @@ class CurrencyManager: ObservableObject {
         Currency(code: "ZMW", name: "Zambia Kwacha", symbol: "ZK"),
         Currency(code: "ZWL", name: "Zimbabwe Dollar", symbol: "Z$")
     ]
-    
-    func selectCurrency(_ currency: Currency) {
-        selectedCurrency = currency
-        // Save to UserDefaults
-        UserDefaults.standard.set(currency.code, forKey: "selectedCurrencyCode")
-        UserDefaults.standard.set(currency.name, forKey: "selectedCurrencyName")
-        UserDefaults.standard.set(currency.symbol, forKey: "selectedCurrencySymbol")
-    }
-    
-    init() {
-        // Load saved currency from UserDefaults
-        if let savedCode = UserDefaults.standard.string(forKey: "selectedCurrencyCode"),
-           let savedName = UserDefaults.standard.string(forKey: "selectedCurrencyName"),
-           let savedSymbol = UserDefaults.standard.string(forKey: "selectedCurrencySymbol") {
-            selectedCurrency = Currency(code: savedCode, name: savedName, symbol: savedSymbol)
-        }
-    }
 }

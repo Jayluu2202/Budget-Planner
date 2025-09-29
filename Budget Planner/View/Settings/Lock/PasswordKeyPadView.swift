@@ -38,7 +38,7 @@ struct PasswordKeyPadView: View {
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 22, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                     Spacer()
                 }
@@ -60,7 +60,7 @@ struct PasswordKeyPadView: View {
             HStack(spacing: 20) {
                 ForEach(0..<4, id: \.self) { index in
                     Circle()
-                        .fill(dots[index] ? Color.black : Color.gray.opacity(0.3))
+                        .fill(dots[index] ? Color.primary : Color.secondary.opacity(0.3))
                         .frame(width: 20, height: 20)
                 }
             }
@@ -106,7 +106,7 @@ struct PasswordKeyPadView: View {
                     Button(action: deleteDigit) {
                         Image(systemName: "delete.left")
                             .font(.system(size: 24))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .frame(width: 60, height: 60)
                     }
                 }
@@ -210,7 +210,7 @@ struct NumberButton: View {
             Text(number)
                 .font(.title)
                 .fontWeight(.medium)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .frame(width: 60, height: 60)
                 .background(Color.clear)
         }

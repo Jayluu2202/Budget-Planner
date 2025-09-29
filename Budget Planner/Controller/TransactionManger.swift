@@ -2,7 +2,6 @@
 //  TransactionManager.swift
 //  Budget Planner
 //
-//  Updated version with budget integration
 //
 
 import Foundation
@@ -10,9 +9,13 @@ import SwiftUI
 
 // MARK: - Transaction Manager
 class TransactionManager: ObservableObject {
+    static let shared = TransactionManager()
     @Published var transactions: [Transaction] = []
     @Published var accounts: [Account] = []
     @Published var categories: [TransactionCategory] = []
+    
+    // Shared AccountStore reference to maintain data consistency
+    private let accountStore = AccountStore.shared
 
     private let transactionsKey = "transactions_key"
     private let accountsKey = "accounts_key"
@@ -47,7 +50,7 @@ class TransactionManager: ObservableObject {
             addDefaultAccounts()
         }
     }
-
+    //Loading Transactions
     private func loadTransactions() {
         if let data = UserDefaults.standard.data(forKey: transactionsKey),
            let decodedTransactions = try? JSONDecoder().decode([Transaction].self, from: data) {
@@ -68,7 +71,7 @@ class TransactionManager: ObservableObject {
             self.categories = decodedCategories
         }
     }
-
+    //Saving Transactions
     private func saveTransactions() {
         if let encoded = try? JSONEncoder().encode(transactions) {
             UserDefaults.standard.set(encoded, forKey: transactionsKey)
@@ -127,48 +130,6 @@ class TransactionManager: ObservableObject {
         saveAccounts()
     }
 
-    // MARK: - Account Management
-
-    func addAccount(_ account: Account) {
-        accounts.append(account)
-        saveAccounts()
-    }
-
-    func updateAccount(_ account: Account) {
-        if let index = accounts.firstIndex(where: { $0.id == account.id }) {
-            accounts[index] = account
-            saveAccounts()
-        }
-    }
-
-    func deleteAccount(_ account: Account) {
-        accounts.removeAll { $0.id == account.id }
-        saveAccounts()
-
-        // Also remove transactions associated with this account
-        transactions.removeAll { $0.account.id == account.id }
-        saveTransactions()
-    }
-
-    // MARK: - Category Management
-
-    func addCategory(_ category: TransactionCategory) {
-        categories.append(category)
-        saveCategories()
-    }
-
-    func updateCategory(_ category: TransactionCategory) {
-        if let index = categories.firstIndex(where: { $0.id == category.id }) {
-            categories[index] = category
-            saveCategories()
-        }
-    }
-
-    func deleteCategory(_ category: TransactionCategory) {
-        categories.removeAll { $0.id == category.id }
-        saveCategories()
-    }
-
     // MARK: - Transaction Management
 
     func addTransaction(_ transaction: Transaction) {
@@ -221,9 +182,15 @@ class TransactionManager: ObservableObject {
         }
     }
 
+    // FIXED: Proper account balance update with persistent storage
     private func updateAccountBalance(for transaction: Transaction, isAdding: Bool) {
-        if let accountIndex = accounts.firstIndex(where: { $0.id == transaction.account.id }) {
-            let multiplier: Double = isAdding ? 1.0 : -1.0
+
+        // Load latest accounts from AccountStore
+        accountStore.loadAccounts()
+        
+        if let accountIndex = accountStore.accounts.firstIndex(where: { $0.id == transaction.account.id }) {
+            let multiplier: Double = isAdding ? 1.0 : -1.0 // if we are adding transaction then 1.0 else -1.0
+
 
             switch transaction.type {
             case .income:
@@ -234,8 +201,14 @@ class TransactionManager: ObservableObject {
                 // Handle transfer logic here if needed
                 break
             }
+
+            // Save the updated account
+            accountStore.saveAccounts()
             
-            saveAccounts()
+            // Also update our local accounts array for consistency
+            if let localIndex = accounts.firstIndex(where: { $0.id == transaction.account.id }) {
+                accounts[localIndex] = accountStore.accounts[accountIndex]
+            }
         }
     }
 

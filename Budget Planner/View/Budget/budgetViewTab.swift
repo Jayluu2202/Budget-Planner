@@ -2,7 +2,6 @@
 //  budgetViewTab.swift
 //  Budget Planner
 //
-//  Created by Assistant on 11/09/25.
 //
 
 import SwiftUI
@@ -10,163 +9,113 @@ import SwiftUI
 struct budgetViewTab: View {
     @StateObject var budgetManager = BudgetManager()
     @StateObject var transactionManager = TransactionManager()
+    // CHANGE: Use EnvironmentObject instead of StateObject
+    @ObservedObject var currencyManager = CurrencyManager()
     @State private var showAddBudget = false
-    @State private var selectedFilter: BudgetFilter = .active
     
-    enum BudgetFilter: String, CaseIterable {
-        case active = "Active"
-        case expired = "Expired"
-        case all = "All"
+    var transportTotal: Double {
+        var sum = 0.0
+        for cat in transactionManager.transactions {
+            if cat.category.name == "Transport" {
+                print(cat.amount)
+                sum += cat.amount
+            }
+        }
+        return sum
     }
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Summary Header
-                buildSummaryHeader()
+            ZStack {
+                VStack(spacing: 0) {
+                    // Custom header since we're hiding the navigation bar
+                    VStack(spacing: 0) {
+                        Text("Budget Overview")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .padding(.top, 65)
+                        
+                        Divider()
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 4)
+                            .padding(.bottom)
+                    }
+                    .background(Color(.systemBackground))
+                    
+                    // Budgets List
+                    buildBudgetsList()
+                }
+                .ignoresSafeArea()
                 
-                // Filter Section
-                buildFilterSection()
-                
-                // Budgets List
-                buildBudgetsList()
-            }
-            .navigationTitle("Budget Overview")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showAddBudget = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.primary)
+                // Floating Action Button
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showAddBudget = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(Color(.systemBackground))
+                                .padding()
+                                .background(Color.primary)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                        }
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 16)
                     }
                 }
             }
+            .navigationBarHidden(true)
             .sheet(isPresented: $showAddBudget) {
                 AddBudgetView(
-                    budgetManager: budgetManager,
-                    transactionManager: transactionManager
+                    budgetManager: budgetManager
                 )
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
-            budgetManager.loadData()
-            transactionManager.loadData()
-            syncBudgetSpending()
+            setupManagerLinking()
+            loadAndSyncData()
         }
+        .onChange(of: showAddBudget) { isShowing in
+            if !isShowing {
+                syncAllBudgetsWithTransactions()
+            }
+        }
+        .onReceive(transactionManager.$transactions) { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                syncAllBudgetsWithTransactions()
+            }
+        }
+    }
+    
+    // MARK: - Setup Methods
+    
+    private func setupManagerLinking() {
+        // CRITICAL: Link managers properly
+//        transactionManager.setBudgetManager(budgetManager)
+//        print("🔗 Managers linked successfully")
+    }
+    
+    private func loadAndSyncData() {
+        budgetManager.loadData()
+        transactionManager.loadData()
+        
+        // Always sync budgets with transactions when view appears
+        syncAllBudgetsWithTransactions()
+//        print("📂 Data loaded and synced")
+    }
+    
+    private func syncAllBudgetsWithTransactions() {
+        budgetManager.syncAllBudgetsWithTransactions(transactionManager.transactions)
     }
     
     // MARK: - View Builders
-    
-    @ViewBuilder
-    private func buildSummaryHeader() -> some View {
-        VStack(spacing: 16) {
-            // Main stats
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Total Budget")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("₹\(formatAmount(budgetManager.totalBudgetAmount()))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text("Spent")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("₹\(formatAmount(budgetManager.totalSpentAmount()))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.red)
-                }
-                
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text("Remaining")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("₹\(formatAmount(budgetManager.totalRemainingAmount()))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.green)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            
-            // Performance indicators
-            let performance = budgetManager.budgetPerformanceData()
-            if performance.onTrack + performance.warning + performance.overBudget > 0 {
-                HStack(spacing: 20) {
-                    performanceIndicator(
-                        title: "On Track",
-                        count: performance.onTrack,
-                        color: .green
-                    )
-                    
-                    performanceIndicator(
-                        title: "Warning",
-                        count: performance.warning,
-                        color: .orange
-                    )
-                    
-                    performanceIndicator(
-                        title: "Over Budget",
-                        count: performance.overBudget,
-                        color: .red
-                    )
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-            }
-        }
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-    }
-    
-    @ViewBuilder
-    private func performanceIndicator(title: String, count: Int, color: Color) -> some View {
-        VStack(spacing: 4) {
-            Text("\(count)")
-                .font(.title3)
-                .fontWeight(.bold)
-                .foregroundColor(color)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-    
-    @ViewBuilder
-    private func buildFilterSection() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(BudgetFilter.allCases, id: \.self) { filter in
-                    FilterChip(
-                        title: filter.rawValue,
-                        isSelected: selectedFilter == filter
-                    ) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            selectedFilter = filter
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-        .padding(.vertical, 16)
-    }
-    
     @ViewBuilder
     private func buildBudgetsList() -> some View {
         let filteredBudgets = getFilteredBudgets()
@@ -177,13 +126,25 @@ struct budgetViewTab: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(filteredBudgets) { budget in
-                        BudgetCard(
-                            budget: budget,
-                            onDelete: {
-                                deleteBudget(budget)
-                            }
-                        )
-                        .padding(.horizontal, 16)
+
+                        NavigationLink(
+                            destination: BudgetDetailsView(
+                                budget: budget,
+                                budgetManager: budgetManager,
+                                transactionManager: transactionManager
+                            )
+                        ) {
+                            BudgetCard(
+                                budget: budget,
+                                transactions: transactionManager.transactions,
+                                currencyManager: currencyManager, // CHANGE: Pass currencyManager
+                                onDelete: {
+                                    deleteBudget(budget)
+                                }, transactionManager: transactionManager
+                            )
+                            .padding(.horizontal, 16)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.bottom, 100)
@@ -222,22 +183,8 @@ struct budgetViewTab: View {
     // MARK: - Helper Methods
     
     private func getFilteredBudgets() -> [Budget] {
-        switch selectedFilter {
-        case .active:
-            return budgetManager.activeBudgets().sorted { $0.daysRemaining < $1.daysRemaining }
-        case .expired:
-            return budgetManager.expiredBudgets().sorted { $0.endDate > $1.endDate }
-        case .all:
-            return budgetManager.budgets.sorted { budget1, budget2 in
-                if budget1.isActive && !budget2.isActive {
-                    return true
-                } else if !budget1.isActive && budget2.isActive {
-                    return false
-                } else {
-                    return budget1.daysRemaining < budget2.daysRemaining
-                }
-            }
-        }
+        return budgetManager.activeBudgets().sorted { $0.daysPassed > $1.daysPassed }
+
     }
     
     private func deleteBudget(_ budget: Budget) {
@@ -257,32 +204,45 @@ struct budgetViewTab: View {
         }
         return "\(Int(abs(amount)))"
     }
-    
-    // Sync budget spending with actual transactions
-    private func syncBudgetSpending() {
-        for budget in budgetManager.budgets {
-            // Calculate actual spending for this category in the budget period
-            let actualSpent = transactionManager.transactions
-                .filter { transaction in
-                    transaction.category.id == budget.category.id &&
-                    transaction.type == .expense &&
-                    transaction.date >= budget.startDate &&
-                    transaction.date <= budget.endDate
-                }
-                .reduce(0) { $0 + $1.amount }
-            
-            // Update budget with actual spending
-            var updatedBudget = budget
-            updatedBudget.spentAmount = actualSpent
-            budgetManager.updateBudget(updatedBudget)
-        }
-    }
 }
 
-// MARK: - Budget Card Component
+// MARK: - Budget Card Component (UPDATED)
 struct BudgetCard: View {
     let budget: Budget
+    let transactions: [Transaction]
+    let currencyManager: CurrencyManager // CHANGE: Add currencyManager parameter
     let onDelete: () -> Void
+    @ObservedObject var transactionManager: TransactionManager
+    @State private var selectedMonth = Date()
+    
+    // Calculate spending just for this budget
+//    private var spentForThisBudget: Double {
+//        transactions
+//            .filter { $0.category.name == budget.category.name }
+//            .reduce(0) { $0 + $1.amount }
+//    }
+    
+    private var sspentForThisBudget: Double {
+        let calendar = Calendar.current
+        return transactionManager.transactions
+            .filter { transaction in
+                // Filter by category name, type, and selected month/year
+                return transaction.category.name == budget.category.name &&
+                transaction.type == .expense &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .month) &&
+                calendar.isDate(transaction.date, equalTo: selectedMonth, toGranularity: .year)
+            }
+            .reduce(0) { $0 + $1.amount }
+    }
+    
+    private var remainingAmount: Double {
+        budget.budgetAmount - sspentForThisBudget
+    }
+    
+    private var progressPercentage: Double {
+        guard budget.budgetAmount > 0 else { return 0 }
+        return (sspentForThisBudget / budget.budgetAmount) * 100
+    }
     
     var body: some View {
         VStack(spacing: 16) {
@@ -298,7 +258,8 @@ struct BudgetCard: View {
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
                         
-                        if !budget.description.isEmpty && budget.description != "Budget for \(budget.category.name)" {
+                        if !budget.description.isEmpty &&
+                            budget.description != "Budget for \(budget.category.name)" {
                             Text(budget.description)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -310,14 +271,14 @@ struct BudgetCard: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("₹\(Int(budget.remainingAmount))")
+                    // CHANGE: Use currencyManager.selectedCurrency.symbol
+                    Text("\(currencyManager.selectedCurrency.symbol)\(formatAmount(remainingAmount))")
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(budget.remainingAmount >= 0 ? .green : .red)
+                        .foregroundColor(.primary)
                     
-                    Text("₹\(Int(budget.spentAmount)) / ₹\(Int(budget.budgetAmount))")
+                    Text("\(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", sspentForThisBudget)) / \(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", budget.budgetAmount))")
                         .font(.caption)
-                        .foregroundColor(.secondary)
                 }
             }
             
@@ -325,129 +286,63 @@ struct BudgetCard: View {
             VStack(spacing: 8) {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
-                        // Background
                         Rectangle()
-                            .fill(Color(.systemGray5))
+                            .fill(Color.secondary)
                             .frame(height: 8)
                             .cornerRadius(4)
                         
-                        // Progress
                         Rectangle()
-                            .fill(progressColor)
+                            .fill(.primary)
                             .frame(
                                 width: min(
-                                    geometry.size.width * CGFloat(budget.progressPercentage / 100),
+                                    geometry.size.width * CGFloat(progressPercentage / 100),
                                     geometry.size.width
                                 ),
                                 height: 8
                             )
                             .cornerRadius(4)
-                            .animation(.easeInOut(duration: 0.3), value: budget.progressPercentage)
+                            .animation(.easeInOut(duration: 0.3), value: progressPercentage)
                     }
                 }
                 .frame(height: 8)
                 
                 HStack {
-                    Text("\(budget.daysRemaining) days left")
+                    Text(daysRemainingText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
                     Spacer()
                     
-                    Text("\(Int(budget.progressPercentage))%")
+                    Text("\(Int(progressPercentage))%")
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(progressColor)
                 }
-            }
-            
-            // Status indicator
-            HStack {
-                StatusBadge(status: budget.budgetStatus)
-                Spacer()
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .background(Color(.systemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-        .contextMenu {
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label("Delete Budget", systemImage: "trash")
-            }
-        }
+        .shadow(color: Color.primary.opacity(0.05), radius: 8, x: 0, y: 2)
     }
     
-    private var progressColor: Color {
-        switch budget.budgetStatus {
-        case .safe:
-            return .green
-        case .onTrack:
-            return .blue
-        case .warning:
-            return .orange
-        case .overBudget:
-            return .red
-        }
-    }
-}
-
-// MARK: - Status Badge Component
-struct StatusBadge: View {
-    let status: BudgetStatus
-    
-    var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(statusColor)
-                .frame(width: 8, height: 8)
-            
-            Text(status.description)
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundColor(statusColor)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(statusColor.opacity(0.1))
-        .cornerRadius(12)
+    // Days remaining (same as before)
+    private var daysRemainingText: String {
+        let calendar = Calendar.current
+        let today = Date()
+        let range = calendar.range(of: .day, in: .month, for: today)!
+        let totalDays = range.count
+        let day = calendar.component(.day, from: today)
+        let remaining = max(0, totalDays - day)
+        return "\(remaining) days remaining"
     }
     
-    private var statusColor: Color {
-        switch status {
-        case .safe:
-            return .green
-        case .onTrack:
-            return .blue
-        case .warning:
-            return .orange
-        case .overBudget:
-            return .red
-        }
-    }
-}
-
-// MARK: - Filter Chip Component (reused from transaction view)
-struct BudgetFilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(isSelected ? Color.black : Color(.systemGray6))
-                .foregroundColor(isSelected ? .white : .primary)
-                .cornerRadius(20)
-        }
-        .buttonStyle(PlainButtonStyle())
+    private func formatAmount(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: abs(amount))) ?? "\(Int(abs(amount)))"
     }
 }
 
@@ -455,5 +350,6 @@ struct BudgetFilterChip: View {
 struct budgetViewTab_Previews: PreviewProvider {
     static var previews: some View {
         budgetViewTab()
+            .environmentObject(CurrencyManager()) // CHANGE: Add environment object
     }
 }

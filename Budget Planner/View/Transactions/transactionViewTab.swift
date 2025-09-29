@@ -2,147 +2,130 @@
 //  transactionViewTab.swift
 //  Budget Planner
 //
-//  Created by mac on 03/09/25.
+//  Updated to use shared TransactionManager instance and fix CurrencyManager
 //
 
 import SwiftUI
 
 struct transactionViewTab: View {
-    @StateObject var transactionManager = TransactionManager()
-    @State private var showAddScreen = false
+    // CHANGED: Use shared instance instead of creating new one
+    @ObservedObject var transactionManager = TransactionManager.shared
+    @StateObject var currencyManager = CurrencyManager()
+    @State private var showFilterSheet = false
     @State private var selectedFilter: FilterType = .all
-    @State private var searchText = ""
+
+    @Environment(\.dismiss) private var dismiss
+    
+    @Binding var showTransactions: Bool
+    
+    var isInsideTab : Bool = true
+    // Make category an optional property
+    let category: TransactionCategory?
+    
+    // Updated initializer - no longer creates new TransactionManager
+    init(category: TransactionCategory? = nil, showTransactions: Binding<Bool> = .constant(false)) {
+        self.category = category
+        self._showTransactions = showTransactions
+    }
     
     enum FilterType: String, CaseIterable {
-        case all = "All"
-        case income = "Income"
-        case expense = "Expense"
-        case transfer = "Transfer"
+        case all = "All Transactions"
+        case recurring = "Recurring"
+        case nonRecurring = "Non-Recurring"
     }
     
     var body: some View {
-        NavigationView {
+        NavigationView{
             VStack(spacing: 0) {
-                // Header with filter options
-                buildHeaderSection()
+                // Add custom header when no category is specified
+                if category == nil {
+                    // for the transaction tab
+                    buildTransactionsHeader()
+                } else {
+                    // for budget details transaction view
+                    buildCategoryHeader()
+                }
                 
-                // Search bar
-                buildSearchSection()
-                
-                // Filter chips
-                buildFilterSection()
-                
-                // Transactions list
+                Divider()
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 4)
+                    .padding(.bottom)
                 buildTransactionsList()
             }
-            .navigationTitle("Transactions")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showAddScreen = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.primary)
-                    }
+            .navigationBarBackButtonHidden(true)
+            .navigationBarHidden(true)
+            .ignoresSafeArea(edges: .bottom)
+            .onAppear {
+                // Only execute once on first appearance
+                transactionManager.loadData()
+                if category != nil {
+                    hideTabBarLegacy()
                 }
             }
-            .sheet(isPresented: $showAddScreen) {
-                AddTransactionDetails(transactionManager: transactionManager)
+            .confirmationDialog("Filter Transactions", isPresented: $showFilterSheet, titleVisibility: .visible) {
+                ForEach(FilterType.allCases, id: \.self) { filter in
+                    Button(filter.rawValue) {
+                        selectedFilter = filter
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
             }
         }
-        .onAppear {
-            transactionManager.loadData()
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
+    }
+    
+    // New method to build transactions header
+    private func buildTransactionsHeader() -> some View {
+        HStack {
+            Text("Transactions")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+            
+            Spacer()
+            
+            Button {
+                showFilterSheet = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 30, weight: .medium))
+                    .foregroundColor(.primary)
+            }
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 15)
+        .background(Color(.systemBackground))
+    }
+    
+    private func buildCategoryHeader() -> some View {
+        HStack {
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showTransactions = false
+                }
+//                dismiss()
+            }) {
+                Image(systemName: "chevron.left")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+                
+                Text(category?.emoji ?? "")
+                    .font(.title2)
+                
+                Text("Transactions")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+            }
+            Spacer()
+        }
+        .navigationBarBackButtonHidden(true)
+        .padding(.top, category == nil ? 0 : 10)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .background(Color(.systemBackground))
     }
     
     // MARK: - View Builders
-    
-    @ViewBuilder
-    private func buildHeaderSection() -> some View {
-        VStack(spacing: 8) {
-            // Total balance summary
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Total Balance")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("₹\(formatAmount(totalBalance))")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(totalBalance >= 0 ? .green : .red)
-                }
-                
-                Spacer()
-                
-                HStack(spacing: 20) {
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Income")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("₹\(formatAmount(totalIncome))")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.green)
-                    }
-                    
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Expense")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("₹\(formatAmount(totalExpense))")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.red)
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 12)
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
-            .padding(.horizontal)
-        }
-        .padding(.top, 8)
-    }
-    
-    @ViewBuilder
-    private func buildSearchSection() -> some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
-            
-            TextField("Search transactions", text: $searchText)
-                .textFieldStyle(PlainTextFieldStyle())
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .padding(.top, 8)
-    }
-    
-    @ViewBuilder
-    private func buildFilterSection() -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(FilterType.allCases, id: \.self) { filter in
-                    FilterChip(
-                        title: filter.rawValue,
-                        isSelected: selectedFilter == filter
-                    ) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            selectedFilter = filter
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .padding(.top, 12)
-    }
     
     @ViewBuilder
     private func buildTransactionsList() -> some View {
@@ -154,13 +137,20 @@ struct transactionViewTab: View {
                     ForEach(groupedTransactions.keys.sorted(by: >), id: \.self) { date in
                         Section {
                             ForEach(groupedTransactions[date] ?? []) { transaction in
-                                TransactionRow(
+                                NavigationLink(destination: TransactionDetailsView(
                                     transaction: transaction,
-                                    onDelete: {
-                                        deleteTransaction(transaction)
-                                    }
-                                )
-                                .padding(.horizontal)
+                                    transactionManager: transactionManager
+                                )) {
+                                    // FIXED: Create TransactionRow without passing currencyManager
+                                    // Let it use its own @StateObject
+                                    TransactionRow(
+                                        transaction: transaction,
+                                        onDelete: {
+                                            deleteTransaction(transaction)
+                                        }
+                                    )
+                                    .padding(.horizontal)
+                                }
                             }
                         } header: {
                             buildDateHeader(date)
@@ -169,6 +159,7 @@ struct transactionViewTab: View {
                 }
                 .padding(.bottom, 100) // Safe area for tab bar
             }
+            .padding(.top, 5)
         }
     }
     
@@ -203,12 +194,6 @@ struct transactionViewTab: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
-            
-            Button("Add Transaction") {
-                showAddScreen = true
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
         }
         .padding(40)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -219,20 +204,14 @@ struct transactionViewTab: View {
     private var filteredTransactions: [Transaction] {
         var transactions = transactionManager.transactions
         
-        // Apply type filter
-        if selectedFilter != .all {
-            transactions = transactions.filter {
-                $0.type.rawValue.lowercased() == selectedFilter.rawValue.lowercased()
-            }
-        }
-        
-        // Apply search filter
-        if !searchText.isEmpty {
-            transactions = transactions.filter { transaction in
-                transaction.description.localizedCaseInsensitiveContains(searchText) ||
-                transaction.category.name.localizedCaseInsensitiveContains(searchText) ||
-                transaction.account.name.localizedCaseInsensitiveContains(searchText)
-            }
+        // Apply type filter based on recurring status
+        switch selectedFilter {
+        case .all:
+            break
+        case .recurring:
+            transactions = transactions.filter { $0.isRecurring ?? false }
+        case .nonRecurring:
+            transactions = transactions.filter { !($0.isRecurring ?? false) }
         }
         
         // Sort by date (newest first)
@@ -245,49 +224,12 @@ struct transactionViewTab: View {
         }
     }
     
-    private var totalBalance: Double {
-        return transactionManager.transactions.reduce(0) { total, transaction in
-            switch transaction.type {
-            case .income:
-                return total + transaction.amount
-            case .expense:
-                return total - transaction.amount
-            case .transfer:
-                return total // Transfers don't affect overall balance
-            }
-        }
-    }
-    
-    private var totalIncome: Double {
-        return transactionManager.transactions
-            .filter { $0.type == .income }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
-    private var totalExpense: Double {
-        return transactionManager.transactions
-            .filter { $0.type == .expense }
-            .reduce(0) { $0 + $1.amount }
-    }
-    
     // MARK: - Helper Methods
     
     private func deleteTransaction(_ transaction: Transaction) {
         withAnimation(.easeOut(duration: 0.3)) {
             transactionManager.deleteTransaction(transaction)
         }
-    }
-    
-    private func formatAmount(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 0
-        
-        if let formattedNumber = formatter.string(from: NSNumber(value: abs(amount))) {
-            return formattedNumber
-        }
-        return "\(Int(abs(amount)))"
     }
     
     private func formatDateHeader(_ date: Date) -> String {
@@ -305,6 +247,66 @@ struct transactionViewTab: View {
     }
 }
 
+extension transactionViewTab {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
+
 // MARK: - Filter Chip Component
 struct FilterChip: View {
     let title: String
@@ -318,7 +320,7 @@ struct FilterChip: View {
                 .fontWeight(.medium)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.black : Color(.systemGray6))
+                .background(isSelected ? Color.primary : Color.secondary)
                 .foregroundColor(isSelected ? .white : .primary)
                 .cornerRadius(20)
         }
@@ -328,8 +330,16 @@ struct FilterChip: View {
 
 // MARK: - Transaction Row Component
 struct TransactionRow: View {
+    @StateObject private var currencyManager = CurrencyManager()
+    @State private var selectedCurrency = CurrencyManager().selectedCurrency
     let transaction: Transaction
     let onDelete: () -> Void
+    
+//     FIXED: Simplified initializer - no longer accepts CurrencyManager
+    init(transaction: Transaction, onDelete: @escaping () -> Void) {
+        self.transaction = transaction
+        self.onDelete = onDelete
+    }
     
     var body: some View {
         HStack(spacing: 16) {
@@ -340,9 +350,8 @@ struct TransactionRow: View {
                     .frame(width: 50, height: 50)
                 
                 Text(transaction.category.emoji)
-                    .font(.title2)
+                    .font(.title2)   
             }
-            
             // Transaction details
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
@@ -382,6 +391,11 @@ struct TransactionRow: View {
                         .lineLimit(1)
                 }
             }
+            
+            // Chevron arrow to indicate navigation
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .padding(.vertical, 12)
         .background(Color(.systemBackground))
@@ -406,8 +420,9 @@ struct TransactionRow: View {
     }
     
     private var amountText: String {
+        let appCurrency = CurrencyManager().selectedCurrency.symbol
         let prefix = transaction.type == .income ? "+" : "-"
-        return "\(prefix)₹\(Int(transaction.amount))"
+        return "\(prefix)\(appCurrency)\(Int(transaction.amount))"
     }
     
     private var amountColor: Color {

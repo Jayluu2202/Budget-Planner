@@ -37,12 +37,12 @@ struct EditAccountView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Edit Account")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 Spacer()
@@ -60,32 +60,36 @@ struct EditAccountView: View {
             .padding(.bottom, 20)
             
             Divider()
-                .background(Color.gray.opacity(0.3))
+                .background(Color.secondary.opacity(0.3))
             
             VStack(spacing: 20) {
                 // Account Name Input
                 VStack(alignment: .leading, spacing: 8) {
                     TextField("Account Name", text: $accountName)
                         .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.secondary, lineWidth: 1)
+                        )
                 }
                 .padding(.horizontal)
                 
                 // Account Balance Input
                 VStack(alignment: .leading, spacing: 8) {
                     TextField("Account Balance", text: $accountBalance)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.secondary, lineWidth: 1)
+                        )
                 }
                 .padding(.horizontal)
                 
                 // Emoji Selection
                 VStack(alignment: .leading, spacing: 12) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        HStack {
+                        HStack(spacing: 20) {
                             ForEach(availableEmojis, id: \.self) { emoji in
                                 Button(action: {
                                     selectedEmoji = emoji
@@ -93,17 +97,17 @@ struct EditAccountView: View {
                                     Text(emoji)
                                         .font(.system(size: 24))
                                         .frame(width: 50, height: 50)
-                                        .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .background(selectedEmoji == emoji ? Color.primary.opacity(0.1) : Color.clear)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(selectedEmoji == emoji ? Color.black : Color.clear, lineWidth: 2)
+                                                .stroke(selectedEmoji == emoji ? Color.primary : Color.secondary, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
                                         )
                                 }
                             }
                             Spacer()
                         }
-                        .padding(.horizontal)
+                        .padding()
                     }
                 }
                 
@@ -113,19 +117,23 @@ struct EditAccountView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(accountName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(accountName.isEmpty ? Color.secondary : Color.primary)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .disabled(accountName.isEmpty)
                 .padding(.horizontal)
-                .padding(.top, 20)
+//                .padding(.top, 20)
                 
                 Spacer()
             }
             .padding(.top, 20)
         }
-        .background(Color(.systemGray6))
+        .onAppear{
+            hideTabBarLegacy()
+        }
+        
+        .background(Color(.systemBackground))
         .alert("Delete Account", isPresented: $showingDeleteAlert) {
             Button("Delete", role: .destructive) {
                 deleteAccount()
@@ -151,6 +159,66 @@ struct EditAccountView: View {
     private func deleteAccount() {
         accountStore.deleteAccount(account: account)
         dismiss()
+    }
+}
+
+extension EditAccountView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
     }
 }
 

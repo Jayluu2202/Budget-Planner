@@ -2,7 +2,7 @@
 //  AddTransactionDetails.swift
 //  Budget Planner
 //
-//  Created by mac on 08/09/25.
+//  FIXED: Only update budgets for current month transactions
 //
 
 import SwiftUI
@@ -11,14 +11,14 @@ import ContactsUI
 struct AddTransactionDetails: View {
     @Environment(\.dismiss) var dismiss
     
-    // 🔄 Accept TransactionManager as parameter instead of creating new instance
-    @ObservedObject var transactionManager: TransactionManager
+    @ObservedObject var transactionManager = TransactionManager.shared
+    @ObservedObject var budgetManager: BudgetManager
     
     @State private var selectedType: TransactionType = .income
     @State private var transactionDate = Date()
     @State private var amount = ""
     @State private var description = ""
-    @State private var repeatTransation = false
+    @State private var repeatTransaction = false
     
     @StateObject private var accountStore = AccountStore()
     @StateObject private var categoryStore = CategoryStore()
@@ -33,7 +33,7 @@ struct AddTransactionDetails: View {
     // Contact picker states
     @State private var showingContactPicker = false
     @State private var selectedContact: String? = nil
-    @State private var isSelectingSender = true // Track which contact we're selecting for
+    @State private var isSelectingSender = true
     
     // Alert states
     @State private var showingAlert = false
@@ -53,9 +53,11 @@ struct AddTransactionDetails: View {
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
                     
+                    
                     DatePicker(
                         "",
                         selection: $transactionDate,
+                        in: ...endOfMonth(),
                         displayedComponents: [.date, .hourAndMinute]
                     )
                         .labelsHidden()
@@ -73,9 +75,10 @@ struct AddTransactionDetails: View {
                                 .font(.largeTitle)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.center)
-                            Text("INR")
+                            let actualCurrency = CurrencyManager().selectedCurrency.code
+                            Text("\(actualCurrency)")
                                 .font(.largeTitle)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                         }
                         .padding()
                         
@@ -85,47 +88,31 @@ struct AddTransactionDetails: View {
                         
                         // Contact Selection Buttons
                         HStack(spacing: 16) {
-                            // Sender Button - Opens Contacts
-                            Button(action: {
-                                isSelectingSender = true
-                                showingContactPicker = true
-                            }) {
-                                Text("Sender")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(Color.black)
-                                    .cornerRadius(8)
-                            }
                             
-                            // Receiver Button - Opens Contacts
                             Button(action: {
                                 isSelectingSender = false
                                 showingContactPicker = true
                             }) {
                                 Text("Receiver")
                                     .font(.headline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color(.secondarySystemBackground))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(Color.black)
+                                    .background(Color(.label))
                                     .cornerRadius(8)
                             }
                         }
                         .padding(.horizontal)
                         
-                        // Simple Account List
+                        // Account List
                         VStack(spacing: 8) {
                             ForEach(accountStore.accounts) { account in
                                 Button(action: {
-                                    // Simple toggle selection
                                     if selectedSenderAccount?.id == account.id {
                                         selectedSenderAccount = nil
                                     } else if selectedReceiverAccount?.id == account.id {
                                         selectedReceiverAccount = nil
                                     } else {
-                                        // Assign to sender or receiver based on which was last selected
                                         if isSelectingSender {
                                             selectedSenderAccount = account
                                         } else {
@@ -141,13 +128,12 @@ struct AddTransactionDetails: View {
                                             .foregroundColor(.primary)
                                         Spacer()
                                         
-                                        // Simple checkmark for selected accounts
                                         if selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.primary)
                                         } else {
                                             Image(systemName: "circle")
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(.secondary)
                                         }
                                     }
                                     .padding(.horizontal, 16)
@@ -155,12 +141,12 @@ struct AddTransactionDetails: View {
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(
-                                                (selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id) ? Color.black : Color.gray.opacity(0.3),
+                                                (selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id) ? Color.primary : Color.secondary.opacity(0.3),
                                                 lineWidth: 1
                                             )
                                             .background(
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .fill(Color(.systemGray6))
+                                                    .fill(Color(UIColor.secondarySystemBackground))
                                             )
                                     )
                                 }
@@ -172,15 +158,16 @@ struct AddTransactionDetails: View {
                 } else {
                     // Existing Income/Expense UI
                     VStack(spacing: 16) {
-                        // Amount Input for Income/Expense
+                        // Amount Input
                         HStack {
                             TextField("0", text: $amount)
                                 .font(.largeTitle)
                                 .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.center)
-                            Text("INR")
+                            let actualCurrency = CurrencyManager().selectedCurrency.code
+                            Text("\(actualCurrency)")
                                 .font(.largeTitle)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                         }
                         .padding()
                         
@@ -192,7 +179,7 @@ struct AddTransactionDetails: View {
                             VStack(alignment: .leading){
                                 Text("Account")
                                     .font(.subheadline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                                 
                                 if accountStore.accounts.isEmpty {
                                     Text("No accounts available")
@@ -206,7 +193,7 @@ struct AddTransactionDetails: View {
                                     } label: {
                                         Text(selectedAccount.map { "\($0.emoji) \($0.name)" } ?? "Select Account")
                                             .font(.headline)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.primary)
                                     }
                                 }
                             }
@@ -216,7 +203,7 @@ struct AddTransactionDetails: View {
                             VStack(alignment: .trailing){
                                 Text("Category")
                                     .font(.subheadline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                                 Menu {
                                     ForEach(categoryStore.getCategories(for: selectedType == .income ? .income : .expense)) { category in
                                         Button("\(category.emoji) \(category.name)") {
@@ -228,7 +215,7 @@ struct AddTransactionDetails: View {
                                         "\($0.emoji) \($0.name)"} ??
                                          "Select Category")
                                         .font(.headline)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                 }
                             }
                         }
@@ -236,7 +223,7 @@ struct AddTransactionDetails: View {
                         
                         Divider()
                         
-                        Toggle(isOn: $repeatTransation) {
+                        Toggle(isOn: $repeatTransaction) {
                             Text("Repeat Transaction")
                                 .font(.headline)
                         }
@@ -251,10 +238,10 @@ struct AddTransactionDetails: View {
                 }) {
                     Text("Save")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(.secondarySystemBackground))
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.black)
+                        .background(Color(.label))
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
@@ -270,7 +257,7 @@ struct AddTransactionDetails: View {
                     }) {
                         Image(systemName: "xmark")
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
             }
@@ -284,8 +271,14 @@ struct AddTransactionDetails: View {
             }
         }
     }
+    private func startOfMonth() -> Date {
+        Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
+    }
     
-    // MARK: - Save Transaction Function
+    private func endOfMonth() -> Date {
+        Calendar.current.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth())!
+    }
+    // MARK: - Save Transaction Function (FIXED FOR MONTHLY BUDGET ISOLATION)
     private func saveTransaction() {
         // Validate input
         guard let amountValue = Double(amount), amountValue > 0 else {
@@ -314,30 +307,36 @@ struct AddTransactionDetails: View {
             type: selectedType == .income ? .income : .expense
         )
         
-        // Convert local TransactionType to global TransactionType
-        let globalTransactionType: TransactionType
-        switch selectedType {
-        case .income:
-            globalTransactionType = .income
-        case .expense:
-            globalTransactionType = .expense
-        case .transfer:
-            globalTransactionType = .transfer
-        }
-        
         // Create transaction
         let transaction = Transaction(
-            type: globalTransactionType,
+            type: selectedType,
             amount: amountValue,
             description: description.isEmpty ? "No description" : description,
             date: transactionDate,
             account: account,
             category: transactionCategory,
-            isRepeating: repeatTransation
+            isRecurring: repeatTransaction
         )
         
-        // Save transaction using the passed transactionManager instance
+        // Save transaction
         transactionManager.addTransaction(transaction)
+        
+        // FIXED: Only update budget spending if it's an expense AND for current month
+        if selectedType == .expense {
+            let calendar = Calendar.current
+            let currentMonth = calendar.component(.month, from: Date())
+            let currentYear = calendar.component(.year, from: Date())
+            let transactionMonth = calendar.component(.month, from: transactionDate)
+            let transactionYear = calendar.component(.year, from: transactionDate)
+            
+            // Only update budget if transaction is for current month/year
+            if transactionMonth == currentMonth && transactionYear == currentYear {
+                budgetManager.updateBudgetSpending(for: transactionCategory, amount: amountValue, isAdding: true)
+                print("✅ Updated current month budget for \(transactionCategory.name)")
+            } else {
+                print("ℹ️ Transaction is for \(transactionMonth)/\(transactionYear), not current month \(currentMonth)/\(currentYear). Budget not updated.")
+            }
+        }
         
         // Clear form and dismiss
         amount = ""
@@ -348,7 +347,7 @@ struct AddTransactionDetails: View {
     }
 }
 
-// Contact Picker View
+// Contact Picker remains the same
 struct ContactPicker: UIViewControllerRepresentable {
     @Binding var selectedContact: String?
     @Environment(\.dismiss) private var dismiss
@@ -387,6 +386,9 @@ struct ContactPicker: UIViewControllerRepresentable {
 
 struct AddTransactionDetails_Previews: PreviewProvider {
     static var previews: some View {
-        AddTransactionDetails(transactionManager: TransactionManager())
+        AddTransactionDetails(
+            transactionManager: TransactionManager(),
+            budgetManager: BudgetManager()
+        )
     }
 }

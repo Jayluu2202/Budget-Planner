@@ -2,14 +2,16 @@
 //  MyWealth.swift
 //  Budget Planner
 //
-//  Created by mac on 10/09/25.
+//  Updated with proper dark mode color support
 //
 
 import SwiftUI
+import UIKit
 
 struct MyWealth: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var accountStore = AccountStore()
+    let actualCurrency = CurrencyManager().selectedCurrency.symbol
     
     var body: some View {
         VStack(spacing: 0) {
@@ -20,16 +22,14 @@ struct MyWealth: View {
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Text("Wealth Overview")
                         .font(.title2)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
-                
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
@@ -41,26 +41,25 @@ struct MyWealth: View {
                     VStack(spacing: 12) {
                         Text("CURRENT TOTAL BALANCE")
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                             .tracking(0.5)
                         
-                        Text("₹\(formattedTotalBalance)")
+                        Text("\(actualCurrency)\(formattedTotalBalance)")
                             .font(.system(size: 36, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(16)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            .stroke(Color(.separator), lineWidth: 1)
                     )
                     .padding(.horizontal, 20)
                     
                     // Check Future Wealth Button
                     Button(action: {
-                        // Add your future wealth navigation logic here
                         print("Check Future Wealth tapped")
                     }) {
                         HStack(spacing: 12) {
@@ -69,11 +68,11 @@ struct MyWealth: View {
                             
                             Text("Check Future Wealth")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(.systemBackground))
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(Color.black)
+                        .background(Color(.label))
                         .cornerRadius(12)
                     }
                     .padding(.horizontal, 20)
@@ -83,7 +82,7 @@ struct MyWealth: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Account Balances")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                                 .padding(.horizontal, 20)
                             
                             VStack(spacing: 12) {
@@ -99,13 +98,13 @@ struct MyWealth: View {
                             AccountSummaryCard(
                                 number: positiveAccountsCount,
                                 title: "Positive Accounts",
-                                backgroundColor: Color.white
+                                backgroundColor: Color(.systemBackground)
                             )
                             
                             AccountSummaryCard(
                                 number: negativeAccountsCount,
                                 title: "Negative Accounts",
-                                backgroundColor: Color.white
+                                backgroundColor: Color(.systemBackground)
                             )
                         }
                         .padding(.horizontal, 20)
@@ -115,15 +114,15 @@ struct MyWealth: View {
                         VStack(spacing: 16) {
                             Image(systemName: "creditcard")
                                 .font(.system(size: 50))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                             
                             Text("No Accounts Yet")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                             Text("Add your first account to start tracking your wealth")
                                 .font(.system(size: 16))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
@@ -133,14 +132,19 @@ struct MyWealth: View {
                 }
             }
         }
-        .background(Color(.systemGray6))
+        .background(Color(.systemGroupedBackground))
         .navigationBarHidden(true)
         .onAppear {
             accountStore.loadAccounts()
+            // SOLUTION 2: Fallback for older iOS versions
+            hideTabBarLegacy()
+        }
+        .onDisappear {
+            showTabBarLegacy()
         }
     }
     
-    // MARK: - Computed Properties (Now using dynamic data)
+    // MARK: - Computed Properties
     
     private var totalBalance: Double {
         accountStore.accounts.reduce(0) { $0 + $1.balance }
@@ -162,6 +166,68 @@ struct MyWealth: View {
     }
 }
 
+// MARK: - Tab Bar Helper Methods
+
+extension MyWealth {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
+
 // MARK: - Supporting Views
 
 struct AccountBalanceRow: View {
@@ -169,32 +235,30 @@ struct AccountBalanceRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Account Icon
             Text(account.emoji)
                 .font(.system(size: 24))
                 .frame(width: 44, height: 44)
                 .background(Color(.systemGray5))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            // Account Name
             Text(account.name)
                 .font(.system(size: 17, weight: .medium))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Spacer()
+            let actualCurrency = CurrencyManager().selectedCurrency.symbol
             
-            // Balance (Color changes based on positive/negative)
-            Text("₹\(formattedBalance)")
+            Text("\(actualCurrency)\(formattedBalance)")
                 .font(.system(size: 17, weight: .medium))
-                .foregroundColor(account.balance >= 0 ? .green : .red)
+                .foregroundColor(account.balance >= 0 ? Color(.systemGreen) : Color(.systemRed))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                .stroke(Color(.separator), lineWidth: 1)
         )
     }
     
@@ -215,11 +279,11 @@ struct AccountSummaryCard: View {
         VStack(spacing: 8) {
             Text("\(number)")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Text(title)
                 .font(.system(size: 14))
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -228,15 +292,21 @@ struct AccountSummaryCard: View {
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                .stroke(Color(.separator), lineWidth: 1)
         )
     }
 }
 
-// MARK: - Preview
-
 struct MyWealth_Previews: PreviewProvider {
     static var previews: some View {
-        MyWealth()
+        Group {
+            MyWealth()
+                .preferredColorScheme(.light)
+                .previewDisplayName("Light Mode")
+            
+            MyWealth()
+                .preferredColorScheme(.dark)
+                .previewDisplayName("Dark Mode")
+        }
     }
 }

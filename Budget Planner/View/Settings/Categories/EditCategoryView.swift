@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-
+import UIKit
 struct EditCategoryView: View {
-    @Environment(\.dismiss) var dismiss
+    @Binding var isPresented: Bool
     @EnvironmentObject var categoryStore: CategoryStore
+    @Environment(\.dismiss) private var dismiss
     
     @State var category: Category
     @State private var categoryName: String
@@ -18,7 +19,8 @@ struct EditCategoryView: View {
     @State private var showingEmojiPicker = false
     @State private var showingDeleteAlert = false
     
-    init(category: Category) {
+    init(isPresented: Binding<Bool>, category: Category) {
+        self._isPresented = isPresented
         self._category = State(initialValue: category)
         self._categoryName = State(initialValue: category.name)
         self._selectedEmoji = State(initialValue: category.emoji)
@@ -27,84 +29,39 @@ struct EditCategoryView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Header
-            HStack {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
-                        
-                        Text("Edit Categories")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.black)
-                    }
-                }
-                Spacer()
-                
-                // Delete button
-                Button(action: {
-                    showingDeleteAlert = true
-                }) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 20))
-                        .foregroundColor(.red)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 16)
-            
-            // Replace your Picker with this custom segmented control
+            // Custom segmented control
             HStack(spacing: 0) {
                 Button(action: {
-                    selectedType = .income
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .income
+                    }
                 }) {
                     Text("Income")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(selectedType == .income ? .white : .black)
+                        .foregroundColor(selectedType == .income ? Color(.systemBackground) : Color(.label))
                         .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(selectedType == .income ? Color.black : Color.clear)
+                        .background(selectedType == .income ? Color(.label) : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 
                 Button(action: {
-                    selectedType = .expense
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .expense
+                    }
                 }) {
                     Text("Expense")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(selectedType == .expense ? .white : .black)
+                        .foregroundColor(selectedType == .expense ? Color(.systemBackground) : Color(.label))
                         .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(selectedType == .expense ? Color.black : Color.clear)
+                        .background(selectedType == .expense ? Color(.label) : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
             .padding(4)
-            .background(Color(.systemGray6))
+            .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal)
             
-            // Type Selector
-//            Picker("Category Type", selection: $selectedType) {
-//                Text("Income").tag(Category.CategoryType.income)
-//                Text("Expense").tag(Category.CategoryType.expense)
-//            }
-//
-//            .pickerStyle(SegmentedPickerStyle())
-//            .padding(.horizontal)
-//            .onAppear {
-//                // Customize the segmented control appearance
-//                UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.black
-//                UISegmentedControl.appearance().backgroundColor = UIColor.clear
-//                UISegmentedControl.appearance().setTitleTextAttributes([
-//                    .foregroundColor: UIColor.white
-//                ], for: .selected)
-//                UISegmentedControl.appearance().setTitleTextAttributes([
-//                    .foregroundColor: UIColor.black
-//                ], for: .normal)
-//            }
             // Emoji Selector
             VStack(spacing: 16) {
                 Button(action: {
@@ -113,9 +70,10 @@ struct EditCategoryView: View {
                     Text(selectedEmoji)
                         .font(.system(size: 40))
                         .frame(width: 80, height: 80)
-                        .background(Color.gray.opacity(0.1))
+                        .background(Color(.secondarySystemBackground))
                         .clipShape(Circle())
                 }
+                .buttonStyle(PlainButtonStyle())
                 
                 // Category Name Input
                 TextField("Category Name", text: $categoryName)
@@ -123,7 +81,7 @@ struct EditCategoryView: View {
                     .frame(height: 50)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color(.systemGray6), lineWidth: 3)
+                            .stroke(Color(.separator), lineWidth: 1)
                     )
                     .padding(.horizontal)
                 
@@ -133,17 +91,49 @@ struct EditCategoryView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(categoryName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(categoryName.isEmpty ? Color(.tertiaryLabel) : Color(.label))
                         .cornerRadius(12)
                 }
                 .disabled(categoryName.isEmpty)
                 .padding(.horizontal)
+                .buttonStyle(PlainButtonStyle())
             }
             
             Spacer()
         }
-        .navigationBarHidden(true)
+//        .navigationTitle("Edit Category")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .onAppear{
+            hideTabBarLegacy()
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                HStack{
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.primary)
+                        Text("Edit Category")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                    }
+                }
+            }
+
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showingDeleteAlert = true
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                }
+            }
+        }
         .sheet(isPresented: $showingEmojiPicker) {
             EmojiPickerView(selectedEmoji: $selectedEmoji)
         }
@@ -161,6 +151,7 @@ struct EditCategoryView: View {
         guard !categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
         let updatedCategory = Category(
+            id: category.id, // Preserve the original ID
             name: categoryName.trimmingCharacters(in: .whitespacesAndNewlines),
             emoji: selectedEmoji,
             type: selectedType
@@ -168,18 +159,93 @@ struct EditCategoryView: View {
         
         categoryStore.updateCategory(original: category, updated: updatedCategory)
         category = updatedCategory
-        dismiss()
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+        
+        isPresented = false
     }
     
     private func deleteCategory() {
         categoryStore.deleteCategory(category)
-        dismiss()
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        isPresented = false
+    }
+}
+
+extension EditCategoryView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
     }
 }
 
 struct EditCategoryView_Previews: PreviewProvider {
     static var previews: some View {
-        EditCategoryView(category: Category(name: "Freelance", emoji: "💻", type: .income))
+        NavigationView {
+            EditCategoryView(
+                isPresented: .constant(true),
+                category: Category(name: "Freelance", emoji: "💻", type: .income)
+            )
             .environmentObject(CategoryStore())
+        }
     }
 }

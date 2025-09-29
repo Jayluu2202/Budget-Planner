@@ -8,7 +8,10 @@
 import Foundation
 
 class AccountStore: ObservableObject {
+    static let shared = AccountStore()
+    
     @Published var accounts: [Account] = []
+    
     private let userDefaults = UserDefaults.standard
     private let accountsKey = "SavedAccounts"
     
@@ -37,7 +40,7 @@ class AccountStore: ObservableObject {
         saveAccounts()
     }
     
-    private func saveAccounts() {
+    func saveAccounts() {
         if let encoded = try? JSONEncoder().encode(accounts) {
             userDefaults.set(encoded, forKey: accountsKey)
         }
@@ -52,9 +55,9 @@ class AccountStore: ObservableObject {
     
     private func addDefaultAccounts() {
         let defaultAccounts = [
-            Account(name: "Cash", emoji: "🏛️", balance: 19000),
-            Account(name: "Credit Card", emoji: "🏛️", balance: 50000),
-            Account(name: "Debit Card", emoji: "💳", balance: 12000)
+            Account(name: "Cash", emoji: "💵", balance: 0),
+            Account(name: "Credit Card", emoji: "🏛️", balance: 0),
+            Account(name: "Debit Card", emoji: "💳", balance: 0)
         ]
         accounts = defaultAccounts
         saveAccounts()
@@ -65,10 +68,10 @@ class AccountStore: ObservableObject {
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 0
-        
+        let actualCurrency = CurrencyManager().selectedCurrency.symbol
         if let formattedNumber = formatter.string(from: NSNumber(value: balance)) {
-            return "₹\(formattedNumber)"
+            return "\(actualCurrency)\(formattedNumber)"
         }
-        return "₹\(Int(balance))"
+        return "\(actualCurrency)\(Int(balance))"
     }
 }

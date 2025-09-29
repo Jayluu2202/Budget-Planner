@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct AddCategoriesView: View {
-    @Environment(\.dismiss) var dismiss
+    @Binding var isPresented: Bool
     @EnvironmentObject var categoryStore: CategoryStore
+    @Environment(\.dismiss) var dismiss
     
-    @State private var selectedType: Category.CategoryType = .income // Changed to income as default
+    @State private var selectedType: Category.CategoryType = .income
     @State private var categoryName = ""
     @State private var selectedEmoji = "😀"
     @State private var showingEmojiPicker = false
@@ -21,43 +22,78 @@ struct AddCategoriesView: View {
             // Header
             HStack {
                 Button(action: {
-                    dismiss()
+                    isPresented = false
+//                    dismiss()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Add Categories")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
+                
                 Spacer()
             }
             .padding(.horizontal)
             .padding(.top, 16)
             
-            // Type Selector - Fixed order to match CategoriesView
-            Picker("Category Type", selection: $selectedType) {
-                Text("Income").tag(Category.CategoryType.income)  // 0th index
-                Text("Expense").tag(Category.CategoryType.expense) // 1st index
+            // Type Selector
+            HStack(spacing: 0) {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .income
+                    }
+                }) {
+                    Text("Income")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(selectedType == .income ? Color(.systemBackground) : Color(.label))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(selectedType == .income ? Color(.label) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .expense
+                    }
+                }) {
+                    Text("Expense")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(selectedType == .expense ? Color(.systemBackground) : Color(.label))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(selectedType == .expense ? Color(.label) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
-            .pickerStyle(SegmentedPickerStyle())
+            .padding(4)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal)
             
             // Emoji Selector
             VStack(spacing: 16) {
                 Button(action: {
-                    showingEmojiPicker.toggle()
+                    showingEmojiPicker = true
                 }) {
-                    Text(selectedEmoji)
-                        .font(.system(size: 40))
-                        .frame(width: 80, height: 80)
-                        .background(Color.gray.opacity(0.1))
-                        .clipShape(Circle())
+                    VStack(spacing: 8) {
+                        Text(selectedEmoji)
+                            .font(.system(size: 40))
+                            .frame(width: 80, height: 80)
+                            .background(Color.secondary.opacity(0.1))
+                            .clipShape(Circle())
+                        
+                        Text("Tap to change")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
+                .buttonStyle(PlainButtonStyle())
                 
                 // Category Name Input
                 TextField("New Category Name", text: $categoryName)
@@ -70,12 +106,13 @@ struct AddCategoriesView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(categoryName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(categoryName.isEmpty ? Color.secondary : Color.primary)
                         .cornerRadius(12)
                 }
                 .disabled(categoryName.isEmpty)
                 .padding(.horizontal)
+                .buttonStyle(PlainButtonStyle())
             }
             
             // All Categories Section
@@ -83,14 +120,14 @@ struct AddCategoriesView: View {
                 .font(.headline)
                 .padding(.horizontal)
             
-            // Display existing categories - Fixed to show proper grid without gaps
+            // Display existing categories
             ScrollView(showsIndicators: false) {
                 let filteredCategories = categoryStore.categories.filter { $0.type == selectedType }
                 
                 if filteredCategories.isEmpty {
                     Text("No \(selectedType.rawValue.lowercased()) categories yet")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .padding()
                 } else {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3), spacing: 16) {
@@ -105,7 +142,7 @@ struct AddCategoriesView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 80)
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.secondary.opacity(0.1))
                             .cornerRadius(12)
                         }
                     }
@@ -114,6 +151,9 @@ struct AddCategoriesView: View {
             }
             
             Spacer()
+        }
+        .onAppear{
+            hideTabBarLegacy()
         }
         .navigationBarHidden(true)
         .sheet(isPresented: $showingEmojiPicker) {
@@ -135,12 +175,78 @@ struct AddCategoriesView: View {
         // Reset form
         categoryName = ""
         selectedEmoji = "😀"
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+        
+        isPresented = false
+    }
+}
+
+extension AddCategoriesView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
     }
 }
 
 struct AddCategoriesView_Previews: PreviewProvider {
     static var previews: some View {
-        AddCategoriesView()
+        AddCategoriesView(isPresented: .constant(true))
             .environmentObject(CategoryStore())
     }
 }

@@ -28,22 +28,22 @@ struct AddAccountView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                             Text("Add Account")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                         }
                     }
                     Spacer()
                 }
                 .padding(.horizontal)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
+                .padding(.vertical, scaleH(20))
+                
                 
                 Divider()
-                    .background(Color.gray.opacity(0.3))
+                    .background(Color.secondary.opacity(0.3))
                 
                 VStack(spacing: 20) {
                     // Account Name Input
@@ -52,7 +52,7 @@ struct AddAccountView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray, lineWidth: 1)
+                                    .stroke(Color.secondary, lineWidth: 1)
                             )
                     }
                     .padding(.horizontal)
@@ -64,7 +64,7 @@ struct AddAccountView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray, lineWidth: 1)
+                                    .stroke(Color.secondary, lineWidth: 1)
                             )
                     }
                     .padding(.horizontal)
@@ -80,11 +80,11 @@ struct AddAccountView: View {
                                         Text(emoji)
                                             .font(.system(size: 24))
                                             .frame(width: 50, height: 50)
-                                            .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
+                                            .background(selectedEmoji == emoji ? Color.primary.opacity(0.1) : Color.clear)
                                             .clipShape(RoundedRectangle(cornerRadius: 10))
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(selectedEmoji == emoji ? Color.black : Color.gray, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
+                                                    .stroke(selectedEmoji == emoji ? Color.primary : Color.secondary, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
                                             )
                                     }
                                 }
@@ -100,17 +100,17 @@ struct AddAccountView: View {
                             .font(.system(size: 17, weight: .medium))
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
-                            .foregroundColor(.white)
-                            .background(accountName.isEmpty ? Color.gray : Color.black)
+                            .foregroundColor(Color(.systemBackground))
+                            .background(accountName.isEmpty ? Color.secondary : Color.primary)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .disabled(accountName.isEmpty)
                     .padding(.horizontal)
-                    .padding(.top, 20)
+//                    .padding(.top, 20)
                     
                     Spacer()
                 }
-                .padding(.top, 20)
+                .padding(.top, scaleH(20))
                 
                 // Existing Accounts List
                 if !accountStore.accounts.isEmpty {
@@ -131,20 +131,40 @@ struct AddAccountView: View {
                                     .font(.system(size: 15))
                                     .foregroundColor(.green)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal, scaleW(16))
+                            .padding(.vertical, scaleH(12))
+                            .background(Color(.systemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(.label), lineWidth: 1)
+                                
+                            )
                         }
                     }
                     .padding(.horizontal)
                     .frame(maxHeight: .infinity, alignment: .top)
                 }
             }
-            .background(Color(.systemGray6))
+            .background(Color(.systemBackground))
             .navigationBarHidden(true)
         }
+        .onAppear{
+            hideTabBarLegacy()
+        }
+        
         .navigationBarHidden(true)
+    }
+    
+    private func scaleH(_ value: CGFloat) -> CGFloat {
+        let deviceHeight = UIScreen.main.bounds.height
+        let screenvalue = deviceHeight / 956
+        return value * screenvalue
+    }
+    
+    private func scaleW(_ value: CGFloat) -> CGFloat {
+        let deviceWidth = UIScreen.main.bounds.width
+        let screenValue = deviceWidth / 452
+        return value * screenValue
     }
     
     private func addAccount() {
@@ -154,7 +174,65 @@ struct AddAccountView: View {
         dismiss()
     }
 }
-
+extension AddAccountView {
+    // Updated method for hiding tab bar
+    private func hideTabBarLegacy() {
+        DispatchQueue.main.async {
+            // Method 1: Using scene-based approach (iOS 13+)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = true
+                } else {
+                    // Method 2: Navigate through view hierarchy
+                    findAndHideTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    private func showTabBarLegacy() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                if let tabBarController = window.rootViewController as? UITabBarController {
+                    tabBarController.tabBar.isHidden = false
+                } else {
+                    findAndShowTabBar(in: window.rootViewController)
+                }
+            }
+        }
+    }
+    
+    // Recursive method to find tab bar controller
+    private func findAndHideTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = true
+        } else if let navigationController = vc as? UINavigationController {
+            findAndHideTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndHideTabBar(in: child)
+            }
+        }
+    }
+    
+    private func findAndShowTabBar(in viewController: UIViewController?) {
+        guard let vc = viewController else { return }
+        
+        if let tabBarController = vc as? UITabBarController {
+            tabBarController.tabBar.isHidden = false
+        } else if let navigationController = vc as? UINavigationController {
+            findAndShowTabBar(in: navigationController.topViewController)
+        } else {
+            for child in vc.children {
+                findAndShowTabBar(in: child)
+            }
+        }
+    }
+}
 struct AddAccountView_Previews: PreviewProvider {
     static var previews: some View {
         AddAccountView(accountStore: AccountStore())

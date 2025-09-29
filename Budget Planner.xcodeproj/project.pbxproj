@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		040034B62E6F0A2700770CDB /* AddCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040034B52E6F0A2700770CDB /* AddCategoriesView.swift */; };
+		042023EA2E73D87D00598928 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023E92E73D87D00598928 /* AddBudgetView.swift */; };
+		042023EC2E73D89A00598928 /* BudgetDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023EB2E73D89A00598928 /* BudgetDetailsView.swift */; };
+		042023F02E73D8E700598928 /* BudgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023EF2E73D8E700598928 /* BudgetModel.swift */; };
+		042023F22E73D91000598928 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042023F12E73D91000598928 /* BudgetManager.swift */; };
 		042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74F82E72CB9E0050348A /* MyWealth.swift */; };
 		042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FC2E72CC910050348A /* TransactionManger.swift */; };
 		042F75002E72CCFB0050348A /* TransactionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042F74FF2E72CCFB0050348A /* TransactionModel.swift */; };
@@ -24,11 +28,14 @@
 		047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6412E6855CB0080D024 /* reportViewTab.swift */; };
 		047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6452E6855EB0080D024 /* settingsViewTab.swift */; };
 		047FB6482E6856050080D024 /* tabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6472E6856050080D024 /* tabView.swift */; };
+		0485BBE82E866E82000BB1A3 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0485BBE72E866E82000BB1A3 /* ThemeManager.swift */; };
 		04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B022E6FE47A001EB314 /* CategoryModel.swift */; };
 		04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B042E6FE4AB001EB314 /* CategoryController.swift */; };
 		04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */; };
 		04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B082E6FF0F8001EB314 /* EditCategoryView.swift */; };
 		04976B0B2E7009C0001EB314 /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B0A2E7009C0001EB314 /* CurrencyModel.swift */; };
+		04ADE8482E7A6C1500F6EC9A /* Charts in Frameworks */ = {isa = PBXBuildFile; productRef = 04ADE8472E7A6C1500F6EC9A /* Charts */; };
+		04D0AF032E77F75B00A6B1E9 /* CurrencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */; };
 		04D1F7E72E6E9186007D2BA2 /* AddTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */; };
 		04D1F7E92E6EB04B007D2BA2 /* ExportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */; };
 		04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */; };
@@ -40,15 +47,18 @@
 		04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */; };
 		04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C0FE2E712E960024FFF4 /* ApplockController.swift */; };
 		04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */; };
-		84A4803B2E73163D00F91140 /* AddBudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803A2E73163D00F91140 /* AddBudgetView.swift */; };
-		84A4803D2E73166200F91140 /* BudgetDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803C2E73166200F91140 /* BudgetDetails.swift */; };
-		84A4803F2E7317D400F91140 /* BudgetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A4803E2E7317CF00F91140 /* BudgetModel.swift */; };
-		84A480412E7317F500F91140 /* BudgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A480402E7317F000F91140 /* BudgetManager.swift */; };
+		04D4C9B32E72E5F50041B09A /* TransactionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4C9B22E72E5F50041B09A /* TransactionDetailsView.swift */; };
+		04FADDEB2E8176E1003BE3E1 /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */; };
+		04FADDED2E817727003BE3E1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FADDEC2E817727003BE3E1 /* OnboardingView.swift */; };
 		84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		040034B52E6F0A2700770CDB /* AddCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoriesView.swift; sourceTree = "<group>"; };
+		042023E92E73D87D00598928 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
+		042023EB2E73D89A00598928 /* BudgetDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailsView.swift; sourceTree = "<group>"; };
+		042023EF2E73D8E700598928 /* BudgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetModel.swift; sourceTree = "<group>"; };
+		042023F12E73D91000598928 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
 		042F74F82E72CB9E0050348A /* MyWealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWealth.swift; sourceTree = "<group>"; };
 		042F74FC2E72CC910050348A /* TransactionManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManger.swift; sourceTree = "<group>"; };
 		042F74FF2E72CCFB0050348A /* TransactionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModel.swift; sourceTree = "<group>"; };
@@ -67,11 +77,13 @@
 		047FB6412E6855CB0080D024 /* reportViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reportViewTab.swift; sourceTree = "<group>"; };
 		047FB6452E6855EB0080D024 /* settingsViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsViewTab.swift; sourceTree = "<group>"; };
 		047FB6472E6856050080D024 /* tabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tabView.swift; sourceTree = "<group>"; };
+		0485BBE72E866E82000BB1A3 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		04976B022E6FE47A001EB314 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		04976B042E6FE4AB001EB314 /* CategoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryController.swift; sourceTree = "<group>"; };
 		04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
 		04976B082E6FF0F8001EB314 /* EditCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryView.swift; sourceTree = "<group>"; };
 		04976B0A2E7009C0001EB314 /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
+		04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyManager.swift; sourceTree = "<group>"; };
 		04D1F7E62E6E9186007D2BA2 /* AddTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionDetails.swift; sourceTree = "<group>"; };
 		04D1F7E82E6EB04B007D2BA2 /* ExportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportDataView.swift; sourceTree = "<group>"; };
 		04D1F7EB2E6EE11F007D2BA2 /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
@@ -83,10 +95,10 @@
 		04D1F7F82E6EE2EE007D2BA2 /* privacyAndPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = privacyAndPolicy.swift; sourceTree = "<group>"; };
 		04D2C0FE2E712E960024FFF4 /* ApplockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplockController.swift; sourceTree = "<group>"; };
 		04D2C1002E712F100024FFF4 /* PasswordUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordUnlockView.swift; sourceTree = "<group>"; };
-		84A4803A2E73163D00F91140 /* AddBudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBudgetView.swift; sourceTree = "<group>"; };
-		84A4803C2E73166200F91140 /* BudgetDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetails.swift; sourceTree = "<group>"; };
-		84A4803E2E7317CF00F91140 /* BudgetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetModel.swift; sourceTree = "<group>"; };
-		84A480402E7317F000F91140 /* BudgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManager.swift; sourceTree = "<group>"; };
+		04D4C9B22E72E5F50041B09A /* TransactionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailsView.swift; sourceTree = "<group>"; };
+		04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingManager.swift; sourceTree = "<group>"; };
+		04FADDEC2E817727003BE3E1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+
 		84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = budgetViewTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -95,12 +107,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04ADE8482E7A6C1500F6EC9A /* Charts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		042023E82E73D86700598928 /* Budget Details */ = {
+			isa = PBXGroup;
+			children = (
+				042023E92E73D87D00598928 /* AddBudgetView.swift */,
+				042023EB2E73D89A00598928 /* BudgetDetailsView.swift */,
+			);
+			path = "Budget Details";
+			sourceTree = "<group>";
+		};
 		042F74FE2E72CCE30050348A /* Tranasctions Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -153,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				047FB6472E6856050080D024 /* tabView.swift */,
+				04FADDE92E815B05003BE3E1 /* On-Boarding */,
 				04D2C1062E713E210024FFF4 /* Home */,
 				04D2C1052E713E140024FFF4 /* Transactions */,
 				04D2C1042E713DDD0024FFF4 /* Report */,
@@ -184,8 +207,8 @@
 			isa = PBXGroup;
 			children = (
 				04D1F7F02E6EE27B007D2BA2 /* CategoriesView.swift */,
-				040034B52E6F0A2700770CDB /* AddCategoriesView.swift */,
 				04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */,
+				040034B52E6F0A2700770CDB /* AddCategoriesView.swift */,
 				04976B082E6FF0F8001EB314 /* EditCategoryView.swift */,
 			);
 			path = Categories;
@@ -211,7 +234,8 @@
 			isa = PBXGroup;
 			children = (
 				84D9E1CA2E68B40D00919A0F /* budgetViewTab.swift */,
-				84A480392E7315D300F91140 /* Budget Details */,
+				042023E82E73D86700598928 /* Budget Details */,
+
 			);
 			path = Budget;
 			sourceTree = "<group>";
@@ -228,6 +252,7 @@
 			isa = PBXGroup;
 			children = (
 				047FB63F2E6855BE0080D024 /* transactionViewTab.swift */,
+				04D4C9B22E72E5F50041B09A /* TransactionDetailsView.swift */,
 			);
 			path = Transactions;
 			sourceTree = "<group>";
@@ -242,13 +267,13 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
-		84A480392E7315D300F91140 /* Budget Details */ = {
+		04FADDE92E815B05003BE3E1 /* On-Boarding */ = {
 			isa = PBXGroup;
 			children = (
-				84A4803A2E73163D00F91140 /* AddBudgetView.swift */,
-				84A4803C2E73166200F91140 /* BudgetDetails.swift */,
+				04FADDEC2E817727003BE3E1 /* OnboardingView.swift */,
 			);
-			path = "Budget Details";
+			path = "On-Boarding";
+
 			sourceTree = "<group>";
 		};
 		84D9E1CF2E68B45200919A0F /* Model */ = {
@@ -259,6 +284,7 @@
 				04443F962E702D4100514154 /* AccountModel.swift */,
 				84A4803E2E7317CF00F91140 /* BudgetModel.swift */,
 				042F74FE2E72CCE30050348A /* Tranasctions Model */,
+				042023EF2E73D8E700598928 /* BudgetModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -269,8 +295,12 @@
 				04976B042E6FE4AB001EB314 /* CategoryController.swift */,
 				04443F942E702CE700514154 /* AccountController.swift */,
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
+				04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
-				84A480402E7317F000F91140 /* BudgetManager.swift */,
+				0485BBE72E866E82000BB1A3 /* ThemeManager.swift */,
+				042023F12E73D91000598928 /* BudgetManager.swift */,
+				04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */,
+
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -291,6 +321,9 @@
 			dependencies = (
 			);
 			name = "Budget Planner";
+			packageProductDependencies = (
+				04ADE8472E7A6C1500F6EC9A /* Charts */,
+			);
 			productName = "Budget Planner";
 			productReference = 047FB6282E6848AC0080D024 /* Budget Planner.app */;
 			productType = "com.apple.product-type.application";
@@ -319,6 +352,9 @@
 				Base,
 			);
 			mainGroup = 047FB61F2E6848AC0080D024;
+			packageReferences = (
+				04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */,
+			);
 			productRefGroup = 047FB6292E6848AC0080D024 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -344,17 +380,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				042023F02E73D8E700598928 /* BudgetModel.swift in Sources */,
 				04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */,
+				0485BBE82E866E82000BB1A3 /* ThemeManager.swift in Sources */,
 				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
 				042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */,
+				04D4C9B32E72E5F50041B09A /* TransactionDetailsView.swift in Sources */,
 				04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */,
-				84A4803B2E73163D00F91140 /* AddBudgetView.swift in Sources */,
-				84A480412E7317F500F91140 /* BudgetManager.swift in Sources */,
+
+				04FADDED2E817727003BE3E1 /* OnboardingView.swift in Sources */,
+
 				042F74F92E72CB9E0050348A /* MyWealth.swift in Sources */,
+				042023F22E73D91000598928 /* BudgetManager.swift in Sources */,
 				04D2C0FF2E712E960024FFF4 /* ApplockController.swift in Sources */,
 				047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */,
 				04D1F7F52E6EE2C4007D2BA2 /* appLock.swift in Sources */,
+				042023EA2E73D87D00598928 /* AddBudgetView.swift in Sources */,
 				04443F9B2E7036DD00514154 /* EditAccountView.swift in Sources */,
 				047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */,
 				84A4803F2E7317D400F91140 /* BudgetModel.swift in Sources */,
@@ -365,15 +407,17 @@
 				84D9E1CB2E68B40D00919A0F /* budgetViewTab.swift in Sources */,
 				04D1F7F72E6EE2D8007D2BA2 /* helpAndSupport.swift in Sources */,
 				04443F952E702CE700514154 /* AccountController.swift in Sources */,
+				04D0AF032E77F75B00A6B1E9 /* CurrencyManager.swift in Sources */,
 				04D1F7F32E6EE2A0007D2BA2 /* themeSettings.swift in Sources */,
 				042F74FD2E72CC910050348A /* TransactionManger.swift in Sources */,
+				042023EC2E73D89A00598928 /* BudgetDetailsView.swift in Sources */,
 				04D1F7F12E6EE27B007D2BA2 /* CategoriesView.swift in Sources */,
 				047FB63D2E684D1D0080D024 /* homeViewTab.swift in Sources */,
 				04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */,
 				04443F9E2E705A8F00514154 /* PasswordKeyPadView.swift in Sources */,
 				04D2C1012E712F100024FFF4 /* PasswordUnlockView.swift in Sources */,
 				04D1F7EC2E6EE11F007D2BA2 /* AccountsView.swift in Sources */,
-				84A4803D2E73166200F91140 /* BudgetDetails.swift in Sources */,
+				04FADDEB2E8176E1003BE3E1 /* OnboardingManager.swift in Sources */,
 				04D1F7F92E6EE2EE007D2BA2 /* privacyAndPolicy.swift in Sources */,
 				047FB6482E6856050080D024 /* tabView.swift in Sources */,
 				04443F972E702D4100514154 /* AccountModel.swift in Sources */,
@@ -508,6 +552,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -519,6 +564,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -528,7 +574,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -537,6 +583,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -548,6 +595,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -557,7 +605,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -583,6 +631,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChartsOrg/Charts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		04ADE8472E7A6C1500F6EC9A /* Charts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04ADE8462E7A6C1500F6EC9A /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = Charts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 047FB6202E6848AC0080D024 /* Project object */;
 }
