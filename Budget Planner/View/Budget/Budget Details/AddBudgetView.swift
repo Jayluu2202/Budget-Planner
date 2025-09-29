@@ -2,7 +2,6 @@
 //  AddBudgetView.swift
 //  Budget Planner
 //
-//  Updated to use CategoryStore instead of TransactionManager
 //
 
 import SwiftUI
@@ -11,7 +10,6 @@ struct AddBudgetView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var budgetManager: BudgetManager
     @StateObject private var categoryStore = CategoryStore() // Use CategoryStore instead
-    
     @State private var selectedCategory: Category? // Changed from TransactionCategory to Category
     @State private var budgetAmount: String = ""
     @State private var sliderValue: Double = 1000
@@ -60,10 +58,12 @@ struct AddBudgetView: View {
             
             // Main Content Card
             VStack(spacing: 0) {
+
                 VStack(spacing: 24) {
                     // Category Selection
                     buildCategorySection()
                     
+
                     // Budget Amount Section with Slider
                     buildBudgetAmountSection()
                     
@@ -100,6 +100,7 @@ struct AddBudgetView: View {
         .onAppear {
             // Initialize the text field with slider value
             budgetAmount = String(Int(sliderValue))
+
         }
     }
     
@@ -133,11 +134,13 @@ struct AddBudgetView: View {
                     Spacer()
                     
                     Image(systemName: "chevron.down")
+
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
+
                 .background(Color(.tertiarySystemBackground))
                 .cornerRadius(12)
                 .overlay(
@@ -157,6 +160,7 @@ struct AddBudgetView: View {
     
     @ViewBuilder
     private func buildBudgetAmountSection() -> some View {
+
         VStack(alignment: .leading, spacing: 16) {
             Text("Budget Amount")
                 .font(.headline)
@@ -215,6 +219,7 @@ struct AddBudgetView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(Color(.systemGray4), lineWidth: 1)
             )
+
         }
     }
     
@@ -288,6 +293,7 @@ struct AddBudgetView: View {
     }
 }
 
+
 // MARK: - Category Picker View (Updated for Category model)
 struct CategoryPickerView: View {
     let categories: [Category] // Changed from TransactionCategory to Category
@@ -333,6 +339,7 @@ struct CategoryPickerView: View {
     }
 }
 
+
 // MARK: - Custom Corner Radius Extension
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
@@ -354,7 +361,9 @@ struct RoundedCorner: Shape {
 struct AddBudgetView_Previews: PreviewProvider {
     static var previews: some View {
         AddBudgetView(
+
             budgetManager: BudgetManager()
+
         )
     }
 }

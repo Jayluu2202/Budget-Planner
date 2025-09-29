@@ -2,7 +2,6 @@
 //  TransactionManager.swift
 //  Budget Planner
 //
-//  Fixed version with proper account balance synchronization
 //
 
 import Foundation
@@ -21,9 +20,17 @@ class TransactionManager: ObservableObject {
     private let transactionsKey = "transactions_key"
     private let accountsKey = "accounts_key"
     private let categoriesKey = "categories_key"
+    
+    // Budget integration
+    var budgetManager: BudgetManager?
 
     init() {
         loadData()
+    }
+    
+    // Set budget manager for integration
+    func setBudgetManager(_ budgetManager: BudgetManager) {
+        self.budgetManager = budgetManager
     }
 
     // MARK: - Data Persistence
@@ -32,6 +39,16 @@ class TransactionManager: ObservableObject {
         loadTransactions()
         loadAccounts()
         loadCategories()
+        
+        // Add default categories if none exist
+        if categories.isEmpty {
+            addDefaultCategories()
+        }
+        
+        // Add default accounts if none exist
+        if accounts.isEmpty {
+            addDefaultAccounts()
+        }
     }
     //Loading Transactions
     private func loadTransactions() {
@@ -72,6 +89,46 @@ class TransactionManager: ObservableObject {
             UserDefaults.standard.set(encoded, forKey: categoriesKey)
         }
     }
+    
+    // MARK: - Default Data Setup
+    
+    private func addDefaultCategories() {
+        let defaultCategories = [
+            // Expense categories
+            TransactionCategory(name: "Food", emoji: "🍔", type: .expense),
+            TransactionCategory(name: "Transport", emoji: "🚗", type: .expense),
+            TransactionCategory(name: "Shopping", emoji: "🛍️", type: .expense),
+            TransactionCategory(name: "Bills", emoji: "📄", type: .expense),
+            TransactionCategory(name: "Entertainment", emoji: "🎮", type: .expense),
+            TransactionCategory(name: "Health", emoji: "💊", type: .expense),
+            TransactionCategory(name: "Education", emoji: "📚", type: .expense),
+            TransactionCategory(name: "Travel", emoji: "✈️", type: .expense),
+            
+            // Income categories
+            TransactionCategory(name: "Salary", emoji: "💰", type: .income),
+            TransactionCategory(name: "Freelance", emoji: "💻", type: .income),
+            TransactionCategory(name: "Investment", emoji: "📈", type: .income),
+            TransactionCategory(name: "Gift", emoji: "🎁", type: .income),
+            
+            // Transfer categories
+            TransactionCategory(name: "Transfer", emoji: "↔️", type: .transfer)
+        ]
+        
+        categories = defaultCategories
+        saveCategories()
+    }
+    
+    private func addDefaultAccounts() {
+        let defaultAccounts = [
+            Account(name: "Cash", emoji: "💵", balance: 0),
+            Account(name: "Bank Account", emoji: "🏦", balance: 0),
+            Account(name: "Credit Card", emoji: "💳", balance: 0),
+            Account(name: "Savings", emoji: "💰", balance: 0)
+        ]
+        
+        accounts = defaultAccounts
+        saveAccounts()
+    }
 
     // MARK: - Transaction Management
 
@@ -81,21 +138,32 @@ class TransactionManager: ObservableObject {
 
         // Update account balance
         updateAccountBalance(for: transaction, isAdding: true)
+        
+        // Update budget spending if it's an expense
+        if transaction.type == .expense {
+            budgetManager?.updateBudgetSpending(for: transaction.category, amount: transaction.amount, isAdding: true)
+        }
     }
 
     func updateTransaction(_ transaction: Transaction) {
         if let index = transactions.firstIndex(where: { $0.id == transaction.id }) {
             let oldTransaction = transactions[index]
 
-            // Reverse old transaction balance effect
+            // Reverse old transaction effects
             updateAccountBalance(for: oldTransaction, isAdding: false)
+            if oldTransaction.type == .expense {
+                budgetManager?.updateBudgetSpending(for: oldTransaction.category, amount: oldTransaction.amount, isAdding: false)
+            }
 
             // Update transaction
             transactions[index] = transaction
             saveTransactions()
 
-            // Apply new transaction balance effect
+            // Apply new transaction effects
             updateAccountBalance(for: transaction, isAdding: true)
+            if transaction.type == .expense {
+                budgetManager?.updateBudgetSpending(for: transaction.category, amount: transaction.amount, isAdding: true)
+            }
         }
     }
 
@@ -106,22 +174,29 @@ class TransactionManager: ObservableObject {
 
             // Reverse the balance change
             updateAccountBalance(for: transaction, isAdding: false)
+            
+            // Reverse budget spending if it was an expense
+            if transaction.type == .expense {
+                budgetManager?.updateBudgetSpending(for: transaction.category, amount: transaction.amount, isAdding: false)
+            }
         }
     }
 
     // FIXED: Proper account balance update with persistent storage
     private func updateAccountBalance(for transaction: Transaction, isAdding: Bool) {
+
         // Load latest accounts from AccountStore
         accountStore.loadAccounts()
         
         if let accountIndex = accountStore.accounts.firstIndex(where: { $0.id == transaction.account.id }) {
             let multiplier: Double = isAdding ? 1.0 : -1.0 // if we are adding transaction then 1.0 else -1.0
 
+
             switch transaction.type {
             case .income:
-                accountStore.accounts[accountIndex].balance += (transaction.amount * multiplier)
+                accounts[accountIndex].balance += (transaction.amount * multiplier)
             case .expense:
-                accountStore.accounts[accountIndex].balance -= (transaction.amount * multiplier)
+                accounts[accountIndex].balance -= (transaction.amount * multiplier)
             case .transfer:
                 // Handle transfer logic here if needed
                 break
@@ -170,6 +245,17 @@ class TransactionManager: ObservableObject {
     func totalExpenseForPeriod(from startDate: Date, to endDate: Date) -> Double {
         return transactions
             .filter { $0.type == .expense && $0.date >= startDate && $0.date <= endDate }
+            .reduce(0) { $0 + $1.amount }
+    }
+    
+    func expensesForCategory(_ category: TransactionCategory, from startDate: Date, to endDate: Date) -> Double {
+        return transactions
+            .filter {
+                $0.category.id == category.id &&
+                $0.type == .expense &&
+                $0.date >= startDate &&
+                $0.date <= endDate
+            }
             .reduce(0) { $0 + $1.amount }
     }
 }

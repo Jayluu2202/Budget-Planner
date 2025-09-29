@@ -2,7 +2,7 @@
 //  BudgetModel.swift
 //  Budget Planner
 //
-//  Updated with explicit month/year tracking
+
 //
 
 import Foundation
@@ -17,11 +17,13 @@ struct Budget: Identifiable, Codable {
     var startDate: Date
     var endDate: Date
     var isActive: Bool
+
     var monthYear: String // Track which month/year this budget belongs to
     
     // ADD THESE NEW PROPERTIES:
     var month: Int // 1-12
     var year: Int // 2024, 2025, etc.
+
     
     init(category: TransactionCategory, budgetAmount: Double, description: String = "", startDate: Date = Date(), endDate: Date = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()) {
         self.id = UUID()
@@ -32,6 +34,7 @@ struct Budget: Identifiable, Codable {
         self.startDate = startDate
         self.endDate = endDate
         self.isActive = true
+
         
         // Set month/year identifier for automatic reset
         let formatter = DateFormatter()
@@ -53,6 +56,7 @@ struct Budget: Identifiable, Codable {
         self.startDate = startDate
         self.endDate = endDate
         self.isActive = isActive
+
         
         // Set month/year if not provided
         if let monthYear = monthYear {
@@ -72,6 +76,7 @@ struct Budget: Identifiable, Codable {
             self.month = calendar.component(.month, from: startDate)
             self.year = calendar.component(.year, from: startDate)
         }
+
     }
     
     // MARK: - Computed Properties
@@ -125,6 +130,7 @@ struct Budget: Identifiable, Codable {
             return .overBudget
         } else if percentage >= 80 {
             return .warning
+
         } else {
             return .onTrack
         }
@@ -134,6 +140,7 @@ struct Budget: Identifiable, Codable {
 // MARK: - Budget Status Enum (Updated without 'safe')
 enum BudgetStatus {
     case onTrack    // < 80%
+
     case warning    // 80-100%
     case overBudget // > 100%
     

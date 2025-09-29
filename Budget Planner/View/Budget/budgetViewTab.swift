@@ -2,7 +2,6 @@
 //  budgetViewTab.swift
 //  Budget Planner
 //
-//  FIXED VERSION: Use shared CurrencyManager from environment
 //
 
 import SwiftUI
@@ -117,7 +116,6 @@ struct budgetViewTab: View {
     }
     
     // MARK: - View Builders
-    
     @ViewBuilder
     private func buildBudgetsList() -> some View {
         let filteredBudgets = getFilteredBudgets()
@@ -128,6 +126,7 @@ struct budgetViewTab: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(filteredBudgets) { budget in
+
                         NavigationLink(
                             destination: BudgetDetailsView(
                                 budget: budget,
@@ -185,6 +184,7 @@ struct budgetViewTab: View {
     
     private func getFilteredBudgets() -> [Budget] {
         return budgetManager.activeBudgets().sorted { $0.daysPassed > $1.daysPassed }
+
     }
     
     private func deleteBudget(_ budget: Budget) {

@@ -2,7 +2,6 @@
 //  BudgetManager.swift
 //  Budget Planner
 //
-//  Fixed version with proper monthly budget isolation
 //
 
 import Foundation
@@ -17,7 +16,9 @@ class BudgetManager: ObservableObject {
     
     init() {
         loadBudgets()
+
         checkAndResetMonthlyBudgets()
+
     }
     
     // MARK: - Data Persistence
@@ -40,6 +41,7 @@ class BudgetManager: ObservableObject {
         }
     }
     
+
     // MARK: - Monthly Reset Logic (IMPROVED)
     
     func checkAndResetMonthlyBudgets() {
@@ -80,7 +82,7 @@ class BudgetManager: ObservableObject {
             saveBudgets()
         }
     }
-    
+
     // MARK: - Budget Management
     
     func addBudget(_ budget: Budget) {
@@ -88,6 +90,7 @@ class BudgetManager: ObservableObject {
         saveBudgets()
     }
     
+
     func addBudget(_ budget: Budget, syncWithTransactions transactions: [Transaction]) {
         budgets.append(budget)
         
@@ -240,10 +243,12 @@ class BudgetManager: ObservableObject {
             budget.isActive &&
             budget.month == currentMonth &&
             budget.year == currentYear
+
         }
     }
     
     func expiredBudgets() -> [Budget] {
+
         let calendar = Calendar.current
         let currentDate = Date()
         let currentMonth = calendar.component(.month, from: currentDate)
@@ -252,6 +257,7 @@ class BudgetManager: ObservableObject {
         return budgets.filter { budget in
             (budget.year < currentYear) ||
             (budget.year == currentYear && budget.month < currentMonth)
+
         }
     }
     
@@ -290,6 +296,7 @@ class BudgetManager: ObservableObject {
     
     // MARK: - Analytics (Updated to work with current month)
     
+
     func totalBudgetAmount() -> Double {
         return activeBudgets().reduce(0) { $0 + $1.budgetAmount }
     }
@@ -311,6 +318,7 @@ class BudgetManager: ObservableObject {
     func budgetPerformanceData() -> (onTrack: Int, warning: Int, overBudget: Int) {
         let active = activeBudgets()
         let onTrack = active.filter { $0.budgetStatus == .onTrack }.count
+
         let warning = active.filter { $0.budgetStatus == .warning }.count
         let overBudget = active.filter { $0.budgetStatus == .overBudget }.count
         
