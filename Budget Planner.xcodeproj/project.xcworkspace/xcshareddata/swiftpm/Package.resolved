@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Charts",
+        "repositoryURL": "https://github.com/ChartsOrg/Charts",
+        "state": {
+          "branch": null,
+          "revision": "07b23476ad52b926be772f317d8f1d4511ee8d02",
+          "version": "4.1.0"
+        }
+      },
+      {
+        "package": "swift-algorithms",
+        "repositoryURL": "https://github.com/apple/swift-algorithms",
+        "state": {
+          "branch": null,
+          "revision": "f6919dfc309e7f1b56224378b11e28bab5bccc42",
+          "version": "1.2.0"
+        }
+      },
+      {
+        "package": "swift-numerics",
+        "repositoryURL": "https://github.com/apple/swift-numerics.git",
+        "state": {
+          "branch": null,
+          "revision": "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
+          "version": "1.0.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
