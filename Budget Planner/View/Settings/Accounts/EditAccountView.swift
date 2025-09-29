@@ -37,12 +37,12 @@ struct EditAccountView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Edit Account")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 Spacer()
@@ -60,7 +60,7 @@ struct EditAccountView: View {
             .padding(.bottom, 20)
             
             Divider()
-                .background(Color.gray.opacity(0.3))
+                .background(Color.secondary.opacity(0.3))
             
             VStack(spacing: 20) {
                 // Account Name Input
@@ -69,7 +69,7 @@ struct EditAccountView: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray, lineWidth: 1)
+                                .stroke(Color.secondary, lineWidth: 1)
                         )
                 }
                 .padding(.horizontal)
@@ -81,7 +81,7 @@ struct EditAccountView: View {
                         .padding()
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray, lineWidth: 1)
+                                .stroke(Color.secondary, lineWidth: 1)
                         )
                 }
                 .padding(.horizontal)
@@ -97,11 +97,11 @@ struct EditAccountView: View {
                                     Text(emoji)
                                         .font(.system(size: 24))
                                         .frame(width: 50, height: 50)
-                                        .background(selectedEmoji == emoji ? Color.black.opacity(0.1) : Color.clear)
+                                        .background(selectedEmoji == emoji ? Color.primary.opacity(0.1) : Color.clear)
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(selectedEmoji == emoji ? Color.black : Color.gray, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
+                                                .stroke(selectedEmoji == emoji ? Color.primary : Color.secondary, lineWidth: selectedEmoji == emoji ? 2 : 1.5)
                                         )
                                 }
                             }
@@ -117,8 +117,8 @@ struct EditAccountView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(accountName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(accountName.isEmpty ? Color.secondary : Color.primary)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .disabled(accountName.isEmpty)
@@ -133,7 +133,7 @@ struct EditAccountView: View {
             hideTabBarLegacy()
         }
         
-        .background(Color(.white))
+        .background(Color(.systemBackground))
         .alert("Delete Account", isPresented: $showingDeleteAlert) {
             Button("Delete", role: .destructive) {
                 deleteAccount()

@@ -30,7 +30,7 @@ struct TransactionDetailsView: View {
             }
             .padding(.vertical, 20)
             .frame(maxWidth: .infinity)
-            .background(Color(.systemGray6))
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(12)
             
             // Transaction details
@@ -67,7 +67,7 @@ struct TransactionDetailsView: View {
                     DetailRow(title: "Description", value: transaction.description)
                 }
             }
-            .background(Color(.systemGray6))
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(12)
             
             Spacer()
@@ -85,7 +85,7 @@ struct TransactionDetailsView: View {
                     .foregroundColor(.primary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color(.systemGray6))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                 }
                 
@@ -100,7 +100,7 @@ struct TransactionDetailsView: View {
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.red.opacity(0.1))
+                    .background(Color.red.opacity(0.3))
                     .cornerRadius(8)
                 }
             }
@@ -293,7 +293,7 @@ struct EditTransactionView: View {
                         let actualCurrency = CurrencyManager().selectedCurrency.code
                         Text("\(actualCurrency)")
                             .font(.largeTitle)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                     .padding()
                     
@@ -305,7 +305,7 @@ struct EditTransactionView: View {
                         VStack(alignment: .leading){
                             Text("Account")
                                 .font(.subheadline)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                             if accountStore.accounts.isEmpty {
                                 Text("No accounts available")
@@ -319,7 +319,7 @@ struct EditTransactionView: View {
                                 } label: {
                                     Text(selectedAccount.map { "\($0.emoji) \($0.name)" } ?? "Select Account")
                                         .font(.headline)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                 }
                             }
                         }
@@ -329,7 +329,7 @@ struct EditTransactionView: View {
                         VStack(alignment: .trailing){
                             Text("Category")
                                 .font(.subheadline)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             Menu {
                                 ForEach(categoryStore.getCategories(for: selectedType == .income ? .income : .expense)) { category in
                                     Button("\(category.emoji) \(category.name)") {
@@ -341,7 +341,7 @@ struct EditTransactionView: View {
                                     "\($0.emoji) \($0.name)"} ??
                                      "Select Category")
                                     .font(.headline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                             }
                         }
                     }
@@ -366,7 +366,7 @@ struct EditTransactionView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.black)
+                        .background(Color.primary)
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
@@ -382,7 +382,7 @@ struct EditTransactionView: View {
                     }) {
                         Image(systemName: "xmark")
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
             }

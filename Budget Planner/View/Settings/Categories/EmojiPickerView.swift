@@ -44,13 +44,13 @@ struct EmojiPickerView: View {
                 // Search Bar
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     
                     TextField("Search emojis...", text: $searchText)
                         .textFieldStyle(.plain)
                 }
                 .padding(12)
-                .background(Color(.systemGray6))
+                .background(Color.secondary)
                 .cornerRadius(10)
                 .padding(.horizontal)
                 .padding(.top, 12)

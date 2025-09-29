@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 import UIKit
 struct ExportDataView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var transactionManager = TransactionManager()
     
     @State private var fromDate = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
@@ -92,8 +93,8 @@ struct ExportDataView: View {
                                         .font(.system(size: 13, weight: .medium))
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
-                                        .background(selectedDateRange == range ? Color.black : Color.gray.opacity(0.15))
-                                        .foregroundColor(selectedDateRange == range ? .white : .primary)
+                                        .background(selectedDateRange == range ? Color.primary : Color.secondary.opacity(0.15))
+                                        .foregroundColor(selectedDateRange == range ? Color(.secondarySystemBackground) : .primary)
                                         .cornerRadius(20)
                                 }
                             }
@@ -113,11 +114,11 @@ struct ExportDataView: View {
                                 .labelsHidden()
                                 .scaleEffect(0.9)
                                 .padding(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
-                                .background(Color.white)
+                                .background(Color(.systemBackground))
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray, lineWidth: 1)
+                                        .stroke(Color.secondary, lineWidth: 1)
                                 )
                                 
                         }
@@ -134,21 +135,21 @@ struct ExportDataView: View {
                                 .labelsHidden()
                                 .scaleEffect(0.9)
                                 .padding(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
-                                .background(Color.white)
+                                .background(Color(.systemBackground))
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray, lineWidth: 1)
+                                        .stroke(Color.secondary, lineWidth: 1)
                                 )
                         }
                         .padding(.horizontal)
                     }
                     .padding(.vertical)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                            .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                     )
                     
                     Text("\(daysSelectedText)")
@@ -190,24 +191,24 @@ struct ExportDataView: View {
                                     Text("CSV File")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                     Text("Comma-separated values for Excel")
                                         .font(.caption)
-                                        .foregroundColor(Color.gray)
+                                        .foregroundColor(Color.secondary)
                                 }
                                 
                                 Spacer()
                                 
                                 Image(systemName: selectedFormat == "CSV File" ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedFormat == "CSV File" ? .blue : .gray.opacity(0.5))
+                                    .foregroundColor(selectedFormat == "CSV File" ? .blue : .secondary.opacity(0.5))
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.white)
+                            .background(Color(.systemBackground))
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "CSV File" ? Color.black : Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(selectedFormat == "CSV File" ? Color.primary : Color.secondary.opacity(0.4), lineWidth: 2)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -228,24 +229,24 @@ struct ExportDataView: View {
                                     Text("Excel File")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                     Text("Microsoft Excel format")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
                                 }
                                 
                                 Spacer()
                                 
                                 Image(systemName: selectedFormat == "Excel File" ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedFormat == "Excel File" ? .blue : .gray.opacity(0.5))
+                                    .foregroundColor(selectedFormat == "Excel File" ? .blue : .secondary.opacity(0.5))
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.white)
+                            .background(Color(.systemBackground))
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "Excel File" ? Color.black : Color.gray
+                                    .stroke(selectedFormat == "Excel File" ? Color.primary : Color.secondary
                                                 .opacity(0.4), lineWidth: 2)
                             )
                         }
@@ -267,24 +268,24 @@ struct ExportDataView: View {
                                     Text("PDF Report")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                     Text("Formatted document with charts")
                                         .font(.caption)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
                                 }
                                 
                                 Spacer()
                                 
                                 Image(systemName: selectedFormat == "PDF Report" ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedFormat == "PDF Report" ? .blue : .gray.opacity(0.5))
+                                    .foregroundColor(selectedFormat == "PDF Report" ? .blue : .secondary.opacity(0.5))
                                     .font(.system(size: 20))
                             }
                             .padding(16)
-                            .background(Color.white)
+                            .background(Color(.systemBackground))
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(selectedFormat == "PDF Report" ? Color.black : Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(selectedFormat == "PDF Report" ? Color.primary : Color.secondary.opacity(0.4), lineWidth: 2)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -322,12 +323,13 @@ struct ExportDataView: View {
                             }
                             Spacer()
                             Toggle("", isOn: $includeCategories)
+                                .tint(colorScheme == .dark ? .secondary : .primary)
                         }
                         .padding(16)
                         
                         Divider()
                             .frame(height: 2)
-                            .background(Color.gray.opacity(0.4))
+                            .background(Color.secondary.opacity(0.4))
                             
                         // Include Accounts
                         HStack {
@@ -342,12 +344,13 @@ struct ExportDataView: View {
                             }
                             Spacer()
                             Toggle("", isOn: $includeAccounts)
+                                .tint(colorScheme == .dark ? .secondary : .primary)
                         }
                         .padding(16)
                         
                         Divider()
                             .frame(height: 2)
-                            .background(Color.gray.opacity(0.4))
+                            .background(Color.secondary.opacity(0.4))
                             
                         
                         // Include Notes
@@ -363,12 +366,13 @@ struct ExportDataView: View {
                             }
                             Spacer()
                             Toggle("", isOn: $includeNotes)
+                                .tint(colorScheme == .dark ? .secondary : .primary)
                         }
                         .padding(16)
                         
                         Divider()
                             .frame(height: 2)
-                            .background(Color.gray.opacity(0.4))
+                            .background(Color.secondary.opacity(0.4))
                         
                         // Include Recurring Info
                         HStack {
@@ -388,7 +392,7 @@ struct ExportDataView: View {
                         
                         Divider()
                             .frame(height: 2)
-                            .background(Color.gray.opacity(0.4))
+                            .background(Color.secondary.opacity(0.4))
                         
                         // Group by Month
                         HStack {
@@ -403,15 +407,16 @@ struct ExportDataView: View {
                             }
                             Spacer()
                             Toggle("", isOn: $groupByMonth)
+                                .tint(colorScheme == .dark ? .secondary : .primary)
                         }
                         .padding(16)
                     }
 //                    .padding(5)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                            .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                     )
                 }
                 .padding()
@@ -458,11 +463,11 @@ struct ExportDataView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color.primary, lineWidth: 1)
                     )
                 }
                 .padding()
@@ -484,10 +489,10 @@ struct ExportDataView: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(.systemBackground))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(filteredTransactions.isEmpty ? Color.gray : Color.black)
+                    .background(filteredTransactions.isEmpty ? Color.secondary : Color.primary)
                     .cornerRadius(12)
                 }
                 .disabled(isExporting || filteredTransactions.isEmpty)
@@ -514,13 +519,13 @@ struct ExportDataView: View {
                         HStack(spacing: 10){
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 17, weight: .medium))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                                 .frame(width: 20, height: 20)
                             
                             Text("Export Data")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                         }
                         .frame(maxWidth: .infinity)
@@ -530,7 +535,7 @@ struct ExportDataView: View {
                     
                     Divider()
 //                        .frame(height: 2)
-                        .background(.gray)
+                        .background(.secondary)
 //                        .frame(maxWidth: .infinity)
                         .padding(.horizontal, scaleW(-250))
                 }

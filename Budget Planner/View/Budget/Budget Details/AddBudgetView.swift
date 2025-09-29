@@ -35,7 +35,7 @@ struct AddBudgetView: View {
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.title2)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                 }
                 
                 Spacer()
@@ -43,7 +43,7 @@ struct AddBudgetView: View {
                 Text("Create Budget")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 
                 Spacer()
                 
@@ -75,9 +75,9 @@ struct AddBudgetView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 24)
             }
-            .background(Color.white)
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(24, corners: [.topLeft, .topRight])
-            .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: -5)
+            .shadow(color: .primary.opacity(0.05), radius: 10, x: 0, y: -5)
             
             Spacer()
             
@@ -85,9 +85,9 @@ struct AddBudgetView: View {
             createBudgetButton
                 .padding(.horizontal, 20)
                 .padding(.bottom, 34)
-                .background(Color.white)
+                .background(Color(.secondarySystemBackground))
         }
-        .background(Color(.systemGray6))
+        .background(Color.secondary)
         .navigationBarHidden(true)
         .onChange(of: sliderValue) { newValue in
             budgetAmount = String(Int(newValue))
@@ -138,7 +138,7 @@ struct AddBudgetView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
-                .background(Color(.systemGray6))
+                .background(Color(.tertiarySystemBackground))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
@@ -178,7 +178,7 @@ struct AddBudgetView: View {
                 
                 // Actual Slider
                 Slider(value: $sliderValue, in: 0...10000, step: 100)
-                    .accentColor(.black)
+                    .accentColor(.primary)
             }
             .padding(.horizontal, 4)
             
@@ -191,6 +191,7 @@ struct AddBudgetView: View {
                 
                 TextField("1000", text: $budgetAmount)
                     .font(.title2)
+                    .foregroundColor(.primary)
                     .keyboardType(.numberPad)
                     .textFieldStyle(PlainTextFieldStyle())
                     .onChange(of: budgetAmount) { newValue in
@@ -208,7 +209,7 @@ struct AddBudgetView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
-            .background(Color(.systemGray6))
+            .background(Color(.tertiarySystemBackground))
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
@@ -226,13 +227,14 @@ struct AddBudgetView: View {
             
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                    .fill(Color(.tertiarySystemBackground))
                     .frame(height: 100)
                 
                 TextEditor(text: $description)
                     .padding(10)
                     .frame(height: 100)
                     .background(Color.clear)
+                    .foregroundColor(.primary)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 
                 if description.isEmpty {
@@ -251,10 +253,10 @@ struct AddBudgetView: View {
         Button(action: createBudget) {
             Text("Create Budget")
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(isFormValid ? Color(.systemBackground) : .secondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isFormValid ? Color.black : Color(.systemGray4))
+                .background(isFormValid ? Color.primary : Color(.systemGray4))
                 .cornerRadius(12)
         }
         .disabled(!isFormValid)
@@ -314,8 +316,10 @@ struct CategoryPickerView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                    .listRowBackground(Color(.systemBackground))
                 }
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Select Category")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

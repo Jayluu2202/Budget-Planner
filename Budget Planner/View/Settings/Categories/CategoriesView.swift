@@ -18,12 +18,12 @@ struct CategoriesView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Categories")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 Spacer()
@@ -35,8 +35,16 @@ struct CategoriesView: View {
                     Text("Add")
                         .font(.system(size: 17, weight: .medium))
                         .frame(width: 50, height: 30)
-                        .foregroundColor(.white)
-                        .background(Color.black)
+                        .foregroundColor(
+                            Color(UIColor { traitCollection in
+                                traitCollection.userInterfaceStyle == .dark ? .black : .white
+                            })
+                        )
+                        .background(
+                            Color(UIColor { traitCollection in
+                                traitCollection.userInterfaceStyle == .dark ? .white : .black
+                            })
+                        )
                         .cornerRadius(6)
                 }
             }
@@ -60,10 +68,10 @@ struct CategoriesView: View {
                     Spacer()
                     Text("No \(currentType.rawValue.lowercased()) categories yet")
                         .font(.title3)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     Text("Tap 'Add' to create your first category")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     Spacer()
                 }
             } else {
@@ -79,7 +87,7 @@ struct CategoriesView: View {
                                         .font(.system(size: 24))
                                     Text(category.name)
                                         .font(.system(size: 17))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                     Spacer()
                                 }
                                 .padding(.vertical, 12)
@@ -88,7 +96,7 @@ struct CategoriesView: View {
                                 .background(.clear)
                                 .background(
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.gray.opacity(0.4))
+                                        .stroke(Color.secondary.opacity(0.4))
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())

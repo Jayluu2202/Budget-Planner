@@ -28,12 +28,12 @@ struct AddCategoriesView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         
                         Text("Add Categories")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -44,11 +44,36 @@ struct AddCategoriesView: View {
             .padding(.top, 16)
             
             // Type Selector
-            Picker("Category Type", selection: $selectedType) {
-                Text("Income").tag(Category.CategoryType.income)
-                Text("Expense").tag(Category.CategoryType.expense)
+            HStack(spacing: 0) {
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .income
+                    }
+                }) {
+                    Text("Income")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(selectedType == .income ? Color(.systemBackground) : Color(.label))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(selectedType == .income ? Color(.label) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedType = .expense
+                    }
+                }) {
+                    Text("Expense")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(selectedType == .expense ? Color(.systemBackground) : Color(.label))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(selectedType == .expense ? Color(.label) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
-            .pickerStyle(SegmentedPickerStyle())
+            .padding(4)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal)
             
             // Emoji Selector
@@ -60,12 +85,12 @@ struct AddCategoriesView: View {
                         Text(selectedEmoji)
                             .font(.system(size: 40))
                             .frame(width: 80, height: 80)
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.secondary.opacity(0.1))
                             .clipShape(Circle())
                         
                         Text("Tap to change")
                             .font(.caption)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -81,8 +106,8 @@ struct AddCategoriesView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(categoryName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(categoryName.isEmpty ? Color.secondary : Color.primary)
                         .cornerRadius(12)
                 }
                 .disabled(categoryName.isEmpty)
@@ -102,7 +127,7 @@ struct AddCategoriesView: View {
                 if filteredCategories.isEmpty {
                     Text("No \(selectedType.rawValue.lowercased()) categories yet")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .padding()
                 } else {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 3), spacing: 16) {
@@ -117,7 +142,7 @@ struct AddCategoriesView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 80)
-                            .background(Color.gray.opacity(0.1))
+                            .background(Color.secondary.opacity(0.1))
                             .cornerRadius(12)
                         }
                     }

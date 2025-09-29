@@ -78,7 +78,7 @@ struct AddTransactionDetails: View {
                             let actualCurrency = CurrencyManager().selectedCurrency.code
                             Text("\(actualCurrency)")
                                 .font(.largeTitle)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                         }
                         .padding()
                         
@@ -88,18 +88,6 @@ struct AddTransactionDetails: View {
                         
                         // Contact Selection Buttons
                         HStack(spacing: 16) {
-                            Button(action: {
-                                isSelectingSender = true
-                                showingContactPicker = true
-                            }) {
-                                Text("Sender")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(Color.black)
-                                    .cornerRadius(8)
-                            }
                             
                             Button(action: {
                                 isSelectingSender = false
@@ -107,10 +95,10 @@ struct AddTransactionDetails: View {
                             }) {
                                 Text("Receiver")
                                     .font(.headline)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color(.secondarySystemBackground))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(Color.black)
+                                    .background(Color(.label))
                                     .cornerRadius(8)
                             }
                         }
@@ -142,10 +130,10 @@ struct AddTransactionDetails: View {
                                         
                                         if selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.primary)
                                         } else {
                                             Image(systemName: "circle")
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(.secondary)
                                         }
                                     }
                                     .padding(.horizontal, 16)
@@ -153,12 +141,12 @@ struct AddTransactionDetails: View {
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(
-                                                (selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id) ? Color.black : Color.gray.opacity(0.3),
+                                                (selectedSenderAccount?.id == account.id || selectedReceiverAccount?.id == account.id) ? Color.primary : Color.secondary.opacity(0.3),
                                                 lineWidth: 1
                                             )
                                             .background(
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .fill(Color(.systemGray6))
+                                                    .fill(Color(UIColor.secondarySystemBackground))
                                             )
                                     )
                                 }
@@ -179,7 +167,7 @@ struct AddTransactionDetails: View {
                             let actualCurrency = CurrencyManager().selectedCurrency.code
                             Text("\(actualCurrency)")
                                 .font(.largeTitle)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                         }
                         .padding()
                         
@@ -191,7 +179,7 @@ struct AddTransactionDetails: View {
                             VStack(alignment: .leading){
                                 Text("Account")
                                     .font(.subheadline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                                 
                                 if accountStore.accounts.isEmpty {
                                     Text("No accounts available")
@@ -205,7 +193,7 @@ struct AddTransactionDetails: View {
                                     } label: {
                                         Text(selectedAccount.map { "\($0.emoji) \($0.name)" } ?? "Select Account")
                                             .font(.headline)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.primary)
                                     }
                                 }
                             }
@@ -215,7 +203,7 @@ struct AddTransactionDetails: View {
                             VStack(alignment: .trailing){
                                 Text("Category")
                                     .font(.subheadline)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                                 Menu {
                                     ForEach(categoryStore.getCategories(for: selectedType == .income ? .income : .expense)) { category in
                                         Button("\(category.emoji) \(category.name)") {
@@ -227,7 +215,7 @@ struct AddTransactionDetails: View {
                                         "\($0.emoji) \($0.name)"} ??
                                          "Select Category")
                                         .font(.headline)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                 }
                             }
                         }
@@ -250,10 +238,10 @@ struct AddTransactionDetails: View {
                 }) {
                     Text("Save")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(.secondarySystemBackground))
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.black)
+                        .background(Color(.label))
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
@@ -269,7 +257,7 @@ struct AddTransactionDetails: View {
                     }) {
                         Image(systemName: "xmark")
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
             }

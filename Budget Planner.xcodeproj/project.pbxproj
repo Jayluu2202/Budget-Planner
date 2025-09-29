@@ -28,6 +28,7 @@
 		047FB6422E6855CB0080D024 /* reportViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6412E6855CB0080D024 /* reportViewTab.swift */; };
 		047FB6462E6855EB0080D024 /* settingsViewTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6452E6855EB0080D024 /* settingsViewTab.swift */; };
 		047FB6482E6856050080D024 /* tabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047FB6472E6856050080D024 /* tabView.swift */; };
+		0485BBE82E866E82000BB1A3 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0485BBE72E866E82000BB1A3 /* ThemeManager.swift */; };
 		04976B032E6FE47A001EB314 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B022E6FE47A001EB314 /* CategoryModel.swift */; };
 		04976B052E6FE4AB001EB314 /* CategoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B042E6FE4AB001EB314 /* CategoryController.swift */; };
 		04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */; };
@@ -76,6 +77,7 @@
 		047FB6412E6855CB0080D024 /* reportViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = reportViewTab.swift; sourceTree = "<group>"; };
 		047FB6452E6855EB0080D024 /* settingsViewTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingsViewTab.swift; sourceTree = "<group>"; };
 		047FB6472E6856050080D024 /* tabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tabView.swift; sourceTree = "<group>"; };
+		0485BBE72E866E82000BB1A3 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		04976B022E6FE47A001EB314 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		04976B042E6FE4AB001EB314 /* CategoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryController.swift; sourceTree = "<group>"; };
 		04976B062E6FE4F0001EB314 /* EmojiPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerView.swift; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 				04D2C0FE2E712E960024FFF4 /* ApplockController.swift */,
 				04D0AF022E77F75B00A6B1E9 /* CurrencyManager.swift */,
 				042F74FC2E72CC910050348A /* TransactionManger.swift */,
+				0485BBE72E866E82000BB1A3 /* ThemeManager.swift */,
 				042023F12E73D91000598928 /* BudgetManager.swift */,
 				04FADDEA2E8176E1003BE3E1 /* OnboardingManager.swift */,
 			);
@@ -374,6 +377,7 @@
 			files = (
 				042023F02E73D8E700598928 /* BudgetModel.swift in Sources */,
 				04976B072E6FE4F0001EB314 /* EmojiPickerView.swift in Sources */,
+				0485BBE82E866E82000BB1A3 /* ThemeManager.swift in Sources */,
 				04976B092E6FF0F8001EB314 /* EditCategoryView.swift in Sources */,
 				04443F992E70300F00514154 /* AddAccountView.swift in Sources */,
 				042F75022E72CD2A0050348A /* TrabsactionCategoryModel.swift in Sources */,

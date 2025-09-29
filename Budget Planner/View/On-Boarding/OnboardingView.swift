@@ -2,8 +2,6 @@
 //  OnboardingView.swift
 //  Budget Planner
 //
-//  Created by mac on 22/09/25.
-//
 
 import SwiftUI
 
@@ -21,7 +19,7 @@ struct OnboardingView: View {
                 ForEach(0..<3) { index in
                     Rectangle()
                         .frame(height: 4)
-                        .foregroundColor(index <= currentPage ? .black : .gray.opacity(0.3))
+                        .foregroundColor(index <= currentPage ? Color(.label) : Color(.tertiaryLabel))
                         .animation(.easeInOut, value: currentPage)
                 }
             }
@@ -30,15 +28,12 @@ struct OnboardingView: View {
             
             // Page Content
             TabView(selection: $currentPage) {
-                // Page 1: Welcome & Currency
                 OnboardingCurrencyPage(currencyManager: currencyManager, currentPage: $currentPage)
                     .tag(0)
                 
-                // Page 2: Add Accounts
                 OnboardingAccountsPage(accountStore: accountStore, currentPage: $currentPage)
                     .tag(1)
                 
-                // Page 3: Add Categories
                 OnboardingCategoriesPage(categoryStore: categoryStore, onboardingManager: onboardingManager)
                     .tag(2)
             }
@@ -46,6 +41,7 @@ struct OnboardingView: View {
             .animation(.easeInOut, value: currentPage)
         }
         .navigationBarHidden(true)
+        .background(Color(.secondarySystemBackground))
     }
 }
 
@@ -53,14 +49,13 @@ struct OnboardingView: View {
 struct OnboardingCurrencyPage: View {
     @ObservedObject var currencyManager: CurrencyManager
     @Binding var currentPage: Int
-//    @State private var currencySelected: Currency?
     
     var body: some View {
         VStack(spacing: 30) {
             VStack(spacing: 16) {
                 Image(systemName: "dollarsign.circle.fill")
                     .font(.system(size: 80))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                 
                 Text("Welcome to Budget Planner!")
                     .font(.largeTitle)
@@ -69,7 +64,7 @@ struct OnboardingCurrencyPage: View {
                 
                 Text("First, let's set up your currency")
                     .font(.title3)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
             .padding(.top, 50)
@@ -80,9 +75,9 @@ struct OnboardingCurrencyPage: View {
                     VStack(alignment: .leading) {
                         Text("Selected Currency")
                             .font(.headline)
-                        Text(currencyManager.selectedCurrency.code + " - " + currencyManager.selectedCurrency.name)
+                        Text("\(currencyManager.selectedCurrency.code) - \(currencyManager.selectedCurrency.name)")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color(.secondaryLabel))
                     }
                     Spacer()
                     Text(currencyManager.selectedCurrency.symbol)
@@ -90,7 +85,7 @@ struct OnboardingCurrencyPage: View {
                         .fontWeight(.bold)
                 }
                 .padding()
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.secondarySystemFill))
                 .cornerRadius(12)
                 
                 NavigationLink(destination: CurrencyChangeView(currencyManager: currencyManager, selectedCurrency: .constant(nil))) {
@@ -98,11 +93,11 @@ struct OnboardingCurrencyPage: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(.label))
                         .background(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.black, lineWidth: 1)
+                                .stroke(Color(.label), lineWidth: 1)
                         )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -117,8 +112,8 @@ struct OnboardingCurrencyPage: View {
                     .font(.system(size: 17, weight: .medium))
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .foregroundColor(.white)
-                    .background(Color.black)
+                    .foregroundColor(Color(.systemBackground))
+                    .background(Color(.label))
                     .cornerRadius(12)
             }
             .padding(.bottom, 40)
@@ -138,7 +133,7 @@ struct OnboardingAccountsPage: View {
             VStack(spacing: 16) {
                 Image(systemName: "creditcard.fill")
                     .font(.system(size: 80))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                 
                 Text("Add Your Accounts")
                     .font(.largeTitle)
@@ -147,7 +142,7 @@ struct OnboardingAccountsPage: View {
                 
                 Text("Set up your income sources like salary, freelance, etc.")
                     .font(.title3)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
             .padding(.top, 50)
@@ -157,15 +152,15 @@ struct OnboardingAccountsPage: View {
                 VStack(spacing: 20) {
                     Image(systemName: "plus.circle.dashed")
                         .font(.system(size: 50))
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(.secondaryLabel))
                     
                     Text("No accounts added yet")
                         .font(.title3)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(.secondaryLabel))
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: 200)
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.secondarySystemFill))
                 .cornerRadius(12)
             } else {
                 ScrollView {
@@ -179,21 +174,21 @@ struct OnboardingAccountsPage: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(account.name)
                                         .font(.system(size: 17, weight: .medium))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color(.label))
                                     
                                     Text(accountStore.formatBalance(balance: account.balance))
                                         .font(.system(size: 15))
-                                        .foregroundColor(.green)
+                                        .foregroundColor(Color(.systemGreen))
                                 }
                                 
                                 Spacer()
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
-                            .background(Color.white)
+                            .background(Color(.secondarySystemBackground))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray, lineWidth: 1)
+                                    .stroke(Color(.separator), lineWidth: 1)
                             )
                         }
                     }
@@ -208,11 +203,11 @@ struct OnboardingAccountsPage: View {
                     .font(.system(size: 17, weight: .medium))
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                     .background(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color(.label), lineWidth: 1)
                     )
             }
             
@@ -226,15 +221,15 @@ struct OnboardingAccountsPage: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(Color(.label))
                         .cornerRadius(12)
                 }
                 
                 if !accountStore.accounts.isEmpty {
                     Text("You can always add more accounts later")
                         .font(.footnote)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(.secondaryLabel))
                 }
             }
             .padding(.bottom, 40)
@@ -257,7 +252,7 @@ struct OnboardingCategoriesPage: View {
             VStack(spacing: 16) {
                 Image(systemName: "tag.fill")
                     .font(.system(size: 80))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                 
                 Text("Add Categories")
                     .font(.largeTitle)
@@ -266,27 +261,26 @@ struct OnboardingCategoriesPage: View {
                 
                 Text("Create expense categories to organize your spending")
                     .font(.title3)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
             .padding(.top, 50)
             
-            // Categories List or Empty State
             let expenseCategories = categoryStore.getCategories(for: .expense)
             
             if expenseCategories.isEmpty {
                 VStack(spacing: 20) {
                     Image(systemName: "plus.circle.dashed")
                         .font(.system(size: 50))
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(.secondaryLabel))
                     
                     Text("No categories added yet")
                         .font(.title3)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(.secondaryLabel))
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: 200)
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.secondarySystemFill))
                 .cornerRadius(12)
             } else {
                 ScrollView {
@@ -299,13 +293,14 @@ struct OnboardingCategoriesPage: View {
                                     .font(.caption)
                                     .multilineTextAlignment(.center)
                                     .lineLimit(2)
+                                    .foregroundColor(Color(.label))
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 80)
-                            .background(Color.white)
+                            .background(Color(.secondarySystemBackground))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.gray, lineWidth: 1)
+                                    .stroke(Color(.separator), lineWidth: 1)
                             )
                         }
                     }
@@ -320,11 +315,11 @@ struct OnboardingCategoriesPage: View {
                     .font(.system(size: 17, weight: .medium))
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(.label))
                     .background(Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color(.label), lineWidth: 1)
                     )
             }
             
@@ -338,14 +333,14 @@ struct OnboardingCategoriesPage: View {
                         .font(.system(size: 17, weight: .bold))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(Color(.label))
                         .cornerRadius(12)
                 }
                 
                 Text("You can always add more categories later")
                     .font(.footnote)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(.secondaryLabel))
             }
             .padding(.bottom, 40)
         }
@@ -361,6 +356,10 @@ struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             OnboardingView(onboardingManager: OnboardingManager())
+                .preferredColorScheme(.light)
+            
+            OnboardingView(onboardingManager: OnboardingManager())
+                .preferredColorScheme(.dark)
         }
     }
 }

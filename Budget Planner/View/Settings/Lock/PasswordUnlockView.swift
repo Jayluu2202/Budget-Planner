@@ -18,7 +18,7 @@ struct PasswordUnlockView: View {
             
             Image(systemName: "lock.fill")
                 .font(.system(size: 80))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             VStack(spacing: 16) {
                 Text("App Locked")
@@ -44,7 +44,7 @@ struct PasswordUnlockView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.black)
+                        .background(Color.primary)
                         .cornerRadius(12)
                     }
                     .padding(.horizontal, 40)
@@ -59,9 +59,9 @@ struct PasswordUnlockView: View {
                             Text("Use Face ID")
                         }
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.gray.opacity(0.2))
+                        .background(Color.secondary.opacity(0.2))
                         .cornerRadius(12)
                     }
                     .padding(.horizontal, 40)

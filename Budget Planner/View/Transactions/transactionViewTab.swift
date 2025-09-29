@@ -107,7 +107,7 @@ struct transactionViewTab: View {
             }) {
                 Image(systemName: "chevron.left")
                     .font(.title2)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 
                 Text(category?.emoji ?? "")
                     .font(.title2)
@@ -320,7 +320,7 @@ struct FilterChip: View {
                 .fontWeight(.medium)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isSelected ? Color.black : Color(.systemGray6))
+                .background(isSelected ? Color.primary : Color.secondary)
                 .foregroundColor(isSelected ? .white : .primary)
                 .cornerRadius(20)
         }

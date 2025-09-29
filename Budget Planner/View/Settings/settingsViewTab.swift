@@ -9,13 +9,13 @@ import SwiftUI
 struct settingsViewTab: View {
     @StateObject private var currencyManager = CurrencyManager()
     @EnvironmentObject var appLockManager: AppLockManager
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var showMailErrorAlert = false
-    
     
     @State var currencySelected: Currency?
     
+//    @State var selectedState : String = "Light"
     
-    @State var selectedState : String = "Light"
     @Environment(\.openURL) var openURL
     var body: some View {
         NavigationView {
@@ -41,7 +41,7 @@ struct settingsViewTab: View {
                             HStack {
                                 Text("GENERAL")
                                     .font(.caption)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                                     .fontWeight(.medium)
                                 Spacer()
                             }
@@ -58,11 +58,11 @@ struct settingsViewTab: View {
                                 }
                             }
                             .frame(height: 60)
-                            .background(Color(.white))
+                            .background(Color(UIColor.systemBackground))
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                             )
                             .padding(.horizontal, 20)
                             
@@ -73,7 +73,7 @@ struct settingsViewTab: View {
                             HStack {
                                 Text("ACCOUNT")
                                     .font(.caption)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                                     .fontWeight(.medium)
                                 Spacer()
                             }
@@ -116,11 +116,11 @@ struct settingsViewTab: View {
                                 Divider()
                                     .padding(.leading, 60)
                                 
-                                NavigationLink(destination: themeSettings(selectedTheme: $selectedState)) {
+                                NavigationLink(destination: themeSettings().environmentObject(themeManager)) {
                                     SettingsRow(
                                         icon: "contrast",
                                         title: "Theme",
-                                        subtitle: selectedState
+                                        subtitle: themeManager.selectedTheme // Change this line
                                     )
                                 }
                                 .frame(height: 60)
@@ -138,11 +138,11 @@ struct settingsViewTab: View {
                                 .frame(height: 60)
                             }
                             
-                            .background(Color(.white))
+                            .background(Color(UIColor.systemBackground))
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                             )
                             .padding(.horizontal, 20)
                         }
@@ -152,7 +152,7 @@ struct settingsViewTab: View {
                             HStack {
                                 Text("SUPPORT")
                                     .font(.caption)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                                     .fontWeight(.medium)
                                 Spacer()
                             }
@@ -183,11 +183,11 @@ struct settingsViewTab: View {
                                 }
                                 .frame(height: 60)
                             }
-                            .background(Color(.white))
+                            .background(Color(UIColor.systemBackground))
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(Color.secondary.opacity(0.4), lineWidth: 2)
                             )
                             .padding(.horizontal, 20)
                             
@@ -198,7 +198,7 @@ struct settingsViewTab: View {
                         if let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
                             Text("Version: \(appVersion)")
                                 .font(.caption)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .padding(.top, 20)
                         }
                         
@@ -206,7 +206,8 @@ struct settingsViewTab: View {
                     }
                 }
             }
-            .background(Color(.white))
+            .background(Color(UIColor.systemBackground))
+            .preferredColorScheme(themeManager.colorScheme)
             .navigationBarHidden(true)
             .alert("Mail Not Available", isPresented: $showMailErrorAlert) {
                 Button("Copy Email") {
@@ -277,7 +278,7 @@ struct settingsViewTab: View {
                 // Chevron
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)

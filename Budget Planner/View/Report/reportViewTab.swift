@@ -2,7 +2,7 @@
 //  ReportViewTab.swift
 //  Budget Planner
 //
-//  Updated version with HalfSheet implementation
+//  Updated version with Dark Mode compatibility fixes
 //
 
 import SwiftUI
@@ -25,6 +25,7 @@ struct ReportViewTab: View {
                         Text("Report")
                             .font(.largeTitle)
                             .fontWeight(.semibold)
+                            .foregroundColor(.primary) // Dynamic color
                         
                         Spacer()
                         
@@ -32,7 +33,7 @@ struct ReportViewTab: View {
                             showingFilterSheet = true
                         }) {
                             Image(systemName: "slider.horizontal.3")
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary) // Dynamic color
                                 .font(.system(size: 24, weight: .medium))
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -44,7 +45,7 @@ struct ReportViewTab: View {
                         .padding(.top, 8)
                         .padding(.horizontal)
                 }
-                .background(Color(.systemBackground))
+                .background(Color(.systemBackground)) // Dynamic background
                 
                 // Scrollable content
                 ScrollView {
@@ -83,15 +84,19 @@ struct ReportViewTab: View {
                 }
             }
             .background(
-                // HalfSheet overlay - this ensures it doesn't interfere with tab bar
+                Color(.systemGroupedBackground) // Better dark mode background
+                    .ignoresSafeArea()
+            )
+            .overlay(
+                // HalfSheet overlay
                 HalfSheet(isPresented: $showingFilterSheet) {
                     TimeFilterHalfSheet(selectedPeriod: $selectedPeriod, isPresented: $showingFilterSheet)
                 }
-                .allowsHitTesting(false) // Prevents interference when not presented
+                .allowsHitTesting(false)
             )
         }
         .padding(.vertical, scaleH(-150))
-        .navigationBarHidden(true) // Hide default navigation bar
+        .navigationBarHidden(true)
     }
     
     private func scaleH(_ value: CGFloat) -> CGFloat {
@@ -105,32 +110,33 @@ struct ReportViewTab: View {
         let screenValue = deviceWidth / 452
         return value * screenValue
     }
+    
     // MARK: - Tab Selector
     private var tabSelector: some View {
         HStack(spacing: 0) {
             Button(action: { selectedTab = .income }) {
                 Text("Income")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(selectedTab == .income ? .white : .black)
+                    .foregroundColor(selectedTab == .income ? Color(.systemBackground) : .primary) // Dynamic text color
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(
-                        selectedTab == .income ? Color.black : Color.clear
+                        selectedTab == .income ? Color.primary : Color.clear
                     )
             }
             
             Button(action: { selectedTab = .expense }) {
                 Text("Expense")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(selectedTab == .expense ? .white : .black)
+                    .foregroundColor(selectedTab == .expense ? Color(.systemBackground) : .primary) // Dynamic text color
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(
-                        selectedTab == .expense ? Color.black : Color.clear
+                        selectedTab == .expense ? Color.primary : Color.clear
                     )
             }
         }
-        .background(Color.gray.opacity(0.15))
+        .background(Color(.systemFill)) // Better background for dark mode
         .cornerRadius(10)
     }
     
@@ -174,6 +180,7 @@ struct ReportViewTab: View {
             Text("No Data")
                 .font(.title2)
                 .fontWeight(.semibold)
+                .foregroundColor(.primary) // Dynamic color
             
             Text(message)
                 .foregroundColor(.secondary)
@@ -182,18 +189,19 @@ struct ReportViewTab: View {
                 .padding(.vertical, 20)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground)) // Better card background
         .cornerRadius(15)
-        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 0, y: 1) // Subtle shadow for dark mode
     }
     
-    // MARK: - Line Chart View (Using Charts library)
+    // MARK: - Line Chart View
     private func lineChartView(transactions: [Transaction], title: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack {
                 Text(title)
                     .font(.title2)
                     .fontWeight(.semibold)
+                    .foregroundColor(.primary) // Dynamic color
                 
                 Spacer()
                 
@@ -224,13 +232,13 @@ struct ReportViewTab: View {
                     period: selectedPeriod
                 )
                 .frame(height: 200)
-                .id("\(selectedPeriod)-\(selectedTab)-\(UUID())") // Force refresh when period/tab changes
+                .id("\(selectedPeriod)-\(selectedTab)-\(UUID())")
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground)) // Better card background
         .cornerRadius(15)
-        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 0, y: 1) // Subtle shadow
     }
     
     // MARK: - Category Distribution View
@@ -239,6 +247,7 @@ struct ReportViewTab: View {
             Text("Category Distribution")
                 .font(.title2)
                 .fontWeight(.semibold)
+                .foregroundColor(.primary) // Dynamic color
             
             if transactions.isEmpty {
                 Text("No transactions found for \(selectedPeriod.rawValue.lowercased())")
@@ -265,7 +274,7 @@ struct ReportViewTab: View {
                                 }
                             )
                             .frame(height: 200)
-                            .id("\(selectedPeriod)-\(selectedTab)-pie-\(UUID())") // Force refresh
+                            .id("\(selectedPeriod)-\(selectedTab)-pie-\(UUID())")
                         }
                         
                         // Category List
@@ -275,9 +284,9 @@ struct ReportViewTab: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemGroupedBackground)) // Better card background
         .cornerRadius(15)
-        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.1), radius: 2, x: 0, y: 1) // Subtle shadow
     }
     
     // MARK: - Category List
@@ -297,6 +306,7 @@ struct ReportViewTab: View {
                     HStack {
                         Text("\(data.category.emoji) \(data.category.name)")
                             .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.primary) // Dynamic color
                         
                         Spacer()
                         
@@ -312,7 +322,7 @@ struct ReportViewTab: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
-                .background(Color(.systemGray6))
+                .background(Color(.tertiarySystemGroupedBackground)) // Better row background
                 .cornerRadius(10)
             }
         }
@@ -322,7 +332,7 @@ struct ReportViewTab: View {
 // MARK: - Extensions and Helper Methods
 extension ReportViewTab {
     
-    // MARK: - UPDATED Computed Properties with Dynamic Filtering
+    // MARK: - Computed Properties with Dynamic Filtering
     private var dateRange: (start: Date, end: Date) {
         let calendar = Calendar.current
         let now = Date()
@@ -376,7 +386,7 @@ extension ReportViewTab {
         filteredTransactions.filter { $0.type == .income }
     }
     
-    // MARK: - UPDATED Helper Functions for Chart Data
+    // MARK: - Helper Functions for Chart Data
     private func prepareChartData(for transactions: [Transaction]) -> [(Date, Double)] {
         guard !transactions.isEmpty else { return [] }
         
@@ -438,7 +448,7 @@ extension ReportViewTab {
     }
     
     private func colorForCategory(at index: Int) -> Color {
-        let colors: [Color] = [.blue, .green, .orange, .purple, .pink, .yellow, .red, .gray, .mint, .cyan]
+        let colors: [Color] = [.blue, .green, .orange, .purple, .pink, .yellow, .red, .secondary, .mint, .cyan]
         return colors[index % colors.count]
     }
     
@@ -450,7 +460,7 @@ extension ReportViewTab {
     }
 }
 
-// MARK: - Updated Chart Components
+// MARK: - Updated Chart Components with Dark Mode Support
 
 struct LineChartWrapper: UIViewRepresentable {
     var data: [(Date, Double)]
@@ -466,11 +476,10 @@ struct LineChartWrapper: UIViewRepresentable {
     
     func updateUIView(_ uiView: LineChartView, context: Context) {
         updateChartData(uiView)
+        updateChartAppearance(uiView) // Update colors for dark mode
     }
     
     private func setupChartView(_ chartView: LineChartView) {
-        chartView.backgroundColor = UIColor.systemBackground
-        chartView.gridBackgroundColor = UIColor.systemBackground
         chartView.drawBordersEnabled = false
         chartView.chartDescription.enabled = false
         chartView.legend.enabled = false
@@ -479,23 +488,33 @@ struct LineChartWrapper: UIViewRepresentable {
         chartView.pinchZoomEnabled = false
         chartView.doubleTapToZoomEnabled = false
         
+        updateChartAppearance(chartView)
+        
         // Configure axes
         chartView.xAxis.drawGridLinesEnabled = true
-        chartView.xAxis.gridColor = UIColor.systemGray5
         chartView.xAxis.drawAxisLineEnabled = false
         chartView.xAxis.drawLabelsEnabled = true
         chartView.xAxis.labelPosition = .bottom
         chartView.xAxis.labelFont = UIFont.systemFont(ofSize: 10)
-        chartView.xAxis.labelTextColor = UIColor.secondaryLabel
         
         chartView.leftAxis.drawGridLinesEnabled = true
-        chartView.leftAxis.gridColor = UIColor.systemGray5
         chartView.leftAxis.drawAxisLineEnabled = false
         chartView.leftAxis.drawLabelsEnabled = true
         chartView.leftAxis.labelFont = UIFont.systemFont(ofSize: 10)
-        chartView.leftAxis.labelTextColor = UIColor.secondaryLabel
         
         chartView.rightAxis.enabled = false
+    }
+    
+    private func updateChartAppearance(_ chartView: LineChartView) {
+        // Dynamic colors based on current interface style
+        chartView.backgroundColor = UIColor.secondarySystemGroupedBackground
+        chartView.gridBackgroundColor = UIColor.secondarySystemGroupedBackground
+        
+        chartView.xAxis.gridColor = UIColor.separator
+        chartView.xAxis.labelTextColor = UIColor.secondaryLabel
+        
+        chartView.leftAxis.gridColor = UIColor.separator
+        chartView.leftAxis.labelTextColor = UIColor.secondaryLabel
     }
     
     private func updateChartData(_ chartView: LineChartView) {
@@ -540,7 +559,7 @@ struct LineChartWrapper: UIViewRepresentable {
     }
 }
 
-// PieChartView remains the same as before
+// PieChartView with Dark Mode Support
 struct PieChartView: UIViewRepresentable {
     let data: [Double]
     let title: String
@@ -554,10 +573,10 @@ struct PieChartView: UIViewRepresentable {
     
     func updateUIView(_ uiView: Charts.PieChartView, context: Context) {
         updateChartData(uiView)
+        updateChartAppearance(uiView) // Update colors for dark mode
     }
     
     private func setupChartView(_ chartView: Charts.PieChartView) {
-        chartView.backgroundColor = UIColor.systemBackground
         chartView.holeRadiusPercent = 0.4
         chartView.transparentCircleRadiusPercent = 0.45
         chartView.chartDescription.enabled = false
@@ -565,9 +584,26 @@ struct PieChartView: UIViewRepresentable {
         chartView.rotationEnabled = false
         chartView.highlightPerTapEnabled = false
         
+        updateChartAppearance(chartView)
+        
         // Center text
         chartView.centerText = title
         chartView.centerTextRadiusPercent = 1.0
+    }
+    
+    private func updateChartAppearance(_ chartView: Charts.PieChartView) {
+        // Dynamic colors
+        chartView.backgroundColor = UIColor.secondarySystemGroupedBackground
+        chartView.holeColor = UIColor.secondarySystemGroupedBackground
+        chartView.transparentCircleColor = UIColor.secondarySystemGroupedBackground
+        
+        // Center text color
+        let centerTextColor = UIColor.label
+        let mutableString = NSMutableAttributedString(string: title)
+        mutableString.addAttribute(.foregroundColor,
+                                  value: centerTextColor,
+                                  range: NSRange(location: 0, length: title.count))
+        chartView.centerAttributedText = mutableString
     }
     
     private func updateChartData(_ uiView: Charts.PieChartView) {
@@ -591,7 +627,7 @@ struct PieChartView: UIViewRepresentable {
     }
 }
 
-// MARK: - New HalfSheet Filter View
+// MARK: - Updated HalfSheet Filter View with Dark Mode Support
 struct TimeFilterHalfSheet: View {
     @Binding var selectedPeriod: TimePeriod
     @Binding var isPresented: Bool
@@ -600,7 +636,7 @@ struct TimeFilterHalfSheet: View {
         VStack(spacing: 0) {
             // Grab handle
             RoundedRectangle(cornerRadius: 2.5)
-                .fill(Color(.systemGray4))
+                .fill(Color.secondary)
                 .frame(width: 36, height: 5)
                 .padding(.top, 8)
             
@@ -609,21 +645,21 @@ struct TimeFilterHalfSheet: View {
                 Button("Reset") {
                     selectedPeriod = .thisMonth
                 }
-                .foregroundColor(.primary)
+                .foregroundColor(.primary) // Dynamic color
                 
                 Spacer()
                 
                 Text("Filter")
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .foregroundColor(.primary) // Dynamic color
                 
                 Spacer()
                 
                 Button("Done") {
                     isPresented = false
                 }
-                .foregroundColor(.primary)
-//                .fontWeight(.medium)
+                .foregroundColor(.primary) // Dynamic color
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -640,21 +676,20 @@ struct TimeFilterHalfSheet: View {
                             HStack {
                                 Text(period.rawValue)
                                     .font(.body)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(.primary) // Dynamic color
                                 
                                 Spacer()
                                 
                                 if selectedPeriod == period {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(.accentColor)
-//                                        .fontWeight(.medium)
                                 }
                             }
                             .padding(.horizontal, 20)
                             .padding(.vertical, 16)
                             .background(
                                 Rectangle()
-                                    .fill(selectedPeriod == period ? Color.accentColor.opacity(0.1) : Color.clear)
+                                    .fill(selectedPeriod == period ? Color.accentColor.opacity(0.15) : Color.clear)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -664,31 +699,10 @@ struct TimeFilterHalfSheet: View {
             
             Spacer()
         }
-        .background(Color(.systemBackground))
+        .background(Color(.systemBackground)) // Dynamic background
         .cornerRadius(16, corners: [.topLeft, .topRight])
     }
 }
-
-// MARK: - Helper extension for corner radius
-//extension View {
-//    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-//        clipShape(RoundedCorner(radius: radius, corners: corners))
-//    }
-//}
-
-//struct RoundedCorner: Shape {
-//    var radius: CGFloat = .infinity
-//    var corners: UIRectCorner = .allCorners
-//
-//    func path(in rect: CGRect) -> Path {
-//        let path = UIBezierPath(
-//            roundedRect: rect,
-//            byRoundingCorners: corners,
-//            cornerRadii: CGSize(width: radius, height: radius)
-//        )
-//        return Path(path.cgPath)
-//    }
-//}
 
 // MARK: - Updated HalfSheet Implementation
 struct HalfSheet<Content: View>: UIViewControllerRepresentable {
@@ -701,23 +715,24 @@ struct HalfSheet<Content: View>: UIViewControllerRepresentable {
     }
     
     func makeUIViewController(context: Context) -> HalfSheetViewController {
-            let controller = HalfSheetViewController()
-            controller.onDismiss = {
-                DispatchQueue.main.async {
-                    self.isPresented = false
-                }
+        let controller = HalfSheetViewController()
+        controller.onDismiss = {
+            DispatchQueue.main.async {
+                self.isPresented = false
             }
-            return controller
         }
+        return controller
+    }
     
     func updateUIViewController(_ uiViewController: HalfSheetViewController, context: Context) {
-            if isPresented && !uiViewController.isPresenting {
-                uiViewController.presentSheet(with: content)
-            } else if !isPresented && uiViewController.isPresenting {
-                uiViewController.dismissSheet()
-            }
+        if isPresented && !uiViewController.isPresenting {
+            uiViewController.presentSheet(with: content)
+        } else if !isPresented && uiViewController.isPresenting {
+            uiViewController.dismissSheet()
         }
+    }
 }
+
 // MARK: - Helper UIViewController for HalfSheet
 class HalfSheetViewController: UIViewController {
     var isPresenting = false
@@ -765,6 +780,7 @@ extension HalfSheetViewController: UIAdaptivePresentationControllerDelegate {
         onDismiss?()
     }
 }
+
 // MARK: - Supporting Types
 enum ReportTab {
     case income
@@ -792,5 +808,6 @@ struct ReportViewTab_Previews: PreviewProvider {
             transactionManager: TransactionManager(),
             budgetManager: BudgetManager()
         )
+        .preferredColorScheme(.dark) // Preview in dark mode
     }
 }

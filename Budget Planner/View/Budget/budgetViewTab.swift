@@ -59,14 +59,14 @@ struct budgetViewTab: View {
                             showAddBudget = true
                         }) {
                             Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(.white)
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(Color(.systemBackground))
+                                .padding()
+                                .background(Color.primary)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
                         }
-                        .frame(width: 50, height: 50)
-                        .background(Color.black)
-                        .clipShape(Circle())
-                        .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
-                        .padding(.trailing, 24)
+                        .padding(.trailing, 16)
                         .padding(.bottom, 16)
                     }
                 }
@@ -275,7 +275,7 @@ struct BudgetCard: View {
                     Text("\(currencyManager.selectedCurrency.symbol)\(formatAmount(remainingAmount))")
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Text("\(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", sspentForThisBudget)) / \(currencyManager.selectedCurrency.symbol)\(String(format: "%.2f", budget.budgetAmount))")
                         .font(.caption)
@@ -287,12 +287,12 @@ struct BudgetCard: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .fill(Color(.systemGray5))
+                            .fill(Color.secondary)
                             .frame(height: 8)
                             .cornerRadius(4)
                         
                         Rectangle()
-                            .fill(.black)
+                            .fill(.primary)
                             .frame(
                                 width: min(
                                     geometry.size.width * CGFloat(progressPercentage / 100),
@@ -323,7 +323,7 @@ struct BudgetCard: View {
         .padding(.vertical, 16)
         .background(Color(.systemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.05), radius: 8, x: 0, y: 2)
     }
     
     // Days remaining (same as before)

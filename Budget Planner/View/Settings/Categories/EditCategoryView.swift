@@ -38,9 +38,9 @@ struct EditCategoryView: View {
                 }) {
                     Text("Income")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(selectedType == .income ? .white : .black)
+                        .foregroundColor(selectedType == .income ? Color(.systemBackground) : Color(.label))
                         .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(selectedType == .income ? Color.black : Color.clear)
+                        .background(selectedType == .income ? Color(.label) : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 
@@ -51,14 +51,14 @@ struct EditCategoryView: View {
                 }) {
                     Text("Expense")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(selectedType == .expense ? .white : .black)
+                        .foregroundColor(selectedType == .expense ? Color(.systemBackground) : Color(.label))
                         .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(selectedType == .expense ? Color.black : Color.clear)
+                        .background(selectedType == .expense ? Color(.label) : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
             .padding(4)
-            .background(Color(.systemGray6))
+            .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal)
             
@@ -70,7 +70,7 @@ struct EditCategoryView: View {
                     Text(selectedEmoji)
                         .font(.system(size: 40))
                         .frame(width: 80, height: 80)
-                        .background(Color.gray.opacity(0.1))
+                        .background(Color(.secondarySystemBackground))
                         .clipShape(Circle())
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -81,7 +81,7 @@ struct EditCategoryView: View {
                     .frame(height: 50)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color(.systemGray6), lineWidth: 3)
+                            .stroke(Color(.separator), lineWidth: 1)
                     )
                     .padding(.horizontal)
                 
@@ -91,8 +91,8 @@ struct EditCategoryView: View {
                         .font(.system(size: 17, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .foregroundColor(.white)
-                        .background(categoryName.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color(.systemBackground))
+                        .background(categoryName.isEmpty ? Color(.tertiaryLabel) : Color(.label))
                         .cornerRadius(12)
                 }
                 .disabled(categoryName.isEmpty)
@@ -115,11 +115,11 @@ struct EditCategoryView: View {
                         isPresented = false
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                         Text("Edit Category")
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                 }
             }

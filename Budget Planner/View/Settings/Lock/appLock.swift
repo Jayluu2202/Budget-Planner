@@ -24,7 +24,7 @@ struct AppLockView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                 }
                 .padding(.top, 10)
                 .padding(.horizontal)
@@ -43,7 +43,7 @@ struct AppLockView: View {
                 HStack(spacing: 15) {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 25))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Password Lock")
@@ -74,7 +74,7 @@ struct AppLockView: View {
                 HStack(spacing: 15) {
                     Image(systemName: "faceid")
                         .font(.system(size: 25))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text("FaceID")
@@ -110,12 +110,12 @@ struct AppLockView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.black, lineWidth: 1)
+                    .stroke(Color.primary, lineWidth: 1)
                     
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
             )
             .padding(.horizontal)
             

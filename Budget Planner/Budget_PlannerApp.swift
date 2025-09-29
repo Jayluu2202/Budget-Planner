@@ -13,6 +13,7 @@ struct Budget_PlannerApp: App {
     @StateObject private var onboardingManager = OnboardingManager()
     @StateObject private var transactionManager = TransactionManager.shared
     @StateObject private var currencyManager = CurrencyManager()
+    @StateObject private var themeManager = ThemeManager()
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
@@ -32,8 +33,10 @@ struct Budget_PlannerApp: App {
                         .environmentObject(appLockManager)
                         .environmentObject(transactionManager)
                         .environmentObject(currencyManager)
+                        .environmentObject(themeManager)
                 }
             }
+            .preferredColorScheme(themeManager.colorScheme)
             .onChange(of: scenePhase) { newPhase in
                 switch newPhase {
                 case .background, .inactive:

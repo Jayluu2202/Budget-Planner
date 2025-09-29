@@ -2,7 +2,7 @@
 //  MyWealth.swift
 //  Budget Planner
 //
-//  Updated with proper tab bar hiding solutions
+//  Updated with proper dark mode color support
 //
 
 import SwiftUI
@@ -22,12 +22,12 @@ struct MyWealth: View {
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Text("Wealth Overview")
                         .font(.title2)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -41,20 +41,20 @@ struct MyWealth: View {
                     VStack(spacing: 12) {
                         Text("CURRENT TOTAL BALANCE")
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                             .tracking(0.5)
                         
                         Text("\(actualCurrency)\(formattedTotalBalance)")
                             .font(.system(size: 36, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
-                    .background(Color.white)
+                    .background(Color(.systemBackground))
                     .cornerRadius(16)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            .stroke(Color(.separator), lineWidth: 1)
                     )
                     .padding(.horizontal, 20)
                     
@@ -68,11 +68,11 @@ struct MyWealth: View {
                             
                             Text("Check Future Wealth")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(.systemBackground))
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(Color.black)
+                        .background(Color(.label))
                         .cornerRadius(12)
                     }
                     .padding(.horizontal, 20)
@@ -82,7 +82,7 @@ struct MyWealth: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Account Balances")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                                 .padding(.horizontal, 20)
                             
                             VStack(spacing: 12) {
@@ -98,13 +98,13 @@ struct MyWealth: View {
                             AccountSummaryCard(
                                 number: positiveAccountsCount,
                                 title: "Positive Accounts",
-                                backgroundColor: Color.white
+                                backgroundColor: Color(.systemBackground)
                             )
                             
                             AccountSummaryCard(
                                 number: negativeAccountsCount,
                                 title: "Negative Accounts",
-                                backgroundColor: Color.white
+                                backgroundColor: Color(.systemBackground)
                             )
                         }
                         .padding(.horizontal, 20)
@@ -114,15 +114,15 @@ struct MyWealth: View {
                         VStack(spacing: 16) {
                             Image(systemName: "creditcard")
                                 .font(.system(size: 50))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                             
                             Text("No Accounts Yet")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                             Text("Add your first account to start tracking your wealth")
                                 .font(.system(size: 16))
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                         }
                         .frame(maxWidth: .infinity)
@@ -132,7 +132,7 @@ struct MyWealth: View {
                 }
             }
         }
-        .background(Color(.systemGray6))
+        .background(Color(.systemGroupedBackground))
         .navigationBarHidden(true)
         .onAppear {
             accountStore.loadAccounts()
@@ -228,7 +228,7 @@ extension MyWealth {
     }
 }
 
-// MARK: - Supporting Views (unchanged)
+// MARK: - Supporting Views
 
 struct AccountBalanceRow: View {
     let account: Account
@@ -243,22 +243,22 @@ struct AccountBalanceRow: View {
             
             Text(account.name)
                 .font(.system(size: 17, weight: .medium))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Spacer()
             let actualCurrency = CurrencyManager().selectedCurrency.symbol
             
             Text("\(actualCurrency)\(formattedBalance)")
                 .font(.system(size: 17, weight: .medium))
-                .foregroundColor(account.balance >= 0 ? .green : .red)
+                .foregroundColor(account.balance >= 0 ? Color(.systemGreen) : Color(.systemRed))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                .stroke(Color(.separator), lineWidth: 1)
         )
     }
     
@@ -279,11 +279,11 @@ struct AccountSummaryCard: View {
         VStack(spacing: 8) {
             Text("\(number)")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Text(title)
                 .font(.system(size: 14))
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -292,13 +292,21 @@ struct AccountSummaryCard: View {
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                .stroke(Color(.separator), lineWidth: 1)
         )
     }
 }
 
 struct MyWealth_Previews: PreviewProvider {
     static var previews: some View {
-        MyWealth()
+        Group {
+            MyWealth()
+                .preferredColorScheme(.light)
+                .previewDisplayName("Light Mode")
+            
+            MyWealth()
+                .preferredColorScheme(.dark)
+                .previewDisplayName("Dark Mode")
+        }
     }
 }

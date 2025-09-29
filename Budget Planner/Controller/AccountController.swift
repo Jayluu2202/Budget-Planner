@@ -55,7 +55,7 @@ class AccountStore: ObservableObject {
     
     private func addDefaultAccounts() {
         let defaultAccounts = [
-            Account(name: "Cash", emoji: "🏛️", balance: 0),
+            Account(name: "Cash", emoji: "💵", balance: 0),
             Account(name: "Credit Card", emoji: "🏛️", balance: 0),
             Account(name: "Debit Card", emoji: "💳", balance: 0)
         ]

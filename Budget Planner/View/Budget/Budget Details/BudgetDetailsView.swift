@@ -132,7 +132,7 @@ struct BudgetDetailsView: View {
             }
             .navigationBarHidden(true)
             .navigationBarBackButtonHidden(true)
-            .background(Color(.white))
+            .background(Color(.systemBackground))
             .onAppear{
                 hideTabBarLegacy()
             }
@@ -182,11 +182,9 @@ struct BudgetDetailsView: View {
                 // Back Button - FIXED: Use presentationMode.wrappedValue.dismiss()
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
-                    print("Navigating back to budget overview")
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.title2)
-                        .foregroundColor(.black)
                     
                     // Category Icon and Name
                     Text(budget.category.emoji)
@@ -195,8 +193,8 @@ struct BudgetDetailsView: View {
                     Text(budget.category.name)
                         .font(.title2)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
                 }
+                .foregroundColor(Color.primary)
                 Spacer()
             }
             .padding(.horizontal, 20)
@@ -204,7 +202,7 @@ struct BudgetDetailsView: View {
             Divider()
         }
         .padding(.top, 60)
-        .background(Color(.white))
+        .background(Color(.systemBackground))
         .edgesIgnoringSafeArea(.top)
     }
     
@@ -225,14 +223,14 @@ struct BudgetDetailsView: View {
                         Text(formatMonthYear(month))
                             .font(.body)
                             .fontWeight(.medium)
-                            .foregroundColor(isSelected ? .white : .black)
+                            .foregroundColor(isSelected ? Color(.systemBackground) : .primary)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(isSelected ? Color.black : Color(.white))
+                            .background(isSelected ? Color.primary : Color(.systemBackground))
                             .cornerRadius(20)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20)
-                                    .stroke(isSelected ? .clear: .gray, lineWidth: 2)
+                                    .stroke(isSelected ? .clear : Color(.systemGray4), lineWidth: 2)
                             )
                     }
                 }
@@ -247,14 +245,14 @@ struct BudgetDetailsView: View {
                     Text(formatMonthYear(today))
                         .font(.body)
                         .fontWeight(.medium)
-                        .foregroundColor(isSelected ? .white : .black)
+                        .foregroundColor(isSelected ? Color(.systemBackground) : .primary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(isSelected ? Color.black : Color(.white))
+                        .background(isSelected ? Color.primary : Color(.systemBackground))
                         .cornerRadius(20)
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
-                                .stroke(isSelected ? .clear : .gray)
+                                .stroke(isSelected ? .clear : Color(.systemGray4))
                         )
                 }
             }
@@ -332,7 +330,7 @@ struct BudgetDetailsView: View {
                 
                 // Divider
                 Rectangle()
-                    .fill(Color(.systemGray4))
+                    .fill(Color.secondary)
                     .frame(width: 1, height: 80)
                     .padding(.top, scaleH(-25))
                 // Total Budget
@@ -356,13 +354,13 @@ struct BudgetDetailsView: View {
                     ZStack(alignment: .leading) {
                         // Background
                         Rectangle()
-                            .fill(Color(.systemGray5))
+                            .fill(Color(.systemGray4))
                             .frame(height: 8)
                             .cornerRadius(4)
                         
                         // Progress
                         Rectangle()
-                            .fill(.black)
+                            .fill(.primary)
                             .frame(
                                 width: min(
                                     geometry.size.width * CGFloat(progressPercentage / 100),
@@ -385,25 +383,25 @@ struct BudgetDetailsView: View {
                     //1st date of the month
                     Text(formatDate(startOfMonth))
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.7))
+                        .foregroundColor(.secondary)
                     
                     Spacer()
                     // last date of the month
                     Text(formatDate(lastOfMonth))
                         .font(.caption)
-                        .foregroundColor(Color.black.opacity(0.7))
+                        .foregroundColor(.secondary)
                 }
                 
                 // Remaining Days
                 Text("\(remainingDays) Remaining Days")
                     .font(.body)
                     .fontWeight(.medium)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 24)
-        .background(Color(.white))
+        .background(Color(.secondarySystemBackground))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color(.systemGray4), lineWidth: 4)
@@ -432,7 +430,7 @@ struct BudgetDetailsView: View {
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(.black), lineWidth: 2)
+                        .stroke(.primary, lineWidth: 2)
                 )
             }
             
@@ -471,10 +469,10 @@ struct BudgetDetailsView: View {
             Text("View Transactions")
                 .font(.headline)
                 .fontWeight(.medium)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color(.systemBackground))
+                .background(Color(.secondarySystemBackground))
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -490,6 +488,7 @@ struct BudgetDetailsView: View {
             Text("Recent Transactions")
                 .font(.headline)
                 .fontWeight(.semibold)
+                .foregroundColor(.primary)
                 .padding(.leading, 4)
             
             VStack(spacing: 12) {
@@ -518,7 +517,7 @@ struct BudgetDetailsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(.systemBackground))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(12)
                 }
             }
@@ -682,13 +681,13 @@ struct EditBudgetView: View {
                 Button("Cancel") {
                     dismiss()
                 }
-                
+                .foregroundColor(.primary)
                 Spacer()
                 
                 Text("Edit Budget")
                     .font(.title2)
                     .fontWeight(.semibold)
-                
+                    .foregroundColor(.primary)
                 Spacer()
                 
                 Button("Save") {
@@ -699,7 +698,7 @@ struct EditBudgetView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
-            
+            .background(Color(.systemBackground))
             // Content
             VStack(spacing: 24) {
                 // Category Display (Read-only)
@@ -719,7 +718,7 @@ struct EditBudgetView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 16)
-                    .background(Color(.systemGray6))
+                    .background(Color(.tertiarySystemBackground))
                     .cornerRadius(12)
                 }
                 
@@ -741,7 +740,7 @@ struct EditBudgetView: View {
                         }
                         
                         Slider(value: $sliderValue, in: 0...10000, step: 100)
-                            .accentColor(.black)
+                            .accentColor(.primary)
                     }
                     .padding(.horizontal, 4)
                     
@@ -752,12 +751,13 @@ struct EditBudgetView: View {
                         
                         TextField("1000", text: $budgetAmount)
                             .font(.title2)
+                            .foregroundColor(.primary)
                             .keyboardType(.numberPad)
                             .textFieldStyle(PlainTextFieldStyle())
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 16)
-                    .background(Color(.systemGray6))
+                    .background(Color(.tertiarySystemBackground))
                     .cornerRadius(12)
                 }
                 
@@ -769,13 +769,14 @@ struct EditBudgetView: View {
                     
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.systemGray6))
+                            .fill(Color(.tertiarySystemBackground))
                             .frame(height: 100)
                         
                         TextEditor(text: $description)
                             .padding(10)
                             .frame(height: 100)
                             .background(Color.clear)
+                            .foregroundColor(.primary)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                         
                         
@@ -793,6 +794,7 @@ struct EditBudgetView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 24)
+            .background(Color(.systemBackground))
         }
         .onChange(of: sliderValue) { newValue in
             budgetAmount = String(Int(newValue))

@@ -47,9 +47,9 @@ struct homeViewTab: View {
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(.systemBackground))
                             .padding()
-                            .background(Color.black)
+                            .background(Color.primary)
                             .clipShape(Circle())
                             .shadow(radius: 5)
                     }
@@ -165,7 +165,7 @@ struct homeViewTab: View {
                 HStack {
                     Text("No transactions for this date")
                         .font(.body)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     Spacer()
                 }
                 .padding(.vertical, 20)
@@ -421,9 +421,9 @@ struct DayView: View {
         } else if isToday {
             return .orange
         } else if hasTransactions {
-            return .gray.opacity(0.6)
+            return .secondary.opacity(0.6)
         } else {
-            return .gray.opacity(0.3)
+            return .secondary.opacity(0.3)
         }
     }
     

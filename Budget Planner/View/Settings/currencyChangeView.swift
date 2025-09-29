@@ -56,12 +56,12 @@ struct CurrencyChangeView: View {
                 HStack(spacing: 20){
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Text("Select Currency")
                         .font(.title2)
                         .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -73,7 +73,7 @@ struct CurrencyChangeView: View {
     private var searchBarView: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
+                .foregroundColor(Color(.secondaryLabel))
             
             TextField("Search currency", text: $searchText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -94,10 +94,10 @@ struct CurrencyChangeView: View {
                     }
                     .padding(.horizontal)
                     .frame(height: 60)
-                    .background(Color.white)
+//                    .background(Color(.secondarySystemBackground))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(selectedCurrency?.code == currency.code ? Color.black : Color(.systemGray6), lineWidth: 2)
+                            .stroke(selectedCurrency?.code == currency.code ? Color.primary : Color.secondary, lineWidth: 2)
                             .padding(.horizontal, 10)
                     )
                 }
@@ -115,10 +115,18 @@ struct CurrencyChangeView: View {
         }) {
             Text("Save")
                 .font(.headline)
-                .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.black)
+                .foregroundColor(
+                    Color(UIColor { traitCollection in
+                        traitCollection.userInterfaceStyle == .dark ? .black : .white
+                    })
+                )
+                .background(
+                    Color(UIColor { traitCollection in
+                        traitCollection.userInterfaceStyle == .dark ? .white : .black
+                    })
+                )
                 .cornerRadius(10)
         }
         .padding(.horizontal)
@@ -198,10 +206,10 @@ struct CurrencyRowView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(currency.code)
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(Color(.label))
                     Text(currency.name)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color(.secondaryLabel))
                 }
                 
                 Spacer()
@@ -209,7 +217,7 @@ struct CurrencyRowView: View {
                 Text(currency.symbol)
                     .font(.title2)
                     .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color(.label))
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 16)

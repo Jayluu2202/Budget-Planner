@@ -23,12 +23,12 @@ struct AccountsView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             
                             Text("Accounts")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                         }
                     }
                     Spacer()
@@ -40,8 +40,8 @@ struct AccountsView: View {
                             Text("Add")
                                 .font(.system(size: 17, weight: .medium))
                                 .frame(width: 50, height: 30)
-                                .foregroundColor(.white)
-                                .background(Color.black)
+                                .foregroundColor(Color(.secondarySystemBackground))
+                                .background(Color.primary)
                                 .cornerRadius(6)
                         }
                     }
@@ -51,7 +51,7 @@ struct AccountsView: View {
                 .padding(.bottom, 20)
                 
                 Divider()
-                    .background(Color.gray.opacity(0.3))
+                    .background(Color.secondary.opacity(0.3))
                 
                 // Accounts List
                 ScrollView {
@@ -74,7 +74,7 @@ struct AccountsView: View {
                 
                 Spacer()
             }
-            .background(Color(.white))
+            .background(Color(.systemBackground))
             .navigationBarHidden(true)
         }
         .onAppear{
@@ -163,7 +163,7 @@ struct AccountRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(account.name)
                     .font(.system(size: 17, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 
                 Text(AccountStore().formatBalance(balance: account.balance))
                     .font(.system(size: 15))
@@ -175,20 +175,25 @@ struct AccountRow: View {
             // Arrow
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray, lineWidth: 1)
+                    .stroke(Color.secondary, lineWidth: 1)
         )
     }
 }
 
 struct AccountsView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountsView()
+        Group {
+            AccountsView()
+                .previewInterfaceOrientation(.portrait)
+            AccountsView()
+                .previewInterfaceOrientation(.portrait)
+        }
     }
 }

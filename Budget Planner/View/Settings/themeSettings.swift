@@ -9,7 +9,8 @@ import SwiftUI
 import UIKit
 struct themeSettings: View {
     @Environment(\.dismiss) var dismiss
-    @Binding var selectedTheme : String
+    @EnvironmentObject var themeManager: ThemeManager
+//    @Binding var selectedTheme : String
 //    @AppStorage("selectedTheme") var selectedTheme: String = "System"
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -41,18 +42,16 @@ struct themeSettings: View {
             
             // Options
             VStack(spacing: 12) {
-                themeOption(title: "Light", systemImage: "lightModeLight", selectedTheme: $selectedTheme)
-                themeOption(title: "Dark", systemImage: "darkModeLight", selectedTheme: $selectedTheme)
-                themeOption(title: "System", systemImage: "systemDark", selectedTheme: $selectedTheme)
+                themeOption(title: "Light", systemImage: "light", selectedTheme: $themeManager.selectedTheme)
+                themeOption(title: "Dark", systemImage: "dark", selectedTheme: $themeManager.selectedTheme)
+                themeOption(title: "System", systemImage: "system", selectedTheme: $themeManager.selectedTheme)
             }
             .padding(.horizontal)
             
             Spacer()
         }
         .preferredColorScheme(
-            selectedTheme == "Light" ? .light :
-                selectedTheme == "Dark" ? .dark :
-                nil // nil = system
+            themeManager.colorScheme
         )
         .onAppear{
             hideTabBarLegacy()
@@ -129,27 +128,14 @@ struct themeOption: View {
     @Binding var selectedTheme: String
     
     @Environment(\.colorScheme) var colorScheme
-    
-    private var dynamicImageName: String {
-        if colorScheme == .dark {
-            switch systemImage {
-            case "lightModeLight": return "lightModeDark"
-            case "darkModeLight": return "darkModeDark"
-            case "systemDark": return "systemLight"
-            default: return systemImage
-            }
-        } else {
-            return systemImage
-        }
-    }
-    
+        
     var body: some View {
         Button(action: {
             selectedTheme = title
             print("Checking theme Selected: \(selectedTheme)")
         }) {
             HStack {
-                Image(dynamicImageName)
+                Image(systemImage)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
@@ -170,10 +156,9 @@ struct themeOption: View {
     }
 }
 
-//struct themeSettings_Previews: PreviewProvider {
-//    @State var selectedState : String = "Light"
-//    static var previews: some View {
-//
-//        themeSettings(selectedTheme: $selectedState)
-//    }
-//}
+struct themeSettings_Previews: PreviewProvider {
+    static var previews: some View {
+        themeSettings()
+            .environmentObject(ThemeManager())
+    }
+}
